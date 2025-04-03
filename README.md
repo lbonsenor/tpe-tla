@@ -1,4 +1,4 @@
-# Proyecto Especial
+# Proyecto Especial - `LaNgTeX`
 
 > [!NOTE]
 >
