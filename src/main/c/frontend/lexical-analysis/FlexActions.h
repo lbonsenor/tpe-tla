@@ -31,4 +31,37 @@ Token ParenthesisLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, T
 
 Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 
+// LaTeX Actions
+
+// TODO
+/// @brief Action for the LaTeX comment initialization (`% This is a comment`)
+/// @param lexicalAnalyzerContext 
+void CommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
+// TODO
+/// @brief Action for the LaTeX environment initialization (`\begin{environment}`)
+/// @param lexicalAnalyzerContext 
+Token BeginCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
+// TODO
+/// @brief Action for the LaTeX environment finalization (`\end{function}`)
+/// @param lexicalAnalyzerContext 
+Token EndCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
+// TODO
+/// @brief Action for command initialization (`\command`)
+/// @param lexicalAnalyzerContext 
+Token CommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
+// TODO
+/// @brief Action for brace initialization and finalization (`{}`)
+/// @param lexicalAnalyzerContext 
+/// @param token 
+Token BraceLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+
+// TODO
+/// @brief Action for basic text in document
+/// @param lexicalAnalyzerContext 
+Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
 #endif

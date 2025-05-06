@@ -44,6 +44,19 @@
 [[:space:]]+						{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 .									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
+/* LaTeX Patterns */
+"\\begin"                           { return BeginCommandLexemeAction(createLexicalAnalyzerContext()); }
+"\\end"                             { return EndCommandLexemeAction(createLexicalAnalyzerContext()); }
+
+"\\[a-zA-Z@]+"                      { return CommandLexemeAction(createLexicalAnalyzerContext()); }
+"{"                                 { return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
+"}"                                 { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
+
+"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext()); }
+
+[[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
+[[:alnum:][:punct:]]+               { TextLexemeAction(createLexicalAnalyzerContext()); }
+
 %%
 
 #include "FlexExport.h"

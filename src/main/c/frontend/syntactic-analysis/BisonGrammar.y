@@ -18,7 +18,12 @@
 	Constant * constant;
 	Expression * expression;
 	Factor * factor;
+
+	/** LaTeX Non-terminals. */
 	Program * program;
+	Command * command;
+	Content * content;
+	Text * text;
 }
 
 /**
@@ -42,13 +47,26 @@
 %token <token> OPEN_PARENTHESIS
 %token <token> SUB
 
+/** LaTeX Terminals */
+%token <token> COMMAND
+%token <token> BEGIN
+%token <token> END
+%token <token> OPEN_BRACE
+%token <token> CLOSE_BRACE
+%token <token> TEXT
+
 %token <token> UNKNOWN
 
 /** Non-terminals. */
 %type <constant> constant
 %type <expression> expression
 %type <factor> factor
+
+/** LaTeX Non-terminals. */
 %type <program> program
+%type <command> command
+%type <content> content
+%type <text> text
 
 /**
  * Precedence and associativity.
@@ -78,5 +96,7 @@ factor: OPEN_PARENTHESIS expression CLOSE_PARENTHESIS				{ $$ = ExpressionFactor
 
 constant: INTEGER													{ $$ = IntegerConstantSemanticAction($1); }
 	;
+
+// TODO Add LaTeX Non-terminals
 
 %%
