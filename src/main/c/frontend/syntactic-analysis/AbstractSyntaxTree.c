@@ -4,11 +4,11 @@
 
 static Logger * _logger = NULL;
 
-void initializeAbstractSyntaxTreeModule() {
+void initializeRenameMeModule() {
 	_logger = createLogger("AbstractSyntxTree");
 }
 
-void shutdownAbstractSyntaxTreeModule() {
+void shutdownRenameMeModule() {
 	if (_logger != NULL) {
 		destroyLogger(_logger);
 	}

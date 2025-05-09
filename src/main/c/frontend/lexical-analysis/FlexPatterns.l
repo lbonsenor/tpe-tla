@@ -14,7 +14,6 @@
  *
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
-%x MULTILINE_COMMENT
 
 /**
  * Reusable patterns.
@@ -23,40 +22,25 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
+/* TODO: \t{ is allowed for some reason, but \t { isn't (as it should) */
+
 %%
 
-"/*"								{ BEGIN(MULTILINE_COMMENT); BeginMultilineCommentLexemeAction(createLexicalAnalyzerContext()); }
-<MULTILINE_COMMENT>"*/"				{ EndMultilineCommentLexemeAction(createLexicalAnalyzerContext()); BEGIN(INITIAL); }
-<MULTILINE_COMMENT>[[:space:]]+		{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-<MULTILINE_COMMENT>[^*]+			{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-<MULTILINE_COMMENT>.				{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-
-"-"									{ return ArithmeticOperatorLexemeAction(createLexicalAnalyzerContext(), SUB); }
-"*"									{ return ArithmeticOperatorLexemeAction(createLexicalAnalyzerContext(), MUL); }
-"/"									{ return ArithmeticOperatorLexemeAction(createLexicalAnalyzerContext(), DIV); }
-"+"									{ return ArithmeticOperatorLexemeAction(createLexicalAnalyzerContext(), ADD); }
-
-"("									{ return ParenthesisLexemeAction(createLexicalAnalyzerContext(), OPEN_PARENTHESIS); }
-")"									{ return ParenthesisLexemeAction(createLexicalAnalyzerContext(), CLOSE_PARENTHESIS); }
-
-[[:digit:]]+						{ return IntegerLexemeAction(createLexicalAnalyzerContext()); }
-
-[[:space:]]+						{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-.									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
-
-/* LaTeX Patterns */
 "\\begin"                           { return BeginCommandLexemeAction(createLexicalAnalyzerContext()); }
 "\\end"                             { return EndCommandLexemeAction(createLexicalAnalyzerContext()); }
 
-"\\[a-zA-Z@]+"                      { return CommandLexemeAction(createLexicalAnalyzerContext()); }
 "{"                                 { return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
 "}"                                 { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
 
-"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext()); }
+"\\[a-zA-Z@]+"                      { return CommandLexemeAction(createLexicalAnalyzerContext(), COMMAND); }
+
+"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 
 [[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-[[:alnum:][:punct:]]+               { TextLexemeAction(createLexicalAnalyzerContext()); }
+[[:alnum:][:punct:]]+               { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
+
+/* LaNgTeX Patterns */
 
 #include "FlexExport.h"

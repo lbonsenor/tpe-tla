@@ -31,50 +31,10 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 
 /* PUBLIC FUNCTIONS */
 
-Constant * IntegerConstantSemanticAction(const int value) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Constant * constant = calloc(1, sizeof(Constant));
-	constant->value = value;
-	return constant;
-}
-
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->leftExpression = leftExpression;
-	expression->rightExpression = rightExpression;
-	expression->type = type;
-	return expression;
-}
-
-Expression * FactorExpressionSemanticAction(Factor * factor) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->factor = factor;
-	expression->type = FACTOR;
-	return expression;
-}
-
-Factor * ConstantFactorSemanticAction(Constant * constant) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Factor * factor = calloc(1, sizeof(Factor));
-	factor->constant = constant;
-	factor->type = CONSTANT;
-	return factor;
-}
-
-Factor * ExpressionFactorSemanticAction(Expression * expression) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Factor * factor = calloc(1, sizeof(Factor));
-	factor->expression = expression;
-	factor->type = EXPRESSION;
-	return factor;
-}
-
-Program * ExpressionProgramSemanticAction(CompilerState * compilerState, Expression * expression) {
+Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
-	program->expression = expression;
+	program->content = content;
 	compilerState->abstractSyntaxtTree = program;
 	if (0 < flexCurrentContext()) {
 		logError(_logger, "The final context is not the default (0): %d", flexCurrentContext());
@@ -85,3 +45,72 @@ Program * ExpressionProgramSemanticAction(CompilerState * compilerState, Express
 	}
 	return program;
 }
+ Content * AppendContentSemanticAction(Element * element, Content * content){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Content * newContent = calloc(1, sizeof(Content));
+	newContent->sequenceElement = element;
+	newContent->sequenceContent = content;
+	newContent->type = SEQUENCE;
+	return newContent;
+ }
+ Content * SingleContentSemanticAction(Element * element){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Content * newContent = calloc(1, sizeof(Content));
+	newContent->element = element;
+	newContent->type = ELEMENT;
+	return newContent;
+
+ }
+
+ Command * SimpleCommandSemanticAction(char * command){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Command * newCommand = calloc(1, sizeof(Command));
+	newCommand->simpleCommand = command;
+	newCommand->type = SIMPLE;
+	return newCommand;
+ }
+
+ Command * ParameterizedCommandSemanticAction(char * command, Content * content){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Command * newCommand = calloc(1, sizeof(Command));
+	newCommand->parameterizedCommand = command;
+	newCommand->parameterizedContent = content;
+	newCommand->type = PARAMETERIZED;
+	return newCommand;
+ } 
+ 
+ Command * EnvironmentCommandSemanticAction(Text * text, Content * content, Text * text2){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Command * newCommand = calloc(1, sizeof(Command));
+	newCommand->environmentLeftText = text;
+	newCommand->environmentContent = content;
+	newCommand->environmentRightText = text2;
+	newCommand->type = ENVIRONMENT;
+	return newCommand;
+ }
+
+ Text * TextSemanticAction(char * text){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Text * newText = calloc(1, sizeof(Text));
+	newText->text = text;
+	return newText;
+ }
+
+ Element * CommandElementSemanticAction(Command *command)
+ {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+	Element * newElement = calloc(1, sizeof(Element));
+	newElement->command = command;
+	newElement->text = NULL;
+	newElement->type = LATEX_COMMAND;
+	return newElement;
+ }
+
+ Element *TextElementSemanticAction(Text *text)
+ {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+	Element * newElement = calloc(1, sizeof(Element));
+	newElement->text = text;
+	newElement->type = LATEX_TEXT;
+	return newElement;
+ }

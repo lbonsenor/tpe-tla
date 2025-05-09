@@ -1,0 +1,90 @@
+#include "LaTeX.h"
+
+/* MODULE INTERNAL STATE */
+
+static Logger * _logger = NULL;
+
+void initializeRenameMeModule() {
+	_logger = createLogger("AbstractSyntxTree");
+}
+
+void shutdownRenameMeModule() {
+	if (_logger != NULL) {
+		destroyLogger(_logger);
+	}
+}
+
+/** PUBLIC FUNCTIONS */
+
+
+void releaseText(Text * text) {
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (text != NULL) {
+		free(text->text);
+        free(text);
+	}
+}
+
+void releaseCommand(Command * command){
+    if (command != NULL){
+        switch (command->type) {
+            case SIMPLE:
+            free(command->simpleCommand);
+            break;
+            case PARAMETERIZED:
+                free(command->parameterizedCommand);
+                releaseContent(command->parameterizedContent);
+                break;
+            case ENVIRONMENT:
+                releaseText(command->environmentLeftText);
+                releaseContent(command->environmentContent);
+                releaseText(command->environmentRightText);
+                break;
+            default:
+                break;
+        }
+        free(command);
+    }
+}
+
+void releaseElement(Element * element){
+    if (element != NULL){
+        switch (element->type) {
+            case LATEX_COMMAND:
+                releaseCommand(element->command);
+                break;
+            case LATEX_TEXT:
+                releaseText(element->text);
+                break;
+            default:
+                break;
+        }
+        free(element);
+    }
+}
+
+
+void releaseContent(Content * content){
+    if (content != NULL){
+        switch (content->type) {
+            case ELEMENT:
+                releaseElement(content->element);
+                break;
+            case SEQUENCE:
+                releaseElement(content->sequenceElement);
+                releaseContent(content->sequenceContent);
+                break;
+            default:
+                break;
+        }
+        free(content);
+    }
+}
+
+void releaseProgram(Program * program) {
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (program != NULL) {
+		releaseContent(program->content);
+		free(program);
+	}
+}

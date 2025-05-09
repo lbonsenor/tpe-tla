@@ -4,7 +4,8 @@
 #include "../../shared/CompilerState.h"
 #include "../../shared/Logger.h"
 #include "../../shared/Type.h"
-#include "AbstractSyntaxTree.h"
+#include "LaTeX.h"
+// #include "AbstractSyntaxTree.h"
 #include "SyntacticAnalyzer.h"
 #include <stdlib.h>
 
@@ -18,11 +19,15 @@ void shutdownBisonActionsModule();
  * Bison semantic actions.
  */
 
-Constant * IntegerConstantSemanticAction(const int value);
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type);
-Expression * FactorExpressionSemanticAction(Factor * factor);
-Factor * ConstantFactorSemanticAction(Constant * constant);
-Factor * ExpressionFactorSemanticAction(Expression * expression);
-Program * ExpressionProgramSemanticAction(CompilerState * compilerState, Expression * expression);
+ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content);
+ Content * AppendContentSemanticAction(Element * element, Content * content);
+ Content * SingleContentSemanticAction(Element * element);
+ Command * SimpleCommandSemanticAction(char * command);
+ Command * ParameterizedCommandSemanticAction(char * command, Content * content); 
+ Command * EnvironmentCommandSemanticAction(Text * text, Content * content, Text * text2);
+ Text * TextSemanticAction(char * text);
+
+ Element * CommandElementSemanticAction(Command * command);
+ Element * TextElementSemanticAction(Text * text);
 
 #endif

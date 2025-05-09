@@ -12,17 +12,14 @@
 
 	int integer;
 	Token token;
+	char * string;
 
 	/** Non-terminals. */
 
-	Constant * constant;
-	Expression * expression;
-	Factor * factor;
-
-	/** LaTeX Non-terminals. */
 	Program * program;
-	Command * command;
+	Element * element;
 	Content * content;
+	Command * command;
 	Text * text;
 }
 
@@ -34,38 +31,29 @@
  *
  * @see https://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
  */
-%destructor { releaseConstant($$); } <constant>
-%destructor { releaseExpression($$); } <expression>
-%destructor { releaseFactor($$); } <factor>
 
-/** Terminals. */
-%token <integer> INTEGER
-%token <token> ADD
-%token <token> CLOSE_PARENTHESIS
-%token <token> DIV
-%token <token> MUL
-%token <token> OPEN_PARENTHESIS
-%token <token> SUB
+%destructor { releaseText($$); } <text>
+%destructor { releaseCommand($$); } <command>
+%destructor { releaseElement($$); } <element>
+%destructor { releaseContent($$); } <content>
+
+
 
 /** LaTeX Terminals */
-%token <token> COMMAND
-%token <token> BEGIN
-%token <token> END
+%token <string> COMMAND
+%token <token> BEGIN_ENVIRONMENT
+%token <token> END_ENVIRONMENT
 %token <token> OPEN_BRACE
 %token <token> CLOSE_BRACE
-%token <token> TEXT
-
-%token <token> UNKNOWN
+%token <string> TEXT
 
 /** Non-terminals. */
-%type <constant> constant
-%type <expression> expression
-%type <factor> factor
 
 /** LaTeX Non-terminals. */
 %type <program> program
-%type <command> command
 %type <content> content
+%type <element> element
+%type <command> command
 %type <text> text
 
 /**
@@ -73,30 +61,30 @@
  *
  * @see https://www.gnu.org/software/bison/manual/html_node/Precedence.html
  */
-%left ADD SUB
-%left MUL DIV
 
 %%
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
-
-program: expression													{ $$ = ExpressionProgramSemanticAction(currentCompilerState(), $1); }
-	;
-
-expression: expression[left] ADD expression[right]					{ $$ = ArithmeticExpressionSemanticAction($left, $right, ADDITION); }
-	| expression[left] DIV expression[right]						{ $$ = ArithmeticExpressionSemanticAction($left, $right, DIVISION); }
-	| expression[left] MUL expression[right]						{ $$ = ArithmeticExpressionSemanticAction($left, $right, MULTIPLICATION); }
-	| expression[left] SUB expression[right]						{ $$ = ArithmeticExpressionSemanticAction($left, $right, SUBTRACTION); }
-	| factor														{ $$ = FactorExpressionSemanticAction($1); }
-	;
-
-factor: OPEN_PARENTHESIS expression CLOSE_PARENTHESIS				{ $$ = ExpressionFactorSemanticAction($2); }
-	| constant														{ $$ = ConstantFactorSemanticAction($1); }
-	;
-
-constant: INTEGER													{ $$ = IntegerConstantSemanticAction($1); }
-	;
-
 // TODO Add LaTeX Non-terminals
+program: content 													{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
+	;
+
+content:
+	element content  												{ $$ = AppendContentSemanticAction($1, $2); }
+	| element														{ $$ = SingleContentSemanticAction($1); }
+	;
+
+element:
+	command															{ $$ = CommandElementSemanticAction($1); }
+	| text															{ $$ = TextElementSemanticAction($1); }
+	;
+
+command:
+	COMMAND 							 											{ $$ = SimpleCommandSemanticAction($1); }
+	| COMMAND OPEN_BRACE content CLOSE_BRACE										{ $$ = ParameterizedCommandSemanticAction($1, $3); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE 	{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
+
+text:
+	TEXT 															{ $$ = TextSemanticAction($1); }
 
 %%
