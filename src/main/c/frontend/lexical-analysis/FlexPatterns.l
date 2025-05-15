@@ -29,10 +29,10 @@
 "\\begin"                           { return BeginCommandLexemeAction(createLexicalAnalyzerContext()); }
 "\\end"                             { return EndCommandLexemeAction(createLexicalAnalyzerContext()); }
 
-"{"                                 { return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
-"}"                                 { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
+\{                                  { printf("This is a startbrace\n"); return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
+\}                                  { printf("This is a brace\n"); return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
 
-"\\[a-zA-Z@]+"                      { return CommandLexemeAction(createLexicalAnalyzerContext(), COMMAND); }
+\\[a-zA-Z@]+                        { return CommandLexemeAction(createLexicalAnalyzerContext()); }
 
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 

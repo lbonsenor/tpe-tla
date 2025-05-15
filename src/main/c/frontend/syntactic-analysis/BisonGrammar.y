@@ -66,7 +66,8 @@
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 // TODO Add LaTeX Non-terminals
-program: content 													{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
+program: 
+	content 													{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
 	;
 
 content:

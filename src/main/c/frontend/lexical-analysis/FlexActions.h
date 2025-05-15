@@ -39,7 +39,7 @@ Token EndCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 
 /// @brief Action for command initialization (`\command`)
 /// @param lexicalAnalyzerContext 
-Token CommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token CommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 
 /// @brief Action for brace initialization and finalization (`{}`)
 /// @param lexicalAnalyzerContext 

@@ -62,9 +62,10 @@ Token EndCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext){
 	return END_ENVIRONMENT;
 }
 
-Token CommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
+Token CommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
-	lexicalAnalyzerContext->semanticValue->token = token;
+	lexicalAnalyzerContext->semanticValue->string = malloc(strlen(lexicalAnalyzerContext->lexeme) + 1);
+	strcpy(lexicalAnalyzerContext->semanticValue->string, lexicalAnalyzerContext->lexeme);
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 	return COMMAND;
 }
