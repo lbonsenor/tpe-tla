@@ -79,6 +79,7 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 
  Command * ParameterizedCommandSemanticAction(char * command, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
+	printf("Hello I'm parameterized\n");
 	Command * newCommand = calloc(1, sizeof(Command));
 	if (command != NULL)
 	{

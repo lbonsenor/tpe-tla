@@ -86,6 +86,7 @@ void CommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
 	lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
+	printf("%s", lexicalAnalyzerContext->semanticValue->string);
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 	return TEXT;
 }

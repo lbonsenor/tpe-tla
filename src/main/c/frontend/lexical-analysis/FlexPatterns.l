@@ -22,8 +22,6 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
-/* TODO: \t{ is allowed for some reason, but \t { isn't (as it should) */
-
 %%
 
 "\\begin"                           { return BeginCommandLexemeAction(createLexicalAnalyzerContext()); }
@@ -37,7 +35,7 @@
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 
 [[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-[[:alnum:][:punct:]]+               { return TextLexemeAction(createLexicalAnalyzerContext()); }
+[^\\{}#\$%\^&_~]+                   { printf("This is a text\n"); return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
 

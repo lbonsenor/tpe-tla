@@ -67,7 +67,7 @@
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 // TODO Add LaTeX Non-terminals
 program: 
-	content 													{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
+	content 														{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
 	;
 
 content:
@@ -81,9 +81,9 @@ element:
 	;
 
 command:
-	COMMAND 							 											{ $$ = SimpleCommandSemanticAction($1); }
-	| COMMAND OPEN_BRACE content CLOSE_BRACE										{ $$ = ParameterizedCommandSemanticAction($1, $3); }
-	| BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE 	{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
+	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE 	{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
+	| COMMAND OPEN_BRACE content CLOSE_BRACE						{ $$ = ParameterizedCommandSemanticAction($1, $3); }
+	| COMMAND 							 							{ $$ = SimpleCommandSemanticAction($1); } 
 
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }
