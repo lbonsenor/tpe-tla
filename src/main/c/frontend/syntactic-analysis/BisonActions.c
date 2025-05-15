@@ -34,7 +34,6 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
-	printf("Entering Content Program: %s\n", content->type == SEQUENCE ? "SEQUENCE" : "SINGLE");
 	program->content = content;
 	compilerState->abstractSyntaxtTree = program;
 	if (0 < flexCurrentContext()) {
@@ -48,8 +47,6 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 }
  Content * AppendContentSemanticAction(Element * element, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	printf("Entering Sequence Content\n");
-	printf("Type %s: Command: %s\n", element->type == LATEX_COMMAND ? "Latex" : "Text", element->command == NULL ? "null" : "not null");
 	Content * newContent = calloc(1, sizeof(Content));
 	newContent->sequenceElement = element;
 	newContent->sequenceContent = content;
@@ -60,7 +57,6 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 
  Content * SingleContentSemanticAction(Element * element){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	printf("Entering Single Content %s\n", element->type == LATEX_COMMAND ? "Command" : "Text");
 	Content * newContent = calloc(1, sizeof(Content));
 	newContent->element = element;
 	newContent->type = ELEMENT;
@@ -70,11 +66,9 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 
  Command * SimpleCommandSemanticAction(char * command){
     _logSyntacticAnalyzerAction(__FUNCTION__);
-	printf("Entering Simple Command: %s\n", command);
     Command * newCommand = calloc(1, sizeof(Command));
     if (command != NULL) {
-        newCommand->simpleCommand = malloc(strlen(command) + 1);
-		strcpy(newCommand->simpleCommand, command);
+        newCommand->simpleCommand = command;
     } else {
         newCommand->simpleCommand = NULL;
         logError(_logger, "SimpleCommandSemanticAction received NULL command");
@@ -88,8 +82,7 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	Command * newCommand = calloc(1, sizeof(Command));
 	if (command != NULL)
 	{
-		newCommand->parameterizedCommand = malloc(strlen(command) + 1);
-		strcpy(newCommand->parameterizedCommand, command);
+		newCommand->parameterizedCommand = command;
 	}
 	newCommand->parameterizedContent = content;
 	newCommand->type = PARAMETERIZED;
@@ -110,17 +103,14 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Text * newText = calloc(1, sizeof(Text));
 	newText->text = text;
-	printf("Entering Text\n");
 	return newText;
  }
 
  Element * CommandElementSemanticAction(Command *command)
  {
     _logSyntacticAnalyzerAction(__FUNCTION__);
-	printf("Entering Command Element: %s\n", command->simpleCommand);
 	Element * newElement = calloc(1, sizeof(Element));
 	newElement->command = command;
-	newElement->text = NULL;
 	newElement->type = LATEX_COMMAND;
 	return newElement;
  }
@@ -128,7 +118,6 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
  Element *TextElementSemanticAction(Text *text)
  {
     _logSyntacticAnalyzerAction(__FUNCTION__);
-	printf("Entering Text Element: %s\n", text->text);
 	Element * newElement = calloc(1, sizeof(Element));
 	newElement->text = text;
 	newElement->type = LATEX_TEXT;
