@@ -32,6 +32,6 @@ void shutdownBisonActionsModule();
  Element * TextElementSemanticAction(Text * text);
  Element * LangtexCommandSemanticAction(LangtexCommand *command);
  Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand);
- LangtexCommand * TranslateSemanticAction(Text *leftText, Text *rightText);
-
+ LangtexCommand * TranslateSemanticAction(Content *leftContent, Content *rightContent);
+ LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent);
 #endif

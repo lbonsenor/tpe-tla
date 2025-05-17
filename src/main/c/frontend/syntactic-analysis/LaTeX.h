@@ -37,7 +37,8 @@ void shutdownRenameMeModule();
 enum LangtexCommandType {
     LANGTEX_TRANSLATE,
     LANGTEX_EXERCISE,
-    LANGTEX_DIALOGUE
+    LANGTEX_DIALOGUE,
+    LANGTEX_SPEAKER
 };
 
 enum CommandType {
@@ -89,11 +90,15 @@ struct LangtexCommand{
    union {
     // [!translate] 
     struct {
-        Text * leftText;
-        Text * rightText;
+        Content * leftContent;
+        Content * rightContent;
+    };
+    // [!dialog]
+    struct {
+        Text * text;
+        Content * content;
     };
     // [!exercise]
-    // [!dialogue]
    };
    LangtexCommandType type;
 };
@@ -130,6 +135,6 @@ struct Program {
  void releaseElement(Element * Element);
  void releaseContent(Content * content);
  void releaseProgram(Program * program);
-
+ void releaseLangtexCommand(LangtexCommand * langtexCommand);
 
 #endif

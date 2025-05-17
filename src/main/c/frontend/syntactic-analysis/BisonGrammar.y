@@ -35,6 +35,7 @@
 
 %destructor { releaseText($$); } <text>
 %destructor { releaseCommand($$); } <command>
+%destructor { releaseLangtexCommand($$); } <langtexCommand>
 %destructor { releaseElement($$); } <element>
 %destructor { releaseContent($$); } <content>
 
@@ -56,6 +57,7 @@
 %token <token> TRANSLATE_COMMAND
 %token <token> EXERCISE_COMMAND
 %token <token> DIALOG_COMMAND
+%token <token> SPEAKER_COMMAND
 
 /** Non-terminals. */
 
@@ -105,9 +107,20 @@ command:
 		{ $$ = SimpleCommandSemanticAction($1); } 
 	;
 
+	/* [!dialog]{}
+    [!speaker]{Juan}{hola}
+	[!speaker]{Juan}{TRANSLATE!!} */
+
 langtexCommand: 
-	TRANSLATE_COMMAND OPEN_BRACE text CLOSE_BRACE OPEN_BRACE text CLOSE_BRACE  { $$ = TranslateSemanticAction($3, $6); }
+	TRANSLATE_COMMAND OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  { $$ = TranslateSemanticAction($3, $6); }
+	| SPEAKER_COMMAND OPEN_BRACE text CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($3, $6); }
 	;
+
+/* envDialog:
+	speakerCommand
+	| speakerCommand envDialog 
+	; */
+
 
 /* langtexParameters:
 	langtexParameter COMMA langtexParameter
@@ -116,7 +129,6 @@ langtexCommand:
 
 /* langtexParameter:
 	TEXT */
-
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }
 

@@ -47,7 +47,8 @@ LANGTEX_COMMAND OPEN_PARENTESIS text CLOSE_PARENTESIS CLOSE_BRACKET OPEN_BRACE c
 %%
 "[!translate]"                      { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),TRANSLATE_COMMAND); }
 "[!dialog]"                         { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),DIALOG_COMMAND); }
-"[!exercise]"                       { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),EXERCISE_COMMAND); }    
+"[!exercise]"                       { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),EXERCISE_COMMAND); }
+"[!speaker]"                        { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),SPEAKER_COMMAND); }
 "("                                 { return OPEN_PARENTHESIS; }
 ")"                                 { return CLOSE_PARENTHESIS;}
 ","                                 { return CommaLexemeAction(createLexicalAnalyzerContext()); }

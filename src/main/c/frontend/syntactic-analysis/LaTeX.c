@@ -50,9 +50,13 @@ void releaseCommand(Command * command){
 void releaseLangtexCommand(LangtexCommand * langtexCommand){
     if (langtexCommand != NULL){
         switch (langtexCommand->type) {
-            case LANGTEX_COMMAND:
-                releaseText(langtexCommand->leftText);
-                releaseText(langtexCommand->rightText);
+            case LANGTEX_TRANSLATE:
+                releaseContent(langtexCommand->rightContent);
+                releaseContent(langtexCommand->leftContent);
+                break;
+            case LANGTEX_SPEAKER:
+                releaseContent(langtexCommand->content);
+                releaseText(langtexCommand->text);
                 break;
             default:
                 break;

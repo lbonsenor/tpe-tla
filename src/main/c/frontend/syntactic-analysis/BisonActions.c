@@ -157,7 +157,7 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	return newElement;
  }
 
- LangtexCommand * TranslateSemanticAction(Text *leftText, Text *rightText)
+ LangtexCommand * TranslateSemanticAction(Content *leftContent, Content *rightContent)
  {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
@@ -165,9 +165,23 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	// 	logError(_logger, "TranslateSemanticAction received NULL parameter(s)");
 	// 	return NULL;
 	// }
-	langtexCommand->leftText=leftText;
-	langtexCommand->rightText=rightText;
+	langtexCommand->leftContent=leftContent;
+	langtexCommand->rightContent =rightContent;
 	langtexCommand->type = LANGTEX_TRANSLATE;
+	return langtexCommand;
+ }
+
+  LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent)
+ {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	// if (!contentBefore || !contentAfter) {
+	// 	logError(_logger, "TranslateSemanticAction received NULL parameter(s)");
+	// 	return NULL;
+	// }
+	langtexCommand->text =leftText;
+	langtexCommand->content =rightContent;
+	langtexCommand->type = LANGTEX_SPEAKER;
 	return langtexCommand;
  }
 
