@@ -79,18 +79,13 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 
  Command * ParameterizedCommandSemanticAction(char * command, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	// printf("Hello I'm parameterized\n"); <TODO change this
 	logDebugging(_logger, "Matched parameterized command");
 	Command * newCommand = calloc(1, sizeof(Command));
-	// TODO: sacar esto 
-	// if (command != NULL)
-	// {
-	// 	newCommand->parameterizedCommand = command;
-	// }
 	if (!command || !content) {
 		logError(_logger, "ParameterizedCommandSemanticAction received NULL argument(s)");
 		return NULL;
 	}
+	newCommand->parameterizedCommand = command;
 	newCommand->parameterizedContent = content;
 	newCommand->type = PARAMETERIZED;
 	return newCommand;
@@ -106,7 +101,6 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	if (strcmp(text->text, text2->text) != 0) {
 		logError(_logger, "Mismatched environment names: %s ≠ %s", text->text, text2->text);
 		currentCompilerState()->succeed = false;
-		// Could maybe set compilerState->succeed = false
 		return NULL;
 	}
 	Command * newCommand = calloc(1, sizeof(Command));
@@ -161,12 +155,8 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
  {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
-	// if (!contentBefore || !contentAfter) {
-	// 	logError(_logger, "TranslateSemanticAction received NULL parameter(s)");
-	// 	return NULL;
-	// }
-	langtexCommand->leftContent=leftContent;
-	langtexCommand->rightContent =rightContent;
+	langtexCommand->leftContent = leftContent;
+	langtexCommand->rightContent = rightContent;
 	langtexCommand->type = LANGTEX_TRANSLATE;
 	return langtexCommand;
  }
@@ -175,12 +165,8 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
  {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
-	// if (!contentBefore || !contentAfter) {
-	// 	logError(_logger, "TranslateSemanticAction received NULL parameter(s)");
-	// 	return NULL;
-	// }
-	langtexCommand->text =leftText;
-	langtexCommand->content =rightContent;
+	langtexCommand->text = leftText;
+	langtexCommand->content = rightContent;
 	langtexCommand->type = LANGTEX_SPEAKER;
 	return langtexCommand;
  }

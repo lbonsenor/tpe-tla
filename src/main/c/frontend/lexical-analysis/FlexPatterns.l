@@ -14,7 +14,6 @@
  *
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
-%x LANGTEX_EXPRESSION
 
 /**
  * Reusable patterns.
@@ -23,26 +22,6 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
-/* 
-[!t]{
-    }
-*/
-/* <LANGTEX_EXPRESSION>"([a-zA-Z]+)"   { return BeginLangtexParameterAction(createLexicalAnalyzerContext()); } */
-/* \[![a-zA-Z]+\]                      { return LangTexLexemeAction(createLexicalAnalyzerContext()); } */
-
-/* 
-
-[!translate         BeginLangtexcommand....
-
-LANGTEX_COMMAND CLOSE_BRACKET                                                                           simple
-LANGTEX_COMMAND OPEN_PARENTESIS text CLOSE_PARENTESIS CLOSE_BRACKET                                     parameterized
-LANGTEX_COMMAND CLOSE_BRACKET OPEN_BRACE content CLOSE_BRACE                                            environment
-LANGTEX_COMMAND OPEN_PARENTESIS text CLOSE_PARENTESIS CLOSE_BRACKET OPEN_BRACE content CLOSE_BRACE      parameterized_environment
-
-<LANGTEX_EXPRESSION>"\""([^\"\\]|\\.)*\"[[:space:]]*,[[:space:]]*\""([^\"\\]|\\.)*\"" 
-                                    { return TranslationContentLexemeAction();}
-
- */
 
 %%
 "[!translate]"                      { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),TRANSLATE_COMMAND); }
@@ -68,7 +47,5 @@ LANGTEX_COMMAND OPEN_PARENTESIS text CLOSE_PARENTESIS CLOSE_BRACKET OPEN_BRACE c
 [^\\{}#\$%\^&_~]+                { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
-
-/** LaNgTeX Patterns */
 
 #include "FlexExport.h"

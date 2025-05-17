@@ -5,7 +5,7 @@
 #include "../../shared/Logger.h"
 #include "../../shared/String.h"
 #include "../../shared/Type.h"
-#include "../syntactic-analysis/LaTeX.h"
+#include "../syntactic-analysis/LangTeXAST.h"
 #include "../syntactic-analysis/BisonParser.h"
 #include "LexicalAnalyzerContext.h"
 #include <stdio.h>

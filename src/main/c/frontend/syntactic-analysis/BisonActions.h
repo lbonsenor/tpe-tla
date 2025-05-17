@@ -4,8 +4,7 @@
 #include "../../shared/CompilerState.h"
 #include "../../shared/Logger.h"
 #include "../../shared/Type.h"
-#include "LaTeX.h"
-#include "LangTeX.h"
+#include "LangTeXAST.h"
 // #include "AbstractSyntaxTree.h"
 #include "SyntacticAnalyzer.h"
 #include <stdlib.h>

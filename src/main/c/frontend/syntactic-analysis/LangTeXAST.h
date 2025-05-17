@@ -1,5 +1,5 @@
-#ifndef LATEX_HEADER
-#define LATEX_HEADER
+#ifndef LANGTEXAST_HEADER
+#define LANGTEXAST_HEADER
 
 #include "../../shared/Logger.h"
 #include <stdlib.h>

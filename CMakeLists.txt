@@ -69,7 +69,7 @@ add_executable(Compiler
 	src/main/c/shared/Logger.c
 	src/main/c/shared/String.c
 	# Add more *.c files if needed (otherwise, they won't be compiled).
-	src/main/c/frontend/syntactic-analysis/LaTeX.c
+	src/main/c/frontend/syntactic-analysis/LangTeXAST.c
 )
 
 # Link final project and libraries.

@@ -1,7 +1,7 @@
 #ifndef GENERATOR_HEADER
 #define GENERATOR_HEADER
 
-#include "../../frontend/syntactic-analysis/LaTeX.h"
+#include "../../frontend/syntactic-analysis/LangTeXAST.h"
 #include "../../shared/CompilerState.h"
 #include "../../shared/Logger.h"
 #include "../../shared/String.h"

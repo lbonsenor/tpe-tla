@@ -39,8 +39,6 @@
 %destructor { releaseElement($$); } <element>
 %destructor { releaseContent($$); } <content>
 
-
-
 /** LaTeX Terminals */
 %token <string> COMMAND
 %token <token> BEGIN_ENVIRONMENT
@@ -68,7 +66,7 @@
 %type <command> command
 %type <text> text
 
-/* LangTeX Non-terminals */
+/** LaNgTeX Non-terminals **/
 %type <langtexCommand> langtexCommand
 /* %type <langtextParameters> langtexParameters
 %type <langtextParameter> langtexParameter */
@@ -81,7 +79,6 @@
 %%
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
-// TODO Add LaTeX Non-terminals
 program: 
 	content 														{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
 	;
@@ -107,28 +104,11 @@ command:
 		{ $$ = SimpleCommandSemanticAction($1); } 
 	;
 
-	/* [!dialog]{}
-    [!speaker]{Juan}{hola}
-	[!speaker]{Juan}{TRANSLATE!!} */
-
 langtexCommand: 
 	TRANSLATE_COMMAND OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  { $$ = TranslateSemanticAction($3, $6); }
 	| SPEAKER_COMMAND OPEN_BRACE text CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($3, $6); }
 	;
 
-/* envDialog:
-	speakerCommand
-	| speakerCommand envDialog 
-	; */
-
-
-/* langtexParameters:
-	langtexParameter COMMA langtexParameter
-	| langtexParameter 
-	; */
-
-/* langtexParameter:
-	TEXT */
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }
 

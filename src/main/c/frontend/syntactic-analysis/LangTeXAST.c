@@ -1,4 +1,4 @@
-#include "LaTeX.h"
+#include "LangTeXAST.h"
 
 /* MODULE INTERNAL STATE */
 
