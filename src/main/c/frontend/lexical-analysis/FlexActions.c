@@ -35,7 +35,7 @@ static void _logLexicalAnalyzerContext(const char * functionName, LexicalAnalyze
 	free(escapedLexeme);
 }
 
-/* PUBLIC FUNCTIONS */
+/* PUBLIC ACTIONS */
 
 void IgnoredLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	if (_logIgnoredLexemes) {
@@ -44,7 +44,7 @@ void IgnoredLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 }
 
-/* LaTeX */
+/* LaTeX ACTIONS */
 
 Token BeginCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext){
 	if (_logIgnoredLexemes) {
@@ -86,9 +86,31 @@ void CommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
 	lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
-	printf("%s", lexicalAnalyzerContext->semanticValue->string);
+	// printf("%s", lexicalAnalyzerContext->semanticValue->string); -> esto me parece que esta mal, Flex no deberia imprimir nada por consola 
+	// “El procesamiento léxico no debe emitir resultados, sino dejar eso al backend.”
+	logDebugging(_logger, "TextLexemeAction: %s", lexicalAnalyzerContext->semanticValue->string);
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 	return TEXT;
 }
 
-/* LaNgTex FUNCTIONS */
+/* LaNgTex ACTIONS */
+Token LangtexCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	lexicalAnalyzerContext->semanticValue->token = token;
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+	return token;
+}
+
+ Token EqualsLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+	lexicalAnalyzerContext->semanticValue->token = EQUAL;
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+	return EQUAL;
+ }
+
+ Token CommaLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	lexicalAnalyzerContext->semanticValue->token = COMMA;
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+	return COMMA;
+ }
+

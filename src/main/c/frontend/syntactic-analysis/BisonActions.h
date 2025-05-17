@@ -5,6 +5,7 @@
 #include "../../shared/Logger.h"
 #include "../../shared/Type.h"
 #include "LaTeX.h"
+#include "LangTeX.h"
 // #include "AbstractSyntaxTree.h"
 #include "SyntacticAnalyzer.h"
 #include <stdlib.h>
@@ -29,5 +30,8 @@ void shutdownBisonActionsModule();
 
  Element * CommandElementSemanticAction(Command * command);
  Element * TextElementSemanticAction(Text * text);
+ Element * LangtexCommandSemanticAction(LangtexCommand *command);
+ Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand);
+ LangtexCommand * TranslateSemanticAction(Text *leftText, Text *rightText);
 
 #endif

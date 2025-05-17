@@ -18,9 +18,11 @@ void shutdownRenameMeModule();
  typedef enum ContentType ContentType;
  typedef enum ElementType ElementType;
  typedef enum CommandType CommandType;
+ typedef enum LangtexCommandType LangtexCommandType;
 
  typedef struct Text Text;
  typedef struct Command Command;
+ typedef struct LangtexCommand LangtexCommand;
  typedef struct Program Program;
  typedef struct Content Content;
  typedef struct Element Element;
@@ -31,6 +33,13 @@ void shutdownRenameMeModule();
  */
 
 //TODO: define the enum types.
+
+enum LangtexCommandType {
+    LANGTEX_TRANSLATE,
+    LANGTEX_EXERCISE,
+    LANGTEX_DIALOGUE
+};
+
 enum CommandType {
     SIMPLE,
     PARAMETERIZED,
@@ -38,6 +47,7 @@ enum CommandType {
 };
 
 enum ElementType {
+    LANGTEX_COMMAND,
     LATEX_COMMAND,
     LATEX_TEXT
 };
@@ -54,12 +64,19 @@ struct Text{
 
 struct Command{
     union{
-        char * simpleCommand;
+        // \command
+		struct {
+			char * simpleCommand;
+		};
+
+        // \begin{...}...\end{...}
         struct {
             Text * environmentLeftText;
             Content * environmentContent;
             Text * environmentRightText;
         };
+
+        // \command{...}
         struct {
             char * parameterizedCommand;
             Content * parameterizedContent;
@@ -68,8 +85,22 @@ struct Command{
     CommandType type;
 };
 
+struct LangtexCommand{
+   union {
+    // [!translate] 
+    struct {
+        Text * leftText;
+        Text * rightText;
+    };
+    // [!exercise]
+    // [!dialogue]
+   };
+   LangtexCommandType type;
+};
+
 struct Element{
     union{
+        LangtexCommand * langtexCommand;
         Command * command;
         Text * text;
     };

@@ -14,6 +14,7 @@
  *
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
+%x LANGTEX_EXPRESSION
 
 /**
  * Reusable patterns.
@@ -22,23 +23,51 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
+/* 
+[!t]{
+    }
+*/
+/* <LANGTEX_EXPRESSION>"([a-zA-Z]+)"   { return BeginLangtexParameterAction(createLexicalAnalyzerContext()); } */
+/* \[![a-zA-Z]+\]                      { return LangTexLexemeAction(createLexicalAnalyzerContext()); } */
+
+/* 
+
+[!translate         BeginLangtexcommand....
+
+LANGTEX_COMMAND CLOSE_BRACKET                                                                           simple
+LANGTEX_COMMAND OPEN_PARENTESIS text CLOSE_PARENTESIS CLOSE_BRACKET                                     parameterized
+LANGTEX_COMMAND CLOSE_BRACKET OPEN_BRACE content CLOSE_BRACE                                            environment
+LANGTEX_COMMAND OPEN_PARENTESIS text CLOSE_PARENTESIS CLOSE_BRACKET OPEN_BRACE content CLOSE_BRACE      parameterized_environment
+
+<LANGTEX_EXPRESSION>"\""([^\"\\]|\\.)*\"[[:space:]]*,[[:space:]]*\""([^\"\\]|\\.)*\"" 
+                                    { return TranslationContentLexemeAction();}
+
+ */
+
 %%
+"[!translate]"                      { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),TRANSLATE_COMMAND); }
+"[!dialog]"                         { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),DIALOG_COMMAND); }
+"[!exercise]"                       { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),EXERCISE_COMMAND); }    
+"("                                 { return OPEN_PARENTHESIS; }
+")"                                 { return CLOSE_PARENTHESIS;}
+","                                 { return CommaLexemeAction(createLexicalAnalyzerContext()); }
+"="                                 { return EqualsLexemeAction(createLexicalAnalyzerContext()); }
 
 "\\begin"                           { return BeginCommandLexemeAction(createLexicalAnalyzerContext()); }
 "\\end"                             { return EndCommandLexemeAction(createLexicalAnalyzerContext()); }
 
-\{                                  { printf("This is a startbrace\n"); return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
-\}                                  { printf("This is a brace\n"); return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
-
 \\[a-zA-Z@]+                        { return CommandLexemeAction(createLexicalAnalyzerContext()); }
 
-"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
+\{                                  { return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
+\}                                  { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
 
+"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 [[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-[^\\{}#\$%\^&_~]+                   { printf("This is a text\n"); return TextLexemeAction(createLexicalAnalyzerContext()); }
+
+[^\\{}#\$%\^&_~]+                { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
 
-/* LaNgTeX Patterns */
+/** LaNgTeX Patterns */
 
 #include "FlexExport.h"

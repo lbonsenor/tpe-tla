@@ -2,6 +2,7 @@
 // #include "backend/domain-specific/Calculator.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/LaTeX.h"
+#include "frontend/syntactic-analysis/LangTeX.h"
 // #include "frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
 #include "frontend/syntactic-analysis/SyntacticAnalyzer.h"

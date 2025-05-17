@@ -20,12 +20,13 @@
 	Element * element;
 	Content * content;
 	Command * command;
+	LangtexCommand * langtexCommand;
 	Text * text;
 }
 
 /**
- * Destructors. This functions are executed after the parsing ends, so if the
- * AST must be used in the following phases of the compiler you shouldn't used
+ * Destructors. These functions are executed after the parsing ends, so if the
+ * AST must be used in the following phases of the compiler you shouldn't use
  * this approach for the AST root node ("program" non-terminal, in this
  * grammar), or it will drop the entire tree even if the parse succeeds.
  *
@@ -46,6 +47,15 @@
 %token <token> OPEN_BRACE
 %token <token> CLOSE_BRACE
 %token <string> TEXT
+%token <string> COMMA
+%token <string> OPEN_PARENTHESIS
+%token <string> CLOSE_PARENTHESIS
+%token <string> EQUAL
+
+/** LaNgTeX Terminals */
+%token <token> TRANSLATE_COMMAND
+%token <token> EXERCISE_COMMAND
+%token <token> DIALOG_COMMAND
 
 /** Non-terminals. */
 
@@ -56,12 +66,16 @@
 %type <command> command
 %type <text> text
 
+/* LangTeX Non-terminals */
+%type <langtexCommand> langtexCommand
+/* %type <langtextParameters> langtexParameters
+%type <langtextParameter> langtexParameter */
+
 /**
  * Precedence and associativity.
  *
  * @see https://www.gnu.org/software/bison/manual/html_node/Precedence.html
  */
-
 %%
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
@@ -76,14 +90,32 @@ content:
 	;
 
 element:
-	command															{ $$ = CommandElementSemanticAction($1); }
+	langtexCommand 			 										{ $$ = LangtexCommandElementSemanticAction($1); }
+	| command														{ $$ = CommandElementSemanticAction($1); }
 	| text															{ $$ = TextElementSemanticAction($1); }
 	;
 
+
 command:
-	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE 	{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
-	| COMMAND OPEN_BRACE content CLOSE_BRACE						{ $$ = ParameterizedCommandSemanticAction($1, $3); }
-	| COMMAND 							 							{ $$ = SimpleCommandSemanticAction($1); } 
+	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE 	
+		{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
+	| COMMAND OPEN_BRACE content CLOSE_BRACE						
+		{ $$ = ParameterizedCommandSemanticAction($1, $3); }
+	| COMMAND 							 							
+		{ $$ = SimpleCommandSemanticAction($1); } 
+	;
+
+langtexCommand: 
+	TRANSLATE_COMMAND OPEN_BRACE text CLOSE_BRACE OPEN_BRACE text CLOSE_BRACE  { $$ = TranslateSemanticAction($3, $6); }
+	;
+
+/* langtexParameters:
+	langtexParameter COMMA langtexParameter
+	| langtexParameter 
+	; */
+
+/* langtexParameter:
+	TEXT */
 
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }

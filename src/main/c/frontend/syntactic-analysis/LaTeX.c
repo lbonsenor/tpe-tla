@@ -29,8 +29,8 @@ void releaseCommand(Command * command){
     if (command != NULL){
         switch (command->type) {
             case SIMPLE:
-            free(command->simpleCommand);
-            break;
+                free(command->simpleCommand);
+                break;
             case PARAMETERIZED:
                 free(command->parameterizedCommand);
                 releaseContent(command->parameterizedContent);
@@ -47,9 +47,26 @@ void releaseCommand(Command * command){
     }
 }
 
+void releaseLangtexCommand(LangtexCommand * langtexCommand){
+    if (langtexCommand != NULL){
+        switch (langtexCommand->type) {
+            case LANGTEX_COMMAND:
+                releaseText(langtexCommand->leftText);
+                releaseText(langtexCommand->rightText);
+                break;
+            default:
+                break;
+        }
+        free(langtexCommand);
+    }
+}
+
 void releaseElement(Element * element){
     if (element != NULL){
         switch (element->type) {
+            case LANGTEX_COMMAND:
+                releaseLangtexCommand(element->langtexCommand);
+                break;
             case LATEX_COMMAND:
                 releaseCommand(element->command);
                 break;

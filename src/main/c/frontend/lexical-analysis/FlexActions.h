@@ -50,4 +50,9 @@ Token BraceLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token t
 /// @param lexicalAnalyzerContext 
 Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 
+/* LaNgTex ACTIONS */
+
+Token LangtexCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token CommaLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+Token EqualsLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 #endif
