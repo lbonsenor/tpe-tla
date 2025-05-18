@@ -16,6 +16,27 @@ void shutdownRenameMeModule() {
 
 /** PUBLIC FUNCTIONS */
 
+void releaseParamList(LangtexParamList * list) {
+	if (list != NULL) {
+		releaseParam(list->param);
+		releaseParamList(list->next);
+		free(list);
+	}
+}
+
+void releaseParam(LangtexParam * param) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (param != NULL) {
+        free(param->key);
+        if (param->type == STRING_PARAMETER) {
+            free(param->value.stringParam);
+        } else if (param->value.stringParam != NULL) {
+			free(param->value.stringParam);  
+		}
+        free(param);
+    }
+    
+}
 
 void releaseText(Text * text) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
@@ -53,10 +74,11 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
             case LANGTEX_TRANSLATE:
                 releaseContent(langtexCommand->rightContent);
                 releaseContent(langtexCommand->leftContent);
+                releaseParamList(langtexCommand->parameters); 
                 break;
             case LANGTEX_SPEAKER:
                 releaseContent(langtexCommand->content);
-                releaseText(langtexCommand->text);
+                releaseParamList(langtexCommand->parameters); 
                 break;
             default:
                 break;

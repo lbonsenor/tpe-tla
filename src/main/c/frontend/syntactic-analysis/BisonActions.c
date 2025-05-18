@@ -151,23 +151,79 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	return newElement;
  }
 
- LangtexCommand * TranslateSemanticAction(Content *leftContent, Content *rightContent)
+ LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftContent, Content *rightContent)
  {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	langtexCommand->parameters = parameters;
 	langtexCommand->leftContent = leftContent;
 	langtexCommand->rightContent = rightContent;
 	langtexCommand->type = LANGTEX_TRANSLATE;
 	return langtexCommand;
  }
 
-  LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent)
- {
+//   LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent)
+//  {
+// 	_logSyntacticAnalyzerAction(__FUNCTION__);
+// 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+// 	langtexCommand->text = leftText;
+// 	langtexCommand->content = rightContent;
+// 	langtexCommand->type = LANGTEX_SPEAKER;
+// 	return langtexCommand;
+//  }
+LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
-	langtexCommand->text = leftText;
-	langtexCommand->content = rightContent;
-	langtexCommand->type = LANGTEX_SPEAKER;
-	return langtexCommand;
- }
+    LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+    langtexCommand->parameters = parameters;
+    langtexCommand->content = content;
+    langtexCommand->type = LANGTEX_SPEAKER;
+    return langtexCommand;
+}
+
+// LangtexParam * ParamSemanticAction(char * key, LangtexParamType * value) {
+//     LangtexParam * param = calloc(1, sizeof(LangtexParam));
+//     param->key = key;
+//     param->value = ;
+//     return param;
+// }
+
+LangtexParam * IntegerParamSemanticAction(char * key, int value) {
+	LangtexParam * param = calloc(1, sizeof(LangtexParam));
+	param->key = key;
+	param->value.intParam = value;
+	param->type = INTEGER_PARAMETER;
+	return param;
+}
+
+LangtexParam * StringParamSemanticAction(char * key, char * value){
+	LangtexParam * param = calloc(1, sizeof(LangtexParam));
+	param->key = key;
+	param->value.stringParam = value;
+	param->type = STRING_PARAMETER;
+	return param;
+}
+
+LangtexParam * BooleanParamSemanticAction(char * key, boolean value){
+	LangtexParam * param = calloc(1, sizeof(LangtexParam));
+	param->key = key;
+	param->value.boolParam = value;
+	param->type = BOOLEAN_PARAMETER;
+	return param;
+}
+
+LangtexParamList * SingleParam(LangtexParam * param) {
+    LangtexParamList * list = calloc(1, sizeof(LangtexParamList));
+    list->param = param;
+    list->next = NULL;
+    return list;
+}
+LangtexParamList * AppendParam(LangtexParam * param, LangtexParamList * list) {
+    LangtexParamList * newList = calloc(1, sizeof(LangtexParamList));
+    newList->param = param;
+    newList->next = list;
+    return newList;
+}
+LangtexParamList * EmptyParamList(void) {
+    return NULL;
+}
 

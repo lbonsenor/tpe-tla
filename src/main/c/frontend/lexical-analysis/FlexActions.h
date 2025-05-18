@@ -55,4 +55,10 @@ Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token LangtexCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
 Token CommaLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token EqualsLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
+Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+
+Token ParenthesisLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token QuotedTextLexemeAction(LexicalAnalyzerContext * context);
+Token ParameterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
 #endif

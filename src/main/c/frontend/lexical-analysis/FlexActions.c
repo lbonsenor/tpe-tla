@@ -94,6 +94,13 @@ Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 }
 
 /* LaNgTex ACTIONS */
+Token ParenthesisLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	lexicalAnalyzerContext->semanticValue->token = token;
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+    return token;
+}
+
 Token LangtexCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
 	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
 	lexicalAnalyzerContext->semanticValue->token = token;
@@ -113,4 +120,56 @@ Token LangtexCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 	return COMMA;
  }
+
+ Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+	return UNKNOWN;
+}
+
+Token ParameterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	switch(token) {
+		case STRING_PARAM:
+			return QuotedTextLexemeAction(lexicalAnalyzerContext);
+		case INTEGER_PARAM:
+			logDebugging(_logger, "ParameterLexemeActionIntegerParam: %s", lexicalAnalyzerContext->lexeme);
+			lexicalAnalyzerContext->semanticValue->integer = atoi(lexicalAnalyzerContext->lexeme);
+			logDebugging(_logger, "ParameterLexemeActionIntegerParam: %d", lexicalAnalyzerContext->semanticValue->integer);
+			destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+			return INTEGER_PARAM;
+		case BOOLEAN_PARAM:
+			logDebugging(_logger, "ParameterLexemeActionInBooleanParam: %s", lexicalAnalyzerContext->lexeme);
+			lexicalAnalyzerContext->semanticValue->boolean = (strcmp(lexicalAnalyzerContext->lexeme, "true") == 0);
+			logDebugging(_logger, "ParameterLexemeActionInBooleanParamAfter: %s", lexicalAnalyzerContext->semanticValue->boolean);
+			destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+			return BOOLEAN_PARAM;
+		default: 
+			lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
+			// logDebugging(_logger, "ParameterLexemeAction: %s", lexicalAnalyzerContext->semanticValue->argument);
+			destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+			return ARGS_PARAM;
+	}
+}
+
+Token QuotedTextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+
+    char * quoted = lexicalAnalyzerContext->lexeme;
+    size_t len = strlen(quoted);
+
+    // Ensure length is at least 2 and begins and ends with quotes
+    if (len >= 2 && quoted[0] == '"' && quoted[len - 1] == '"') {
+        quoted[len - 1] = '\0'; // strip trailing quote
+        char * unquoted = strdup(quoted + 1); // skip initial quote
+        lexicalAnalyzerContext->semanticValue->string = unquoted;
+    } else {
+        // fallback, shouldn't happen
+        lexicalAnalyzerContext->semanticValue->string = strdup(quoted);
+    }
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+
+    return STRING_PARAM;
+}
+
 

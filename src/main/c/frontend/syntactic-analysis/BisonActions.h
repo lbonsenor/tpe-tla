@@ -31,6 +31,17 @@ void shutdownBisonActionsModule();
  Element * TextElementSemanticAction(Text * text);
  Element * LangtexCommandSemanticAction(LangtexCommand *command);
  Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand);
- LangtexCommand * TranslateSemanticAction(Content *leftContent, Content *rightContent);
- LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent);
+ LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Content *leftContent, Content *rightContent);
+//  LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent);
+LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content);
+// LangtexParam * ParamSemanticAction(char * key, char * value);
+LangtexParamList * SingleParam(LangtexParam * param);
+LangtexParamList * AppendParam(LangtexParam * param, LangtexParamList * list);
+LangtexParamList * EmptyParamList(void);
+
+
+LangtexParam * IntegerParamSemanticAction(char * key, int value);
+LangtexParam * StringParamSemanticAction(char * key, char * value);
+LangtexParam * BooleanParamSemanticAction(char * key, boolean value);
+
 #endif

@@ -13,6 +13,7 @@
 	int integer;
 	Token token;
 	char * string;
+	boolean boolean;
 
 	/** Non-terminals. */
 
@@ -21,6 +22,8 @@
 	Content * content;
 	Command * command;
 	LangtexCommand * langtexCommand;
+	LangtexParam * param;
+	LangtexParamList * param_list;
 	Text * text;
 }
 
@@ -38,6 +41,8 @@
 %destructor { releaseLangtexCommand($$); } <langtexCommand>
 %destructor { releaseElement($$); } <element>
 %destructor { releaseContent($$); } <content>
+%destructor { releaseParam($$); } <param>
+%destructor { releaseParamList($$); } <param_list>
 
 /** LaTeX Terminals */
 %token <string> COMMAND
@@ -46,16 +51,24 @@
 %token <token> OPEN_BRACE
 %token <token> CLOSE_BRACE
 %token <string> TEXT
-%token <string> COMMA
-%token <string> OPEN_PARENTHESIS
-%token <string> CLOSE_PARENTHESIS
-%token <string> EQUAL
 
 /** LaNgTeX Terminals */
 %token <token> TRANSLATE_COMMAND
 %token <token> EXERCISE_COMMAND
 %token <token> DIALOG_COMMAND
 %token <token> SPEAKER_COMMAND
+%token <token> COMMA
+%token <token> OPEN_PARENTHESIS
+%token <token> CLOSE_PARENTHESIS
+%token <token> EQUAL
+%token <string> ARGS_PARAM
+
+%token <integer> INTEGER_PARAM
+%token <string> STRING_PARAM
+%token <boolean> BOOLEAN_PARAM
+
+/** Other Terminals */ 
+%token <token> UNKNOWN
 
 /** Non-terminals. */
 
@@ -66,8 +79,14 @@
 %type <command> command
 %type <text> text
 
+
 /** LaNgTeX Non-terminals **/
 %type <langtexCommand> langtexCommand
+
+%type <param> param
+%type <param_list> param_list
+%type <param_list> parameters
+%type <param_list> optional_parameters
 /* %type <langtextParameters> langtexParameters
 %type <langtextParameter> langtexParameter */
 
@@ -105,9 +124,29 @@ command:
 	;
 
 langtexCommand: 
-	TRANSLATE_COMMAND OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  { $$ = TranslateSemanticAction($3, $6); }
-	| SPEAKER_COMMAND OPEN_BRACE text CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($3, $6); }
+	TRANSLATE_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  { $$ = TranslateSemanticAction($2, $4, $7); }
+	| SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($2, $4); }
 	;
+
+optional_parameters:
+    parameters  { $$ = $1; }
+  	| %empty      { $$ = EmptyParamList(); }
+  	;
+parameters:
+    OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS { $$ = $2; }
+  	;
+
+param_list:
+	param COMMA param_list 			{ $$ = AppendParam($1, $3); }
+  	| param                  		{ $$ = SingleParam($1); }
+	| %empty      					{ $$ = EmptyParamList(); }
+  	;
+
+param:
+    ARGS_PARAM EQUAL INTEGER_PARAM 			{ $$ = IntegerParamSemanticAction($1, $3); }
+	| ARGS_PARAM EQUAL STRING_PARAM			{ $$ = StringParamSemanticAction($1, $3); }
+	| ARGS_PARAM EQUAL BOOLEAN_PARAM		{ $$ = BooleanParamSemanticAction($1, $3); }
+  	;
 
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }

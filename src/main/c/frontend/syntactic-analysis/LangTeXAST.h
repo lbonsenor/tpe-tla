@@ -14,11 +14,12 @@ void shutdownRenameMeModule();
  * This typedefs allows self-referencing types.
  */
 
-
  typedef enum ContentType ContentType;
  typedef enum ElementType ElementType;
  typedef enum CommandType CommandType;
  typedef enum LangtexCommandType LangtexCommandType;
+ typedef enum LangtexParamType LangtexParamType;
+
 
  typedef struct Text Text;
  typedef struct Command Command;
@@ -26,13 +27,22 @@ void shutdownRenameMeModule();
  typedef struct Program Program;
  typedef struct Content Content;
  typedef struct Element Element;
- 
+
+ typedef struct LangtexParam LangtexParam;
+ typedef struct LangtexParamList LangtexParamList;
+
 
  /**
  * Node types for the Abstract Syntax Tree (AST).
  */
 
 //TODO: define the enum types.
+
+enum LangtexParamType {
+    STRING_PARAMETER,
+    BOOLEAN_PARAMETER,
+    INTEGER_PARAMETER
+};
 
 enum LangtexCommandType {
     LANGTEX_TRANSLATE,
@@ -87,6 +97,7 @@ struct Command{
 };
 
 struct LangtexCommand{
+    LangtexParamList * parameters;
    union {
     // [!translate] 
     struct {
@@ -95,12 +106,26 @@ struct LangtexCommand{
     };
     // [!dialog]
     struct {
-        Text * text;
         Content * content;
     };
     // [!exercise]
    };
    LangtexCommandType type;
+};
+
+struct LangtexParam {
+    char * key;
+    union {
+        char * stringParam;
+        int intParam;
+        boolean boolParam;
+    } value;
+    LangtexParamType type;
+};
+    
+struct LangtexParamList {
+    LangtexParam * param;
+    LangtexParamList * next;
 };
 
 struct Element{
@@ -127,6 +152,8 @@ struct Program {
 	Content * content;
 };
 
+
+
 /**
  * Node recursive destructors.
  */
@@ -136,5 +163,8 @@ struct Program {
  void releaseContent(Content * content);
  void releaseProgram(Program * program);
  void releaseLangtexCommand(LangtexCommand * langtexCommand);
+
+ void releaseParam(LangtexParam * param);
+ void releaseParamList(LangtexParamList * list);
 
 #endif
