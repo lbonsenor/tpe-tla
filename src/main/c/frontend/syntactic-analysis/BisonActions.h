@@ -23,7 +23,7 @@ void shutdownBisonActionsModule();
  Content * AppendContentSemanticAction(Element * element, Content * content);
  Content * SingleContentSemanticAction(Element * element);
  Command * SimpleCommandSemanticAction(char * command);
- Command * ParameterizedCommandSemanticAction(char * command, Content * content); 
+ Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs);
  Command * EnvironmentCommandSemanticAction(Text * text, Content * content, Text * text2);
  Text * TextSemanticAction(char * text);
 
@@ -33,8 +33,10 @@ void shutdownBisonActionsModule();
  Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand);
  LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Content *leftContent, Content *rightContent);
 //  LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent);
-Object * SpeakerSemanticAction(LangtexParamList * parameters, Content * content);
-LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, Object * objectList);
+LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content);
+LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, LangtexCommandList * langtexCommandList);
+LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList);
+LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList);
 
 // LangtexParam * ParamSemanticAction(char * key, char * value);
 LangtexParamList * SingleParam(LangtexParam * param);
@@ -47,6 +49,7 @@ LangtexParam * StringParamSemanticAction(char * key, char * value);
 LangtexParam * BooleanParamSemanticAction(char * key, boolean value);
 
 // Utils
-Object * AppendObject(Object * object, Object * objectList);
-
+LangtexCommandList * AppendLangtexComand(LangtexCommand * langtexCommand, LangtexCommandList * langtexCommandList);
+ContentList * ContentListSemanticAction(Content * content, ContentList * next);
+LangtexCommandList * SingleLangtexCommand(LangtexCommand * command);
 #endif

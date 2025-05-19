@@ -77,16 +77,12 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
     return newCommand;
  }
 
- Command * ParameterizedCommandSemanticAction(char * command, Content * content){
+ Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	logDebugging(_logger, "Matched parameterized command");
 	Command * newCommand = calloc(1, sizeof(Command));
-	if (!command || !content) {
-		logError(_logger, "ParameterizedCommandSemanticAction received NULL argument(s)");
-		return NULL;
-	}
 	newCommand->parameterizedCommand = command;
-	newCommand->parameterizedContent = content;
+	newCommand->parameterizedContentList = commandArgs;
 	newCommand->type = PARAMETERIZED;
 	return newCommand;
  } 
@@ -132,6 +128,14 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	return newElement;
  }
 
+ ContentList * ContentListSemanticAction(Content * content, ContentList * next){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	ContentList * newContentList = calloc(1, sizeof(ContentList));
+	newContentList->content = content;
+	newContentList->next = next;
+	return newContentList;
+ }
+
  Element *TextElementSemanticAction(Text *text)
  {
     _logSyntacticAnalyzerAction(__FUNCTION__);
@@ -162,23 +166,45 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	return langtexCommand;
  }
 
- LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, Object * objectList) {
+ LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, LangtexCommandList * langtexCommandList) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
     langtexCommand->parameters = parameters;
-    langtexCommand->objectList = objectList;
+    langtexCommand->langtexCommandList = langtexCommandList;
     langtexCommand->type = LANGTEX_DIALOG;
     return langtexCommand;
  }
 
-Object * SpeakerSemanticAction(LangtexParamList * parameters, Content * content) {
+LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-    Object * speakerObject = calloc(1, sizeof(Object));
-	speakerObject->parameters = parameters;
-    speakerObject->content = content;
-    // speakerObject->type = LANGTEX_SPEAKER;
-    return speakerObject;
+    LangtexCommand * speakerCommand = calloc(1, sizeof(LangtexCommand));
+	speakerCommand->parameters = parameters;
+    speakerCommand->content = content;
+    speakerCommand->type = LANGTEX_SPEAKER;
+    return speakerCommand;
 }
+
+//Table
+
+LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	langtexCommand->parameters = parameters;
+	langtexCommand->langtexCommandList = commandList;
+	langtexCommand->type = LANGTEX_TABLE;
+	return langtexCommand;
+}
+
+LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    LangtexCommand * rowCommand = calloc(1, sizeof(LangtexCommand));
+	rowCommand->parameters = parameters;
+    rowCommand->contentList = contentList;
+    rowCommand->type = LANGTEX_ROW;
+    return rowCommand;
+}
+
+// Parameters
 
 LangtexParam * IntegerParamSemanticAction(char * key, int value) {
 	LangtexParam * param = calloc(1, sizeof(LangtexParam));
@@ -216,12 +242,22 @@ LangtexParamList * AppendParam(LangtexParam * param, LangtexParamList * list) {
     newList->next = list;
     return newList;
 }
+
 LangtexParamList * EmptyParamList(void) {
     return NULL;
 }
 
 // Utils
-Object * AppendObject(Object * object, Object * objectList) {
-    object->next = objectList;
-    return object;
+LangtexCommandList * AppendLangtexComand(LangtexCommand * langtexCommand, LangtexCommandList * langtexCommandList) {
+    LangtexCommandList * newList = calloc(1, sizeof(LangtexCommandList));
+	newList->command = langtexCommand;
+	newList->next = langtexCommandList;
+	return newList;
+}
+
+LangtexCommandList * SingleLangtexCommand(LangtexCommand * command) {
+	LangtexCommandList * list = calloc(1, sizeof(LangtexCommandList));
+	list->command = command;
+	list->next = NULL;
+	return list;
 }

@@ -55,7 +55,7 @@ void releaseCommand(Command * command){
                 break;
             case PARAMETERIZED:
                 free(command->parameterizedCommand);
-                releaseContent(command->parameterizedContent);
+                releaseContentList(command->parameterizedContentList);
                 break;
             case ENVIRONMENT:
                 releaseText(command->environmentLeftText);
@@ -69,6 +69,14 @@ void releaseCommand(Command * command){
     }
 }
 
+void releaseContentList(ContentList * contentList) {
+    if (contentList != NULL){
+        releaseContent(contentList->content);
+        releaseContentList(contentList->next);
+        free(contentList);
+    }
+}
+
 void releaseLangtexCommand(LangtexCommand * langtexCommand){
     if (langtexCommand != NULL){
         switch (langtexCommand->type) {
@@ -78,9 +86,17 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
                 releaseParamList(langtexCommand->parameters); 
                 break;
             case LANGTEX_DIALOG:
-                releaseObject(langtexCommand->objectList);
+            case LANGTEX_TABLE:
+                releaseLangtexCommandList(langtexCommand->langtexCommandList);
                 releaseParamList(langtexCommand->parameters); 
                 break;
+            case LANGTEX_SPEAKER:
+                releaseContent(langtexCommand->content);
+                releaseParamList(langtexCommand->parameters); 
+                break;
+            case LANGTEX_ROW:
+                releaseContentList(langtexCommand->contentList);
+                releaseParamList(langtexCommand->parameters);                
             default:
                 break;
         }
@@ -88,18 +104,11 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
     }
 }
 
-void releaseObject(Object * object) {
-    if (object != NULL){
-        // switch (object->type){
-        //     case OBJECT_SPEAKER:
-                releaseParamList(object->parameters);
-                releaseContent(object->content);
-                releaseObject(object->next); 
-                free(object);
-            //     break;
-            // default:
-            //     break;
-        // };
+void releaseLangtexCommandList(LangtexCommandList * langtexCommandList) {
+    if (langtexCommandList != NULL){
+        releaseLangtexCommand(langtexCommandList->command);
+        releaseLangtexCommandList(langtexCommandList->next); 
+        free(langtexCommandList);
     }
 }
 

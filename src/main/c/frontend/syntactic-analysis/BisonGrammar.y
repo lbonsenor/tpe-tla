@@ -20,13 +20,14 @@
 	Program * program;
 	Element * element;
 	Content * content;
+	ContentList * contentList;
 	Command * command;
 	LangtexCommand * langtexCommand;
+	LangtexCommandList * langtexCommandList;
 	LangtexParam * param;
 	LangtexParamList * param_list;
 	Text * text;
 
-	Object* object;
 }
 
 /**
@@ -41,6 +42,7 @@
 %destructor { releaseText($$); } <text>
 %destructor { releaseCommand($$); } <command>
 %destructor { releaseLangtexCommand($$); } <langtexCommand>
+%destructor {releaseLangtexCommandList($$); } <langtexCommandList>
 %destructor { releaseElement($$); } <element>
 %destructor { releaseContent($$); } <content>
 %destructor { releaseParamList($$); } <param_list>
@@ -60,6 +62,9 @@
 %token <token> EXERCISE_COMMAND
 %token <token> DIALOG_COMMAND
 %token <token> SPEAKER_COMMAND
+%token <token> TABLE_COMMAND
+%token <token> ROW_COMMAND
+
 %token <token> COMMA
 %token <token> OPEN_PARENTHESIS
 %token <token> CLOSE_PARENTHESIS
@@ -78,14 +83,15 @@
 /** LaTeX Non-terminals. */
 %type <program> program
 %type <content> content
+%type <contentList> commandArgs
 %type <element> element
 %type <command> command
 %type <text> text
 
-
 /** LaNgTeX Non-terminals **/
-%type <langtexCommand> langtexCommand
-%type <object> speakerCommand speakerCommands
+%type <langtexCommand> langtexCommand speakerCommand rowCommand 
+%type <langtexCommandList> speakerCommands
+%type <langtexCommandList> rowCommands
 
 %type <param> param
 %type <param_list> param_list
@@ -120,45 +126,65 @@ element:
 
 command:
 	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
-		{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
-	| COMMAND OPEN_BRACE content CLOSE_BRACE
-		{ $$ = ParameterizedCommandSemanticAction($1, $3); }
-	| COMMAND
-		{ $$ = SimpleCommandSemanticAction($1); } 
+																	{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
+	| COMMAND commandArgs
+																	{ $$ = ParameterizedCommandSemanticAction($1,$2); }
+	;
+
+commandArgs:
+	OPEN_BRACE content CLOSE_BRACE commandArgs						{ $$ = ContentListSemanticAction($2, $4); }
+	| %empty														{ $$ = NULL; }
 	;
 
 langtexCommand:
-	TRANSLATE_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  { $$ = TranslateSemanticAction($2, $4, $7); }
-	| DIALOG_COMMAND optional_parameters OPEN_BRACE speakerCommands CLOSE_BRACE { $$ = DialogSemanticAction($2, $4); }
+	TRANSLATE_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
+																	{ $$ = TranslateSemanticAction($2, $4, $7); }
+	| DIALOG_COMMAND optional_parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
+																	{ $$ = DialogSemanticAction($2, $4); }
+	| TABLE_COMMAND optional_parameters OPEN_BRACE rowCommands CLOSE_BRACE 
+																	{ $$ = TableSemanticAction($2, $4); }
+	;
+
+rowCommands:
+	rowCommand rowCommands 											{ $$ = AppendLangtexComand($1, $2); }
+	| rowCommand 													{ $$ = SingleLangtexCommand($1); } 
+	;
+
+rowCommand:
+	ROW_COMMAND optional_parameters commandArgs						{ $$ = RowSemanticAction($2, $3); }
 	;
 
 speakerCommands:
-	speakerCommand speakerCommands	{ $$ = AppendObject($1, $2); }
-	| speakerCommand 				{ $$ = $1; }
+	speakerCommand speakerCommands									{ $$ = AppendLangtexComand($1, $2); }
+	| speakerCommand 												{ $$ = SingleLangtexCommand($1); }
 	;
+
 
 speakerCommand: 
-	SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($2, $4); }
+	SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE 
+																	{ $$ = SpeakerSemanticAction($2, $4); }
 	;
 
+// TODO: see if we can optimize it by adding %empty directly in parameters
 optional_parameters:
-    parameters  { $$ = $1; }
-  	| %empty      { $$ = EmptyParamList(); }
+    parameters  													{ $$ = $1; }
+  	| %empty      													{ $$ = EmptyParamList(); }
   	;
+	
 parameters:
-    OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS { $$ = $2; }
-  	;
+    OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS 					{ $$ = $2; }
+	;
 
 param_list:
-	param COMMA param_list 			{ $$ = AppendParam($1, $3); }
-  	| param                  		{ $$ = SingleParam($1); }
-	| %empty      					{ $$ = EmptyParamList(); }
+	param COMMA param_list 											{ $$ = AppendParam($1, $3); }
+  	| param                  										{ $$ = SingleParam($1); }
+	| %empty      													{ $$ = EmptyParamList(); }
   	;
 
 param:
-    ARGS_PARAM EQUAL INTEGER_PARAM 			{ $$ = IntegerParamSemanticAction($1, $3); }
-	| ARGS_PARAM EQUAL STRING_PARAM			{ $$ = StringParamSemanticAction($1, $3); }
-	| ARGS_PARAM EQUAL BOOLEAN_PARAM		{ $$ = BooleanParamSemanticAction($1, $3); }
+    ARGS_PARAM EQUAL INTEGER_PARAM 									{ $$ = IntegerParamSemanticAction($1, $3); }
+	| ARGS_PARAM EQUAL STRING_PARAM									{ $$ = StringParamSemanticAction($1, $3); }
+	| ARGS_PARAM EQUAL BOOLEAN_PARAM								{ $$ = BooleanParamSemanticAction($1, $3); }
   	;
 
 text:

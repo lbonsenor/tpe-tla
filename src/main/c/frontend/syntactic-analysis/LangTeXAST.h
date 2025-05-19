@@ -24,6 +24,7 @@ void shutdownRenameMeModule();
 
  typedef struct Text Text;
  typedef struct Command Command;
+ typedef struct ContentList ContentList;
  typedef struct LangtexCommand LangtexCommand;
  typedef struct Program Program;
  typedef struct Content Content;
@@ -31,6 +32,7 @@ void shutdownRenameMeModule();
 
  typedef struct LangtexParam LangtexParam;
  typedef struct LangtexParamList LangtexParamList;
+ typedef struct LangtexCommandList LangtexCommandList;
 
  //rows, speakers, and more
 
@@ -58,7 +60,9 @@ enum LangtexCommandType {
     LANGTEX_TRANSLATE,
     LANGTEX_EXERCISE,
     LANGTEX_DIALOG,
-    LANGTEX_SPEAKER
+    LANGTEX_SPEAKER,
+    LANGTEX_TABLE,
+    LANGTEX_ROW
 };
 
 enum CommandType {
@@ -100,24 +104,37 @@ struct Command{
         // \command{...}
         struct {
             char * parameterizedCommand;
-            Content * parameterizedContent;
+            ContentList * parameterizedContentList;
         };
     };
     CommandType type;
 };
 
+struct ContentList{
+    Content * content;
+    ContentList * next;
+};
+
 struct LangtexCommand{
     LangtexParamList * parameters;
    union {
-    // [!translate]
+    // [!translate]{}{}
     struct {
         Content * leftContent;
         Content * rightContent;
     };
-    // [!dialog] 
+    // [!dialog]{}{}, table 
         //spekers-->objectList
     struct {
-        Object * objectList;
+        LangtexCommandList * langtexCommandList;
+    };
+    // [!speaker]{}
+    struct {
+        Content * content;
+    };
+    // [!row]
+    struct {
+        ContentList * contentList;
     };
 
     // [!exercise]
@@ -128,21 +145,9 @@ struct LangtexCommand{
    LangtexCommandType type;
 };
 
-struct Object{
-    // ObjectType type;
-     union {
-        //Speaker
-       struct {
-        LangtexParamList * parameters;
-        Content * content;
-        };
-        // struct {
-            
-        //      Row row;
-        // }
-     };
-     Object * next;
-     
+struct LangtexCommandList{
+    LangtexCommand * command;
+    LangtexCommandList * next;
 };
 
 struct LangtexParam {
@@ -195,8 +200,10 @@ struct Program {
  void releaseContent(Content * content);
  void releaseProgram(Program * program);
  void releaseLangtexCommand(LangtexCommand * langtexCommand);
+ void releaseLangtexCommandList(LangtexCommandList * langtexCommandList);
 
  void releaseParam(LangtexParam * param);
  void releaseParamList(LangtexParamList * list);
- void releaseObject(Object * object);
+ void releaseObject(LangtexCommandList * langtexCommandList);
+ void releaseContentList(ContentList * contentList);
 #endif

@@ -1,5 +1,5 @@
 % Esto es un comentario
 Texto visible
-\command
+\command{hello}{gello}
 % Otro comentario con símbolos % $ # _
 Más texto

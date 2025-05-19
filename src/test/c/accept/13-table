@@ -1,0 +1,5 @@
+[!table]{
+    [!row]{\color{red}hola}{col2}{col3}
+    [!row]{col1}{col2}{col3}
+    [!row]{col1}{col2}{col3}
+}
