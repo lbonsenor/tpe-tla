@@ -25,7 +25,7 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
-
+// TODO: useLangugae and block 
 
 %%
 "[!translate]"                      { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), TRANSLATE_COMMAND); }
@@ -37,6 +37,8 @@
 "[!prompt]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), PROMPT_COMMAND); }
 "[!options]"                        { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), OPTIONS_COMMAND); }
 "[!answer]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), ANSWER_COMMAND); }
+"[!useLanguage]"                    { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), LANGUAGE_COMMAND); }
+"[!block]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), BLOCK_COMMAND);}
 
 <PARAM>,[[:space:]]*                { return CommaLexemeAction(createLexicalAnalyzerContext()); }
 <PARAM>"="                          { return EqualsLexemeAction(createLexicalAnalyzerContext()); }           

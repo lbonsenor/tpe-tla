@@ -71,6 +71,10 @@
 %token <token> OPTIONS_COMMAND
 %token <token> ANSWER_COMMAND
 
+%token <token> LANGUAGE_COMMAND
+
+%token <token> BLOCK_COMMAND
+
 %token <token> COMMA
 %token <token> OPEN_PARENTHESIS
 %token <token> CLOSE_PARENTHESIS
@@ -95,13 +99,8 @@
 %type <text> text
 
 /** LaNgTeX Non-terminals **/
-%type <langtexCommand> langtexCommand speakerCommand rowCommand 
-%type <langtexCommandList> speakerCommands
-%type <langtexCommandList> rowCommands
-
-%type <langtexCommand> exercisePrompt
-%type <langtexCommand> exerciseOptions
-%type <langtexCommand> exerciseAnswer
+%type <langtexCommand> langtexCommand speakerCommand rowCommand exercisePrompt exerciseOptions exerciseAnswer
+%type <langtexCommandList> speakerCommands rowCommands
 
 %type <param> param
 %type <param_list> param_list
