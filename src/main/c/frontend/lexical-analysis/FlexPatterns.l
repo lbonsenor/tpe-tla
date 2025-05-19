@@ -30,10 +30,13 @@
 %%
 "[!translate]"                      { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), TRANSLATE_COMMAND); }
 "[!dialog]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), DIALOG_COMMAND); }
-"[!exercise]"                       { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), EXERCISE_COMMAND); }
 "[!speaker]"                        { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), SPEAKER_COMMAND); }
 "[!table]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), TABLE_COMMAND); }
 "[!row]"                            { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), ROW_COMMAND); }
+"[!exercise]"                       { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), EXERCISE_COMMAND); }
+"[!prompt]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), PROMPT_COMMAND); }
+"[!options]"                        { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), OPTIONS_COMMAND); }
+"[!answer]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), ANSWER_COMMAND); }
 
 <PARAM>,[[:space:]]*                { return CommaLexemeAction(createLexicalAnalyzerContext()); }
 <PARAM>"="                          { return EqualsLexemeAction(createLexicalAnalyzerContext()); }           

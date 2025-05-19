@@ -7,6 +7,8 @@
 
 #define BASE 0xAC00
 #define LAST 0xD7A3
+#define BASE_JAMO 0x3130
+#define LAST_JAMO 0x318F
 #define BLOCK 10
 
 #define INITIAL_COUNT 19

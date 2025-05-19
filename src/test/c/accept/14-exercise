@@ -1,0 +1,5 @@
+[!exercise](type="fill", title="Ejercicio de completar"){
+    [!prompt]{How many fingers does a human have?}
+    [!options]{Hello}{World}{5}{lo siento}{:(}
+    [!answer]{5}{19}{sadf}
+}

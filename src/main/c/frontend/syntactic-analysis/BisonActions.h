@@ -33,12 +33,13 @@ void shutdownBisonActionsModule();
  Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand);
  LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Content *leftContent, Content *rightContent);
 //  LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent);
-LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content);
 LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, LangtexCommandList * langtexCommandList);
-LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList);
-LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList);
+LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList, LangtexCommandType type);
+LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList,LangtexCommandType type);
+LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content, LangtexCommandType type);
+// LangtexCommandList * PromptSemanticAction(LangtexParamList * parameters,Content * content, LangtexCommandType type);
+LangtexCommand * ExerciseSemanticAction(LangtexParamList * parameters, LangtexCommand * commandPrompt, LangtexCommand *commandOptions, LangtexCommand * commandAnswers, LangtexCommandType type);
 
-// LangtexParam * ParamSemanticAction(char * key, char * value);
 LangtexParamList * SingleParam(LangtexParam * param);
 LangtexParamList * AppendParam(LangtexParam * param, LangtexParamList * list);
 LangtexParamList * EmptyParamList(void);

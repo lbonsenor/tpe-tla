@@ -91,12 +91,22 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
                 releaseParamList(langtexCommand->parameters); 
                 break;
             case LANGTEX_SPEAKER:
+            case LANGTEX_PROMPT:
                 releaseContent(langtexCommand->content);
                 releaseParamList(langtexCommand->parameters); 
                 break;
             case LANGTEX_ROW:
+            case LANGTEX_OPTIONS:
+            case LANGTEX_ANSWERS:
                 releaseContentList(langtexCommand->contentList);
-                releaseParamList(langtexCommand->parameters);                
+                releaseParamList(langtexCommand->parameters);
+                break;        
+            case LANGTEX_EXERCISE: 
+                releaseLangtexCommand(langtexCommand->answers);
+                releaseLangtexCommand(langtexCommand->options);
+                releaseLangtexCommand(langtexCommand->prompt);
+                releaseParamList(langtexCommand->parameters);
+                break;
             default:
                 break;
         }

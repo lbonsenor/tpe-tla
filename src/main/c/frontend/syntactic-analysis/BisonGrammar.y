@@ -59,11 +59,17 @@
 
 /** LaNgTeX Terminals */
 %token <token> TRANSLATE_COMMAND
-%token <token> EXERCISE_COMMAND
+
 %token <token> DIALOG_COMMAND
 %token <token> SPEAKER_COMMAND
+
 %token <token> TABLE_COMMAND
 %token <token> ROW_COMMAND
+
+%token <token> EXERCISE_COMMAND
+%token <token> PROMPT_COMMAND
+%token <token> OPTIONS_COMMAND
+%token <token> ANSWER_COMMAND
 
 %token <token> COMMA
 %token <token> OPEN_PARENTHESIS
@@ -92,6 +98,10 @@
 %type <langtexCommand> langtexCommand speakerCommand rowCommand 
 %type <langtexCommandList> speakerCommands
 %type <langtexCommandList> rowCommands
+
+%type <langtexCommand> exercisePrompt
+%type <langtexCommand> exerciseOptions
+%type <langtexCommand> exerciseAnswer
 
 %type <param> param
 %type <param_list> param_list
@@ -140,18 +150,34 @@ langtexCommand:
 	TRANSLATE_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
 																	{ $$ = TranslateSemanticAction($2, $4, $7); }
 	| DIALOG_COMMAND optional_parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
-																	{ $$ = DialogSemanticAction($2, $4); }
+																	{ $$ = TableSemanticAction($2, $4, LANGTEX_DIALOG); }
 	| TABLE_COMMAND optional_parameters OPEN_BRACE rowCommands CLOSE_BRACE 
-																	{ $$ = TableSemanticAction($2, $4); }
+																	{ $$ = TableSemanticAction($2, $4, LANGTEX_TABLE); }
+	| EXERCISE_COMMAND optional_parameters OPEN_BRACE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
+																	{ $$ = ExerciseSemanticAction($2, $4, $5, $6, LANGTEX_EXERCISE); }
 	;
 
+exercisePrompt:
+	PROMPT_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE
+																	{ $$ = SpeakerSemanticAction($2, $4, LANGTEX_PROMPT);}
+	;
+	
+exerciseOptions:
+	OPTIONS_COMMAND optional_parameters commandArgs 				{ $$ = RowSemanticAction($2,$3, LANGTEX_OPTIONS);}
+	| %empty														{ $$ = NULL; }
+	;
+
+exerciseAnswer:
+	ANSWER_COMMAND optional_parameters commandArgs					{ $$ = RowSemanticAction($2,$3, LANGTEX_ANSWERS);}
+	;
+	
 rowCommands:
 	rowCommand rowCommands 											{ $$ = AppendLangtexComand($1, $2); }
 	| rowCommand 													{ $$ = SingleLangtexCommand($1); } 
 	;
 
 rowCommand:
-	ROW_COMMAND optional_parameters commandArgs						{ $$ = RowSemanticAction($2, $3); }
+	ROW_COMMAND optional_parameters commandArgs						{ $$ = RowSemanticAction($2, $3, LANGTEX_ROW); }
 	;
 
 speakerCommands:
@@ -162,7 +188,7 @@ speakerCommands:
 
 speakerCommand: 
 	SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE 
-																	{ $$ = SpeakerSemanticAction($2, $4); }
+																	{ $$ = SpeakerSemanticAction($2, $4, LANGTEX_SPEAKER); }
 	;
 
 // TODO: see if we can optimize it by adding %empty directly in parameters

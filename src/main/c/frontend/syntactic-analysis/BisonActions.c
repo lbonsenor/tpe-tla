@@ -166,43 +166,64 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	return langtexCommand;
  }
 
- LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, LangtexCommandList * langtexCommandList) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-    LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
-    langtexCommand->parameters = parameters;
-    langtexCommand->langtexCommandList = langtexCommandList;
-    langtexCommand->type = LANGTEX_DIALOG;
-    return langtexCommand;
- }
-
-LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content) {
+LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     LangtexCommand * speakerCommand = calloc(1, sizeof(LangtexCommand));
 	speakerCommand->parameters = parameters;
     speakerCommand->content = content;
-    speakerCommand->type = LANGTEX_SPEAKER;
+    speakerCommand->type = type;
     return speakerCommand;
 }
 
+// Options
+
+// LangtexCommandList * PromptSemanticAction(LangtexParamList * parameters, Content * content, LangtexCommandType type) {
+// 	_logSyntacticAnalyzerAction(__FUNCTION__);
+// 	LangtexCommandList * optionCommand = calloc(1, sizeof(LangtexCommandList));
+// 	optionCommand->command = calloc(1, sizeof(LangtexCommand));
+// 	//TODO: check this line
+// 	// optionCommand->command->parameters = NULL; 
+// 	optionCommand->command->promptContent = content; 
+// 	optionCommand->command->type = type;
+// 	optionCommand->next = NULL;
+// 	return optionCommand;
+// }
+
 //Table
 
-LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList) {
+//TODO: change name
+LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = parameters;
 	langtexCommand->langtexCommandList = commandList;
-	langtexCommand->type = LANGTEX_TABLE;
+	langtexCommand->type = type;
 	return langtexCommand;
 }
 
-LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList) {
+//TODO: change name
+LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     LangtexCommand * rowCommand = calloc(1, sizeof(LangtexCommand));
 	rowCommand->parameters = parameters;
     rowCommand->contentList = contentList;
-    rowCommand->type = LANGTEX_ROW;
+    rowCommand->type = type;
     return rowCommand;
 }
+
+// Exercise
+LangtexCommand * ExerciseSemanticAction(LangtexParamList * parameters, LangtexCommand * commandPrompt, LangtexCommand *commandOptions, LangtexCommand * commandAnswers, LangtexCommandType type) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	langtexCommand->parameters = parameters;
+	langtexCommand->options = commandOptions;
+	langtexCommand->answers = commandAnswers;
+	langtexCommand->prompt = commandPrompt;
+
+	langtexCommand->type = type;
+	return langtexCommand;
+}
+
 
 // Parameters
 

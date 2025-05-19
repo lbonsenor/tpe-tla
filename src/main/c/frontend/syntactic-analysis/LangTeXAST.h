@@ -62,7 +62,10 @@ enum LangtexCommandType {
     LANGTEX_DIALOG,
     LANGTEX_SPEAKER,
     LANGTEX_TABLE,
-    LANGTEX_ROW
+    LANGTEX_ROW,
+    LANGTEX_OPTIONS,
+    LANGTEX_ANSWERS,
+    LANGTEX_PROMPT,
 };
 
 enum CommandType {
@@ -81,6 +84,24 @@ enum ElementType {
 enum ContentType {
     ELEMENT,
     SEQUENCE
+};
+
+struct Prompt{
+    Content * promptContent;
+    LangtexParamList * parameters;
+    LangtexCommandType type;
+};
+
+struct Options{
+    ContentList * contentList;
+    LangtexParamList * parameters;
+    LangtexCommandType type;
+
+};
+
+struct Answer{
+    ContentList * contentList;
+    LangtexParamList * parameters;
 };
 
 struct Text{
@@ -138,9 +159,11 @@ struct LangtexCommand{
     };
 
     // [!exercise]
-    // [!table]
-        //header
-        //rows--> objectList
+    struct {
+        LangtexCommand * options; 
+        LangtexCommand * answers;
+        LangtexCommand * prompt;
+    };
    };
    LangtexCommandType type;
 };
@@ -201,7 +224,6 @@ struct Program {
  void releaseProgram(Program * program);
  void releaseLangtexCommand(LangtexCommand * langtexCommand);
  void releaseLangtexCommandList(LangtexCommandList * langtexCommandList);
-
  void releaseParam(LangtexParam * param);
  void releaseParamList(LangtexParamList * list);
  void releaseObject(LangtexCommandList * langtexCommandList);
