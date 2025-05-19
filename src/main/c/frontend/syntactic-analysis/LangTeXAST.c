@@ -30,9 +30,10 @@ void releaseParam(LangtexParam * param) {
         free(param->key);
         if (param->type == STRING_PARAMETER) {
             free(param->value.stringParam);
-        } else if (param->value.stringParam != NULL) {
-			free(param->value.stringParam);  
-		}
+        } 
+        // else if (param->value.stringParam != NULL) {
+		// 	free(param->value.stringParam);  
+		// }
         free(param);
     }
     
@@ -76,14 +77,29 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
                 releaseContent(langtexCommand->leftContent);
                 releaseParamList(langtexCommand->parameters); 
                 break;
-            case LANGTEX_SPEAKER:
-                releaseContent(langtexCommand->content);
+            case LANGTEX_DIALOG:
+                releaseObject(langtexCommand->objectList);
                 releaseParamList(langtexCommand->parameters); 
                 break;
             default:
                 break;
         }
         free(langtexCommand);
+    }
+}
+
+void releaseObject(Object * object) {
+    if (object != NULL){
+        // switch (object->type){
+        //     case OBJECT_SPEAKER:
+                releaseParamList(object->parameters);
+                releaseContent(object->content);
+                releaseObject(object->next); 
+                free(object);
+            //     break;
+            // default:
+            //     break;
+        // };
     }
 }
 

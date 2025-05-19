@@ -162,30 +162,23 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	return langtexCommand;
  }
 
-//   LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent)
-//  {
-// 	_logSyntacticAnalyzerAction(__FUNCTION__);
-// 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
-// 	langtexCommand->text = leftText;
-// 	langtexCommand->content = rightContent;
-// 	langtexCommand->type = LANGTEX_SPEAKER;
-// 	return langtexCommand;
-//  }
-LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content) {
+ LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, Object * objectList) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
     langtexCommand->parameters = parameters;
-    langtexCommand->content = content;
-    langtexCommand->type = LANGTEX_SPEAKER;
+    langtexCommand->objectList = objectList;
+    langtexCommand->type = LANGTEX_DIALOG;
     return langtexCommand;
-}
+ }
 
-// LangtexParam * ParamSemanticAction(char * key, LangtexParamType * value) {
-//     LangtexParam * param = calloc(1, sizeof(LangtexParam));
-//     param->key = key;
-//     param->value = ;
-//     return param;
-// }
+Object * SpeakerSemanticAction(LangtexParamList * parameters, Content * content) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Object * speakerObject = calloc(1, sizeof(Object));
+	speakerObject->parameters = parameters;
+    speakerObject->content = content;
+    // speakerObject->type = LANGTEX_SPEAKER;
+    return speakerObject;
+}
 
 LangtexParam * IntegerParamSemanticAction(char * key, int value) {
 	LangtexParam * param = calloc(1, sizeof(LangtexParam));
@@ -227,3 +220,8 @@ LangtexParamList * EmptyParamList(void) {
     return NULL;
 }
 
+// Utils
+Object * AppendObject(Object * object, Object * objectList) {
+    object->next = objectList;
+    return object;
+}

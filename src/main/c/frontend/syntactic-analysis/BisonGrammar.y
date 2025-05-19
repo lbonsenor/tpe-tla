@@ -25,6 +25,8 @@
 	LangtexParam * param;
 	LangtexParamList * param_list;
 	Text * text;
+
+	Object* object;
 }
 
 /**
@@ -41,8 +43,9 @@
 %destructor { releaseLangtexCommand($$); } <langtexCommand>
 %destructor { releaseElement($$); } <element>
 %destructor { releaseContent($$); } <content>
-%destructor { releaseParam($$); } <param>
 %destructor { releaseParamList($$); } <param_list>
+%destructor { releaseParam($$); } <param>
+
 
 /** LaTeX Terminals */
 %token <string> COMMAND
@@ -82,11 +85,13 @@
 
 /** LaNgTeX Non-terminals **/
 %type <langtexCommand> langtexCommand
+%type <object> speakerCommand speakerCommands
 
 %type <param> param
 %type <param_list> param_list
 %type <param_list> parameters
 %type <param_list> optional_parameters
+
 /* %type <langtextParameters> langtexParameters
 %type <langtextParameter> langtexParameter */
 
@@ -113,19 +118,27 @@ element:
 	| text															{ $$ = TextElementSemanticAction($1); }
 	;
 
-
 command:
-	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE 	
+	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
 		{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
-	| COMMAND OPEN_BRACE content CLOSE_BRACE						
+	| COMMAND OPEN_BRACE content CLOSE_BRACE
 		{ $$ = ParameterizedCommandSemanticAction($1, $3); }
-	| COMMAND 							 							
+	| COMMAND
 		{ $$ = SimpleCommandSemanticAction($1); } 
 	;
 
-langtexCommand: 
+langtexCommand:
 	TRANSLATE_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  { $$ = TranslateSemanticAction($2, $4, $7); }
-	| SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($2, $4); }
+	| DIALOG_COMMAND optional_parameters OPEN_BRACE speakerCommands CLOSE_BRACE { $$ = DialogSemanticAction($2, $4); }
+	;
+
+speakerCommands:
+	speakerCommand speakerCommands	{ $$ = AppendObject($1, $2); }
+	| speakerCommand 				{ $$ = $1; }
+	;
+
+speakerCommand: 
+	SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE { $$ = SpeakerSemanticAction($2, $4); }
 	;
 
 optional_parameters:

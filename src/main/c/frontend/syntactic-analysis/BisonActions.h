@@ -33,7 +33,9 @@ void shutdownBisonActionsModule();
  Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand);
  LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Content *leftContent, Content *rightContent);
 //  LangtexCommand * SpeakerSemanticAction(Text * leftText, Content *rightContent);
-LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content);
+Object * SpeakerSemanticAction(LangtexParamList * parameters, Content * content);
+LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, Object * objectList);
+
 // LangtexParam * ParamSemanticAction(char * key, char * value);
 LangtexParamList * SingleParam(LangtexParam * param);
 LangtexParamList * AppendParam(LangtexParam * param, LangtexParamList * list);
@@ -43,5 +45,8 @@ LangtexParamList * EmptyParamList(void);
 LangtexParam * IntegerParamSemanticAction(char * key, int value);
 LangtexParam * StringParamSemanticAction(char * key, char * value);
 LangtexParam * BooleanParamSemanticAction(char * key, boolean value);
+
+// Utils
+Object * AppendObject(Object * object, Object * objectList);
 
 #endif

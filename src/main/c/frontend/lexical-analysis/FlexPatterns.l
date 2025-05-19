@@ -33,7 +33,7 @@
 "[!exercise]"                       { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),EXERCISE_COMMAND);  }
 "[!speaker]"                        { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(),SPEAKER_COMMAND); }
 
-<PARAM>","                          { return CommaLexemeAction(createLexicalAnalyzerContext()); }
+<PARAM>,[[:space:]]*                { return CommaLexemeAction(createLexicalAnalyzerContext()); }
 <PARAM>"="                          { return EqualsLexemeAction(createLexicalAnalyzerContext()); }           
 <PARAM>[[:digit:]]+					{ return ParameterLexemeAction(createLexicalAnalyzerContext(), INTEGER_PARAM); }
 <PARAM>\"[^\"]*\"                   { return ParameterLexemeAction(createLexicalAnalyzerContext(), STRING_PARAM); }
@@ -62,7 +62,8 @@
 
 
 /* ([[:alnum:]]|[[:punct:]]|[[:alpha:]])+ { return TextLexemeAction(createLexicalAnalyzerContext()); } */
-
+/* \\\\                                { return EscapedTextLexemeAction(createLexicalAnalyzerContext()); }
+\\#                                 { return EscapedTextLexemeAction(createLexicalAnalyzerContext()); } */
 /* [a-zA-Z0-9@!$#_-]+                  { return TextLexemeAction(createLexicalAnalyzerContext()); } */
 
 #include "FlexExport.h"

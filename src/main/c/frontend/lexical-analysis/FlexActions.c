@@ -133,20 +133,15 @@ Token ParameterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Tok
 		case STRING_PARAM:
 			return QuotedTextLexemeAction(lexicalAnalyzerContext);
 		case INTEGER_PARAM:
-			logDebugging(_logger, "ParameterLexemeActionIntegerParam: %s", lexicalAnalyzerContext->lexeme);
 			lexicalAnalyzerContext->semanticValue->integer = atoi(lexicalAnalyzerContext->lexeme);
-			logDebugging(_logger, "ParameterLexemeActionIntegerParam: %d", lexicalAnalyzerContext->semanticValue->integer);
 			destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 			return INTEGER_PARAM;
 		case BOOLEAN_PARAM:
-			logDebugging(_logger, "ParameterLexemeActionInBooleanParam: %s", lexicalAnalyzerContext->lexeme);
 			lexicalAnalyzerContext->semanticValue->boolean = (strcmp(lexicalAnalyzerContext->lexeme, "true") == 0);
-			logDebugging(_logger, "ParameterLexemeActionInBooleanParamAfter: %s", lexicalAnalyzerContext->semanticValue->boolean);
 			destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 			return BOOLEAN_PARAM;
 		default: 
 			lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
-			// logDebugging(_logger, "ParameterLexemeAction: %s", lexicalAnalyzerContext->semanticValue->argument);
 			destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 			return ARGS_PARAM;
 	}

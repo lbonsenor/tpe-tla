@@ -19,6 +19,7 @@ void shutdownRenameMeModule();
  typedef enum CommandType CommandType;
  typedef enum LangtexCommandType LangtexCommandType;
  typedef enum LangtexParamType LangtexParamType;
+//  typedef enum ObjectType ObjectType;
 
 
  typedef struct Text Text;
@@ -31,12 +32,21 @@ void shutdownRenameMeModule();
  typedef struct LangtexParam LangtexParam;
  typedef struct LangtexParamList LangtexParamList;
 
+ //rows, speakers, and more
+
+ typedef struct Object Object;
 
  /**
  * Node types for the Abstract Syntax Tree (AST).
  */
 
 //TODO: define the enum types.
+
+
+// enum ObjectType {
+//     OBJECT_SPEAKER,
+//     OBJECT_ROW
+// };
 
 enum LangtexParamType {
     STRING_PARAMETER,
@@ -47,7 +57,7 @@ enum LangtexParamType {
 enum LangtexCommandType {
     LANGTEX_TRANSLATE,
     LANGTEX_EXERCISE,
-    LANGTEX_DIALOGUE,
+    LANGTEX_DIALOG,
     LANGTEX_SPEAKER
 };
 
@@ -99,18 +109,40 @@ struct Command{
 struct LangtexCommand{
     LangtexParamList * parameters;
    union {
-    // [!translate] 
+    // [!translate]
     struct {
         Content * leftContent;
         Content * rightContent;
     };
-    // [!dialog]
+    // [!dialog] 
+        //spekers-->objectList
     struct {
-        Content * content;
+        Object * objectList;
     };
+
     // [!exercise]
+    // [!table]
+        //header
+        //rows--> objectList
    };
    LangtexCommandType type;
+};
+
+struct Object{
+    // ObjectType type;
+     union {
+        //Speaker
+       struct {
+        LangtexParamList * parameters;
+        Content * content;
+        };
+        // struct {
+            
+        //      Row row;
+        // }
+     };
+     Object * next;
+     
 };
 
 struct LangtexParam {
@@ -166,5 +198,5 @@ struct Program {
 
  void releaseParam(LangtexParam * param);
  void releaseParamList(LangtexParamList * list);
-
+ void releaseObject(Object * object);
 #endif
