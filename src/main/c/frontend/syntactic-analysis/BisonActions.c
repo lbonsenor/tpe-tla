@@ -31,6 +31,8 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 
 /* PUBLIC FUNCTIONS */
 
+ /* Latex semantic actions. */
+
 Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
@@ -45,7 +47,8 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	}
 	return program;
 }
- Content * AppendContentSemanticAction(Element * element, Content * content){
+
+Content * AppendContentSemanticAction(Element * element, Content * content){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Content * newContent = calloc(1, sizeof(Content));
 	newContent->sequenceElement = element;
@@ -53,18 +56,18 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	newContent->type = SEQUENCE;
 	
 	return newContent;
- }
+}
 
- Content * SingleContentSemanticAction(Element * element){
+Content * SingleContentSemanticAction(Element * element){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Content * newContent = calloc(1, sizeof(Content));
 	newContent->element = element;
 	newContent->type = ELEMENT;
 	return newContent;
 
- }
+}
 
- Command * SimpleCommandSemanticAction(char * command){
+Command * SimpleCommandSemanticAction(char * command){
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Command * newCommand = calloc(1, sizeof(Command));
     if (command != NULL) {
@@ -75,9 +78,9 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
     }
     newCommand->type = SIMPLE;
     return newCommand;
- }
+}
 
- Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs){
+Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	logDebugging(_logger, "Matched parameterized command");
 	Command * newCommand = calloc(1, sizeof(Command));
@@ -85,11 +88,11 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	newCommand->parameterizedContentList = commandArgs;
 	newCommand->type = PARAMETERIZED;
 	return newCommand;
- } 
- 
- Command * EnvironmentCommandSemanticAction(Text * text, Content * content, Text * text2){
+}
+
+Command * EnvironmentCommandSemanticAction(Text * text, Content * params, ContentList * args, Content * content, Text * text2){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	// TODO: agregar esto para validar asi no tira segmenetacion fault si algo falta 
+	// TODO: agregar esto para validar asi no tira segmenetacion fault si algo falta
 	if (!text || !content || !text2) {
 		logError(_logger, "EnvironmentCommandSemanticAction received NULL argument(s)");
 		return NULL;
@@ -101,23 +104,24 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	}
 	Command * newCommand = calloc(1, sizeof(Command));
 	newCommand->environmentLeftText = text;
+	newCommand->environmentParameters = params;
+	newCommand->environmentCommandArgs = args;
 	newCommand->environmentContent = content;
-	newCommand->environmentRightText = text2;
 	newCommand->type = ENVIRONMENT;
-	return newCommand;
- }
 
- Text * TextSemanticAction(char * text){
+	releaseText(text2);
+	return newCommand;
+}
+
+Text * TextSemanticAction(char * text){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Text * newText = calloc(1, sizeof(Text));
 	newText->text = text;
 	return newText;
- }
+}
 
- Element * CommandElementSemanticAction(Command *command)
- {
+Element * CommandElementSemanticAction(Command *command){
     _logSyntacticAnalyzerAction(__FUNCTION__);
-	// TODO:
 	if (!command) {
 		logError(_logger, "CommandElementSemanticAction received NULL command");
 		return NULL;
@@ -126,47 +130,27 @@ Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * 
 	newElement->command = command;
 	newElement->type = LATEX_COMMAND;
 	return newElement;
- }
+}
 
- ContentList * ContentListSemanticAction(Content * content, ContentList * next){
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	ContentList * newContentList = calloc(1, sizeof(ContentList));
-	newContentList->content = content;
-	newContentList->next = next;
-	return newContentList;
- }
-
- Element *TextElementSemanticAction(Text *text)
- {
+Element * TextElementSemanticAction(Text * text){
     _logSyntacticAnalyzerAction(__FUNCTION__);
 	Element * newElement = calloc(1, sizeof(Element));
 	newElement->text = text;
 	newElement->type = LATEX_TEXT;
 	return newElement;
- }
+}
 
+/* Langtex semantic actions. */
 
-  Element * LangtexCommandElementSemanticAction(LangtexCommand *langtexCommand)
- {
+Element * LangtexCommandElementSemanticAction(LangtexCommand * langtexCommand){
     _logSyntacticAnalyzerAction(__FUNCTION__);
 	Element * newElement = calloc(1, sizeof(Element));
 	newElement->langtexCommand = langtexCommand;
 	newElement->type = LANGTEX_COMMAND;
 	return newElement;
- }
+}
 
- LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftContent, Content *rightContent)
- {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
-	langtexCommand->parameters = parameters;
-	langtexCommand->leftContent = leftContent;
-	langtexCommand->rightContent = rightContent;
-	langtexCommand->type = LANGTEX_TRANSLATE;
-	return langtexCommand;
- }
-
-LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * content, LangtexCommandType type) {
+LangtexCommand * LangtexSimpleContentSemanticAction(LangtexParamList * parameters, Content * content, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     LangtexCommand * speakerCommand = calloc(1, sizeof(LangtexCommand));
 	speakerCommand->parameters = parameters;
@@ -175,24 +159,7 @@ LangtexCommand * SpeakerSemanticAction(LangtexParamList * parameters, Content * 
     return speakerCommand;
 }
 
-// Options
-
-// LangtexCommandList * PromptSemanticAction(LangtexParamList * parameters, Content * content, LangtexCommandType type) {
-// 	_logSyntacticAnalyzerAction(__FUNCTION__);
-// 	LangtexCommandList * optionCommand = calloc(1, sizeof(LangtexCommandList));
-// 	optionCommand->command = calloc(1, sizeof(LangtexCommand));
-// 	//TODO: check this line
-// 	// optionCommand->command->parameters = NULL; 
-// 	optionCommand->command->promptContent = content; 
-// 	optionCommand->command->type = type;
-// 	optionCommand->next = NULL;
-// 	return optionCommand;
-// }
-
-//Table
-
-//TODO: change name
-LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList, LangtexCommandType type) {
+LangtexCommand * LangtexCommandListSemanticAction(LangtexParamList * parameters, LangtexCommandList * commandList, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = parameters;
@@ -201,8 +168,7 @@ LangtexCommand * TableSemanticAction(LangtexParamList * parameters, LangtexComma
 	return langtexCommand;
 }
 
-//TODO: change name
-LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * contentList, LangtexCommandType type) {
+LangtexCommand * LangtexContentListSemanticAction(LangtexParamList * parameters, ContentList * contentList, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     LangtexCommand * rowCommand = calloc(1, sizeof(LangtexCommand));
 	rowCommand->parameters = parameters;
@@ -211,7 +177,16 @@ LangtexCommand * RowSemanticAction(LangtexParamList * parameters, ContentList * 
     return rowCommand;
 }
 
-// Exercise
+LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftContent, Content *rightContent) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	langtexCommand->parameters = parameters;
+	langtexCommand->leftContent = leftContent;
+	langtexCommand->rightContent = rightContent;
+	langtexCommand->type = LANGTEX_TRANSLATE;
+	return langtexCommand;
+}
+
 LangtexCommand * ExerciseSemanticAction(LangtexParamList * parameters, LangtexCommand * commandPrompt, LangtexCommand *commandOptions, LangtexCommand * commandAnswers, LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
@@ -223,9 +198,26 @@ LangtexCommand * ExerciseSemanticAction(LangtexParamList * parameters, LangtexCo
 	langtexCommand->type = type;
 	return langtexCommand;
 }
+LangtexCommand * LanguageSemanticAction( TextList * textList, LangtexCommandType type) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	langtexCommand->parameters = NULL;
+	langtexCommand->textList = textList;
+	langtexCommand->type = type;
+	return langtexCommand;
+}
+
+LangtexCommand * FillSemanticAction(Text * text, LangtexCommandType type) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
+	langtexCommand->parameters = NULL;
+	langtexCommand->text = text;
+	langtexCommand->type = type;
+	return langtexCommand;
+}
 
 
-// Parameters
+/* Langtex Parameter Type Actions */
 
 LangtexParam * IntegerParamSemanticAction(char * key, int value) {
 	LangtexParam * param = calloc(1, sizeof(LangtexParam));
@@ -251,12 +243,15 @@ LangtexParam * BooleanParamSemanticAction(char * key, boolean value){
 	return param;
 }
 
+/* Langtex Parameter Actions */
+
 LangtexParamList * SingleParam(LangtexParam * param) {
     LangtexParamList * list = calloc(1, sizeof(LangtexParamList));
     list->param = param;
     list->next = NULL;
     return list;
 }
+
 LangtexParamList * AppendParam(LangtexParam * param, LangtexParamList * list) {
     LangtexParamList * newList = calloc(1, sizeof(LangtexParamList));
     newList->param = param;
@@ -268,7 +263,24 @@ LangtexParamList * EmptyParamList(void) {
     return NULL;
 }
 
-// Utils
+/* Utils */
+
+ContentList * ContentListSemanticAction(Content * content, ContentList * next){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	ContentList * newContentList = calloc(1, sizeof(ContentList));
+	newContentList->content = content;
+	newContentList->next = next;
+	return newContentList;
+}
+
+TextList * TextListSemanticAction(Text * text, TextList * next){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	TextList * newTextList = calloc(1, sizeof(TextList));
+	newTextList->text = text;
+	newTextList->next = next;
+	return newTextList;
+}
+
 LangtexCommandList * AppendLangtexComand(LangtexCommand * langtexCommand, LangtexCommandList * langtexCommandList) {
     LangtexCommandList * newList = calloc(1, sizeof(LangtexCommandList));
 	newList->command = langtexCommand;

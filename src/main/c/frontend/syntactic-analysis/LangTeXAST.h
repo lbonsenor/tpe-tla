@@ -14,58 +14,31 @@ void shutdownRenameMeModule();
  * This typedefs allows self-referencing types.
  */
 
- typedef enum ContentType ContentType;
- typedef enum ElementType ElementType;
- typedef enum CommandType CommandType;
- typedef enum LangtexCommandType LangtexCommandType;
- typedef enum LangtexParamType LangtexParamType;
-//  typedef enum ObjectType ObjectType;
+typedef enum ContentType ContentType;
+typedef enum ElementType ElementType;
+typedef enum CommandType CommandType;
+typedef enum LangtexCommandType LangtexCommandType;
+typedef enum LangtexParamType LangtexParamType;
 
+typedef struct Text Text;
+typedef struct Command Command;
+typedef struct ContentList ContentList;
+typedef struct TextList TextList;
+typedef struct LangtexCommand LangtexCommand;
+typedef struct Program Program;
+typedef struct Content Content;
+typedef struct Element Element;
 
- typedef struct Text Text;
- typedef struct Command Command;
- typedef struct ContentList ContentList;
- typedef struct LangtexCommand LangtexCommand;
- typedef struct Program Program;
- typedef struct Content Content;
- typedef struct Element Element;
+typedef struct LangtexParam LangtexParam;
+typedef struct LangtexParamList LangtexParamList;
+typedef struct LangtexCommandList LangtexCommandList;
 
- typedef struct LangtexParam LangtexParam;
- typedef struct LangtexParamList LangtexParamList;
- typedef struct LangtexCommandList LangtexCommandList;
-
- //rows, speakers, and more
-
- typedef struct Object Object;
-
- /**
+/**
  * Node types for the Abstract Syntax Tree (AST).
  */
-
-//TODO: define the enum types.
-
-
-// enum ObjectType {
-//     OBJECT_SPEAKER,
-//     OBJECT_ROW
-// };
-
-enum LangtexParamType {
-    STRING_PARAMETER,
-    BOOLEAN_PARAMETER,
-    INTEGER_PARAMETER
-};
-
-enum LangtexCommandType {
-    LANGTEX_TRANSLATE,
-    LANGTEX_EXERCISE,
-    LANGTEX_DIALOG,
-    LANGTEX_SPEAKER,
-    LANGTEX_TABLE,
-    LANGTEX_ROW,
-    LANGTEX_OPTIONS,
-    LANGTEX_ANSWERS,
-    LANGTEX_PROMPT,
+enum ContentType {
+    ELEMENT,
+    SEQUENCE
 };
 
 enum CommandType {
@@ -80,10 +53,70 @@ enum ElementType {
     LATEX_TEXT
 };
 
- 
-enum ContentType {
-    ELEMENT,
-    SEQUENCE
+enum LangtexCommandType {
+    LANGTEX_TRANSLATE,
+    LANGTEX_EXERCISE,
+    LANGTEX_DIALOG,
+    LANGTEX_SPEAKER,
+    LANGTEX_TABLE,
+    LANGTEX_ROW,
+    LANGTEX_OPTIONS,
+    LANGTEX_ANSWERS,
+    LANGTEX_PROMPT,
+    LANGTEX_BLOCK,
+    LANGTEX_LANGUAGE,
+    LANGTEX_FILL
+};
+
+enum LangtexParamType {
+    STRING_PARAMETER,
+    BOOLEAN_PARAMETER,
+    INTEGER_PARAMETER
+};
+
+/* Langtex */
+
+struct LangtexCommand{
+    LangtexParamList * parameters;
+    union {
+    // Usage: translate
+    struct {
+        Content * leftContent;
+        Content * rightContent;
+    };
+    // Usage: dialog, table
+    struct {
+        LangtexCommandList * langtexCommandList;
+    };
+    // Usage: speaker
+    struct {
+        Content * content;
+    };
+    // Usage: row
+    struct {
+        ContentList * contentList;
+    };
+    // Usage: exercise
+    struct {
+        LangtexCommand * options;
+        LangtexCommand * answers;
+        LangtexCommand * prompt;
+    };
+    // Usage: language
+    struct {
+        TextList * textList;
+    };
+    // Usage: fill
+    struct {
+        Text * text;
+    };
+   };
+   LangtexCommandType type;
+};
+
+struct LangtexCommandList{
+    LangtexCommand * command;
+    LangtexCommandList * next;
 };
 
 struct Prompt{
@@ -96,7 +129,6 @@ struct Options{
     ContentList * contentList;
     LangtexParamList * parameters;
     LangtexCommandType type;
-
 };
 
 struct Answer{
@@ -104,74 +136,7 @@ struct Answer{
     LangtexParamList * parameters;
 };
 
-struct Text{
-    char * text;
-};
-
-struct Command{
-    union{
-        // \command
-		struct {
-			char * simpleCommand;
-		};
-
-        // \begin{...}...\end{...}
-        struct {
-            Text * environmentLeftText;
-            Content * environmentContent;
-            Text * environmentRightText;
-        };
-
-        // \command{...}
-        struct {
-            char * parameterizedCommand;
-            ContentList * parameterizedContentList;
-        };
-    };
-    CommandType type;
-};
-
-struct ContentList{
-    Content * content;
-    ContentList * next;
-};
-
-struct LangtexCommand{
-    LangtexParamList * parameters;
-   union {
-    // [!translate]{}{}
-    struct {
-        Content * leftContent;
-        Content * rightContent;
-    };
-    // [!dialog]{}{}, table 
-        //spekers-->objectList
-    struct {
-        LangtexCommandList * langtexCommandList;
-    };
-    // [!speaker]{}
-    struct {
-        Content * content;
-    };
-    // [!row]
-    struct {
-        ContentList * contentList;
-    };
-
-    // [!exercise]
-    struct {
-        LangtexCommand * options; 
-        LangtexCommand * answers;
-        LangtexCommand * prompt;
-    };
-   };
-   LangtexCommandType type;
-};
-
-struct LangtexCommandList{
-    LangtexCommand * command;
-    LangtexCommandList * next;
-};
+/* Langtex Parameters */
 
 struct LangtexParam {
     char * key;
@@ -188,14 +153,7 @@ struct LangtexParamList {
     LangtexParamList * next;
 };
 
-struct Element{
-    union{
-        LangtexCommand * langtexCommand;
-        Command * command;
-        Text * text;
-    };
-    ElementType type;
-};
+/* Latex */
 
 struct Content{
     union{
@@ -208,10 +166,56 @@ struct Content{
     ContentType type;
 };
 
+struct ContentList{
+    Content * content;
+    ContentList * next;
+};
+
+struct Text{
+    char * text;
+};
+
+struct TextList{
+    Text * text;
+    TextList * next;
+};
+
+struct Command{
+    union{
+        // \command
+		struct {
+			char * simpleCommand;
+		};
+
+        // \begin{...}...\end{...}
+        struct {
+            Text * environmentLeftText;
+            Content * environmentParameters;
+            ContentList * environmentCommandArgs;
+            Content * environmentContent;
+        };
+
+        // \command{...}
+        struct {
+            char * parameterizedCommand;
+            ContentList * parameterizedContentList;
+        };
+    };
+    CommandType type;
+};
+
+struct Element{
+    union{
+        LangtexCommand * langtexCommand;
+        Command * command;
+        Text * text;
+    };
+    ElementType type;
+};
+
 struct Program {
 	Content * content;
 };
-
 
 
 /**
@@ -228,4 +232,5 @@ struct Program {
  void releaseParamList(LangtexParamList * list);
  void releaseObject(LangtexCommandList * langtexCommandList);
  void releaseContentList(ContentList * contentList);
+ void releaseTextList(TextList * textList);
 #endif

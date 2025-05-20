@@ -76,6 +76,13 @@ Token BraceLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token t
 	return token;
 }
 
+Token BracketLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	lexicalAnalyzerContext->semanticValue->token = token == OPEN_BRACKET;
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+	return token;
+}
+
 void CommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	if (_logIgnoredLexemes) {
 		_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
@@ -86,8 +93,6 @@ void CommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 Token TextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
 	lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
-	// printf("%s", lexicalAnalyzerContext->semanticValue->string); -> esto me parece que esta mal, Flex no deberia imprimir nada por consola 
-	// “El procesamiento léxico no debe emitir resultados, sino dejar eso al backend.”
 	logDebugging(_logger, "TextLexemeAction: %s", lexicalAnalyzerContext->semanticValue->string);
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 	return TEXT;
@@ -121,12 +126,6 @@ Token LangtexCommandLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext
 	return COMMA;
  }
 
- Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
-	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
-	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
-	return UNKNOWN;
-}
-
 Token ParameterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
 	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
 	switch(token) {
@@ -153,18 +152,23 @@ Token QuotedTextLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     char * quoted = lexicalAnalyzerContext->lexeme;
     size_t len = strlen(quoted);
 
-    // Ensure length is at least 2 and begins and ends with quotes
     if (len >= 2 && quoted[0] == '"' && quoted[len - 1] == '"') {
         quoted[len - 1] = '\0'; // strip trailing quote
         char * unquoted = strdup(quoted + 1); // skip initial quote
         lexicalAnalyzerContext->semanticValue->string = unquoted;
     } else {
-        // fallback, shouldn't happen
         lexicalAnalyzerContext->semanticValue->string = strdup(quoted);
     }
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 
     return STRING_PARAM;
+}
+
+
+Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+	_logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+	destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
+	return UNKNOWN;
 }
 
 

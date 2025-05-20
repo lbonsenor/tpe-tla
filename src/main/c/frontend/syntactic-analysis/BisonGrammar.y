@@ -8,26 +8,30 @@
 %define api.value.union.name SemanticValue
 
 %union {
-	/** Terminals. */
-
+	/** Terminals. **/
 	int integer;
 	Token token;
 	char * string;
 	boolean boolean;
 
-	/** Non-terminals. */
-
+	/** Non-terminals. **/
 	Program * program;
 	Element * element;
+	Text * text;
 	Content * content;
 	ContentList * contentList;
-	Command * command;
-	LangtexCommand * langtexCommand;
+	TextList * textList;
+
+	/** Latex **/
+	Command * command; 
+
+	/** Langtex **/
+	LangtexCommand * langtexCommand; 
 	LangtexCommandList * langtexCommandList;
+
+	/** Langtex Parameters **/
 	LangtexParam * param;
 	LangtexParamList * param_list;
-	Text * text;
-
 }
 
 /**
@@ -42,58 +46,56 @@
 %destructor { releaseText($$); } <text>
 %destructor { releaseCommand($$); } <command>
 %destructor { releaseLangtexCommand($$); } <langtexCommand>
-%destructor {releaseLangtexCommandList($$); } <langtexCommandList>
+%destructor { releaseLangtexCommandList($$); } <langtexCommandList>
 %destructor { releaseElement($$); } <element>
 %destructor { releaseContent($$); } <content>
 %destructor { releaseParamList($$); } <param_list>
 %destructor { releaseParam($$); } <param>
 
 
-/** LaTeX Terminals */
+/** LaTeX Terminals **/
 %token <string> COMMAND
 %token <token> BEGIN_ENVIRONMENT
 %token <token> END_ENVIRONMENT
 %token <token> OPEN_BRACE
 %token <token> CLOSE_BRACE
+%token <token> OPEN_BRACKET
+%token <token> CLOSE_BRACKET
 %token <string> TEXT
+%token <token> UNKNOWN
 
-/** LaNgTeX Terminals */
+/** LaNgTeX Terminals **/
 %token <token> TRANSLATE_COMMAND
-
 %token <token> DIALOG_COMMAND
 %token <token> SPEAKER_COMMAND
-
 %token <token> TABLE_COMMAND
 %token <token> ROW_COMMAND
-
 %token <token> EXERCISE_COMMAND
 %token <token> PROMPT_COMMAND
 %token <token> OPTIONS_COMMAND
 %token <token> ANSWER_COMMAND
-
 %token <token> LANGUAGE_COMMAND
-
 %token <token> BLOCK_COMMAND
+%token <token> FILL_COMMAND
 
+/** Punctuation **/ 
 %token <token> COMMA
 %token <token> OPEN_PARENTHESIS
 %token <token> CLOSE_PARENTHESIS
 %token <token> EQUAL
 %token <string> ARGS_PARAM
 
+/** Param types **/
 %token <integer> INTEGER_PARAM
 %token <string> STRING_PARAM
 %token <boolean> BOOLEAN_PARAM
-
-/** Other Terminals */ 
-%token <token> UNKNOWN
-
-/** Non-terminals. */
 
 /** LaTeX Non-terminals. */
 %type <program> program
 %type <content> content
 %type <contentList> commandArgs
+%type <content> commandParams
+%type <textList> textArgs
 %type <element> element
 %type <command> command
 %type <text> text
@@ -102,13 +104,10 @@
 %type <langtexCommand> langtexCommand speakerCommand rowCommand exercisePrompt exerciseOptions exerciseAnswer
 %type <langtexCommandList> speakerCommands rowCommands
 
+/** Params **/
 %type <param> param
 %type <param_list> param_list
 %type <param_list> parameters
-%type <param_list> optional_parameters
-
-/* %type <langtextParameters> langtexParameters
-%type <langtextParameter> langtexParameter */
 
 /**
  * Precedence and associativity.
@@ -118,13 +117,17 @@
 %%
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
+
+/* ============================ PROGRAM ============================ */
 program: 
 	content 														{ $$ = ContentProgramSemanticAction(currentCompilerState(), $1); }
 	;
 
+/* =========================== ESSENTIALS ========================== */
+
 content:
 	element content  												{ $$ = AppendContentSemanticAction($1, $2); }
-	| element														{ $$ = SingleContentSemanticAction($1); }
+	| %empty														{ $$ = NULL; }
 	;
 
 element:
@@ -133,71 +136,55 @@ element:
 	| text															{ $$ = TextElementSemanticAction($1); }
 	;
 
-command:
-	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
-																	{ $$ = EnvironmentCommandSemanticAction($3, $5, $8); }
-	| COMMAND commandArgs
-																	{ $$ = ParameterizedCommandSemanticAction($1,$2); }
-	;
-
 commandArgs:
 	OPEN_BRACE content CLOSE_BRACE commandArgs						{ $$ = ContentListSemanticAction($2, $4); }
 	| %empty														{ $$ = NULL; }
 	;
 
-langtexCommand:
-	TRANSLATE_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
-																	{ $$ = TranslateSemanticAction($2, $4, $7); }
-	| DIALOG_COMMAND optional_parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
-																	{ $$ = TableSemanticAction($2, $4, LANGTEX_DIALOG); }
-	| TABLE_COMMAND optional_parameters OPEN_BRACE rowCommands CLOSE_BRACE 
-																	{ $$ = TableSemanticAction($2, $4, LANGTEX_TABLE); }
-	| EXERCISE_COMMAND optional_parameters OPEN_BRACE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
-																	{ $$ = ExerciseSemanticAction($2, $4, $5, $6, LANGTEX_EXERCISE); }
-	;
-
-exercisePrompt:
-	PROMPT_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE
-																	{ $$ = SpeakerSemanticAction($2, $4, LANGTEX_PROMPT);}
-	;
-	
-exerciseOptions:
-	OPTIONS_COMMAND optional_parameters commandArgs 				{ $$ = RowSemanticAction($2,$3, LANGTEX_OPTIONS);}
+textArgs:
+	OPEN_BRACE text CLOSE_BRACE textArgs 							{ $$ = TextListSemanticAction($2, $4); }
 	| %empty														{ $$ = NULL; }
 	;
 
-exerciseAnswer:
-	ANSWER_COMMAND optional_parameters commandArgs					{ $$ = RowSemanticAction($2,$3, LANGTEX_ANSWERS);}
-	;
-	
-rowCommands:
-	rowCommand rowCommands 											{ $$ = AppendLangtexComand($1, $2); }
-	| rowCommand 													{ $$ = SingleLangtexCommand($1); } 
+text:
+	TEXT 															{ $$ = TextSemanticAction($1); }
 	;
 
-rowCommand:
-	ROW_COMMAND optional_parameters commandArgs						{ $$ = RowSemanticAction($2, $3, LANGTEX_ROW); }
+/* ============================= LATEX ============================= */
+
+command:
+	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE commandParams commandArgs content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
+																	{ $$ = EnvironmentCommandSemanticAction($3, $5, $6, $7, $10); }
+	| COMMAND commandArgs
+																	{ $$ = ParameterizedCommandSemanticAction($1,$2); }
 	;
 
-speakerCommands:
-	speakerCommand speakerCommands									{ $$ = AppendLangtexComand($1, $2); }
-	| speakerCommand 												{ $$ = SingleLangtexCommand($1); }
+commandParams:
+	OPEN_BRACKET content CLOSE_BRACKET								{ $$ = $2; }
+	| %empty														{ $$ = NULL; }
+
+/* ============================ LANGTEX ============================ */
+
+langtexCommand:
+	TRANSLATE_COMMAND parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
+																	{ $$ = TranslateSemanticAction($2, $4, $7); }
+	| DIALOG_COMMAND parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
+																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_DIALOG); }
+	| TABLE_COMMAND parameters OPEN_BRACE rowCommands CLOSE_BRACE 
+																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_TABLE); }
+	| EXERCISE_COMMAND parameters OPEN_BRACE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
+																	{ $$ = ExerciseSemanticAction($2, $4, $5, $6, LANGTEX_EXERCISE); }
+	| BLOCK_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
+																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_BLOCK); }
+	| LANGUAGE_COMMAND textArgs
+																	{ $$ = LanguageSemanticAction($2, LANGTEX_LANGUAGE); }
+	| FILL_COMMAND text
+																	{ $$ = FillSemanticAction($2, LANGTEX_FILL); }
 	;
 
-
-speakerCommand: 
-	SPEAKER_COMMAND optional_parameters OPEN_BRACE content CLOSE_BRACE 
-																	{ $$ = SpeakerSemanticAction($2, $4, LANGTEX_SPEAKER); }
-	;
-
-// TODO: see if we can optimize it by adding %empty directly in parameters
-optional_parameters:
-    parameters  													{ $$ = $1; }
-  	| %empty      													{ $$ = EmptyParamList(); }
-  	;
-	
 parameters:
     OPEN_PARENTHESIS param_list CLOSE_PARENTHESIS 					{ $$ = $2; }
+	| %empty														{ $$ = EmptyParamList(); }
 	;
 
 param_list:
@@ -212,7 +199,41 @@ param:
 	| ARGS_PARAM EQUAL BOOLEAN_PARAM								{ $$ = BooleanParamSemanticAction($1, $3); }
   	;
 
-text:
-	TEXT 															{ $$ = TextSemanticAction($1); }
+	/* ========================= EXERCISE ========================== */
+	exercisePrompt:
+		PROMPT_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
+																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_PROMPT);}
+		;
+		
+	exerciseOptions:
+		OPTIONS_COMMAND parameters commandArgs 						{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_OPTIONS);}
+		| %empty													{ $$ = NULL; }
+		;
+
+	exerciseAnswer:
+		ANSWER_COMMAND parameters commandArgs						{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_ANSWERS);}
+		;
+	
+	/* ============================ ROW ============================ */
+	rowCommands:
+		rowCommand rowCommands 										{ $$ = AppendLangtexComand($1, $2); }
+		| rowCommand 												{ $$ = SingleLangtexCommand($1); } 
+		;
+
+	rowCommand:
+		ROW_COMMAND parameters commandArgs							{ $$ = LangtexContentListSemanticAction($2, $3, LANGTEX_ROW); }
+		;
+
+	/* ========================== SPEAKER ========================== */
+	speakerCommands:
+		speakerCommand speakerCommands								{ $$ = AppendLangtexComand($1, $2); }
+		| speakerCommand 											{ $$ = SingleLangtexCommand($1); }
+		;
+
+	
+	speakerCommand: 
+		SPEAKER_COMMAND parameters OPEN_BRACE content CLOSE_BRACE 
+																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_SPEAKER); }
+		;
 
 %%

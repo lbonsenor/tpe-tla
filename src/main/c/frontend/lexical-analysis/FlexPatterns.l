@@ -25,7 +25,6 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
-// TODO: useLangugae and block 
 
 %%
 "[!translate]"                      { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), TRANSLATE_COMMAND); }
@@ -39,6 +38,9 @@
 "[!answer]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), ANSWER_COMMAND); }
 "[!useLanguage]"                    { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), LANGUAGE_COMMAND); }
 "[!block]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), BLOCK_COMMAND);}
+"[!fill]"                           { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
+
+\\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 <PARAM>,[[:space:]]*                { return CommaLexemeAction(createLexicalAnalyzerContext()); }
 <PARAM>"="                          { return EqualsLexemeAction(createLexicalAnalyzerContext()); }           
@@ -58,19 +60,16 @@
 \{                                  { return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
 \}                                  { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
 
+\[                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACKET); }
+\]                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACKET); }
+
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 
 [[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-[^\\{}#\$%\^&_~\[\]]+               { return TextLexemeAction(createLexicalAnalyzerContext()); }
+[^\\{}#\$%\^_~\[\]]+               { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 .									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
-
-
-/* ([[:alnum:]]|[[:punct:]]|[[:alpha:]])+ { return TextLexemeAction(createLexicalAnalyzerContext()); } */
-/* \\\\                                { return EscapedTextLexemeAction(createLexicalAnalyzerContext()); }
-\\#                                 { return EscapedTextLexemeAction(createLexicalAnalyzerContext()); } */
-/* [a-zA-Z0-9@!$#_-]+                  { return TextLexemeAction(createLexicalAnalyzerContext()); } */
 
 #include "FlexExport.h"

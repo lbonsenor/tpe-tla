@@ -1,0 +1,10 @@
+[!dialog]{
+    [!speaker]{
+        [!dialog]{
+            [!speaker]{hello}
+        }
+    }
+    [!speaker]{"text"}
+}
+% Note: This test case currently passes, but should be rejected later by the backend.
+% Nested [!dialog] commands like this are invalid and will be caught during semantic validation.
