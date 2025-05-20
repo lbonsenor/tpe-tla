@@ -9,7 +9,8 @@
 > - `Fernando LI` | <feli@itba.edu.ar> | Legajo `64382`
 > - `Matias RINALDO` | <mrinaldo@itba.edu.ar> | Legajo `60357`
 
-Notas
+## Notas
+Subimos un nuevo documento de especificación (v2.0.0) en la carpeta doc, que refleja los cambios realizados en la sintaxis y diseño del lenguaje.
 
 ---
 
