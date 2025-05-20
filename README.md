@@ -9,6 +9,8 @@
 > - `Fernando LI` | <feli@itba.edu.ar> | Legajo `64382`
 > - `Matias RINALDO` | <mrinaldo@itba.edu.ar> | Legajo `60357`
 
+Notas
+
 ---
 
 ## Flex-Bison-Compiler
