@@ -1,4 +1,5 @@
-// #include "backend/code-generation/Generator.h"
+#include "backend/code-generation/Generator.h"
+#include "backend/domain-specific/Langtex.h"
 // #include "backend/domain-specific/Calculator.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/LangTeXAST.h"
@@ -22,7 +23,8 @@ const int main(const int count, const char ** arguments) {
 	initializeSyntacticAnalyzerModule();
 	initializeRenameMeModule();
 	// initializeCalculatorModule();
-	// initializeGeneratorModule();
+	initializeLangtexModule(); 
+	initializeGeneratorModule();
 
 	// Logs the arguments of the application.
 	for (int k = 0; k < count; ++k) {
@@ -33,7 +35,7 @@ const int main(const int count, const char ** arguments) {
 	CompilerState compilerState = {
 		.abstractSyntaxtTree = NULL,
 		.succeed = false,
-		.value = 0
+		.value = 0 // is it necessary?
 	};
 	const SyntacticAnalysisStatus syntacticAnalysisStatus = parse(&compilerState);
 	CompilationStatus compilationStatus = SUCCEED;
@@ -43,14 +45,15 @@ const int main(const int count, const char ** arguments) {
 		// Beginning of the Backend... ------------------------------------------------------------
 		logDebugging(logger, "Computing expression value...");
 		// ComputationResult computationResult = computeExpression(program->expression);
-		// if (computationResult.succeed) {
-		// 	compilerState.value = computationResult.value;
-		// 	generate(&compilerState);
-		// }
-		// else {
-		// 	logError(logger, "The computation phase rejects the input program.");
-		// 	compilationStatus = FAILED;
-		// }
+		ComputationResult computationResult = computeContent(program->content);
+		if (computationResult.succeed) {
+			compilerState.value = computationResult.value;
+			generate(&compilerState);
+		}
+		else {
+			logError(logger, "The computation phase rejects the input program.");
+			compilationStatus = FAILED;
+		}
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 	}
@@ -61,7 +64,8 @@ const int main(const int count, const char ** arguments) {
 	logDebugging(logger, "Releasing AST resources...");
 	releaseProgram(program);
 	logDebugging(logger, "Releasing modules resources...");
-	// shutdownGeneratorModule();
+	shutdownGeneratorModule();
+	shutdownLangtexModule();
 	// shutdownCalculatorModule();
 	shutdownRenameMeModule();
 	shutdownSyntacticAnalyzerModule();
