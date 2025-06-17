@@ -32,17 +32,34 @@ static ComputationResult _invalidComputation() {
 
 ComputationResult computeContent(Content * content){
 	logDebugging(_logger, "In compute content function");
+	if (content == NULL) {
+		logError(_logger, "Content is NULL");
+		return (ComputationResult){
+					.succeed = true,
+					.value = 0 // Placeholder value, actual logic needed
+				};
+	}
 	logDebugging(_logger, "Content type is SEQUENCE?: %s",content->type == SEQUENCE ? "YES" : "NO");
-	logDebugging(_logger, "Content: %s",content->sequenceElement->text->text);
 
 
 	switch(content->type){
-		case ELEMENT: 
-			return computeElement(content->element);
+		// case ELEMENT: 
+		// 	return computeElement(content->element);
 		case SEQUENCE: 
 			ComputationResult sequenceElementResult = computeElement(content->sequenceElement);
-			logDebugging(_logger,"ContentSequence is NULL?: %s", content->sequenceContent == NULL ? "yes" : "no");
-			ComputationResult sequenceContentResult = computeContent(content->sequenceContent);
+			ComputationResult sequenceContentResult;
+	
+			if (content->sequenceContent != NULL) {
+				sequenceContentResult = computeContent(content->sequenceContent);
+			}
+			else {
+				sequenceContentResult = (ComputationResult){
+					.succeed = true,
+					.value = 0 // Placeholder value, actual logic needed
+				};
+			}
+
+			
 			if (sequenceElementResult.succeed && sequenceContentResult.succeed){
 					return (ComputationResult){
 							.succeed = true,
@@ -81,6 +98,77 @@ ComputationResult computeText(Text * text){
 	//todo return something
 }
 
+// case LANGTEX_EXERCISE:
+// 			ComputationResult promptResult = computeLangtexCommand(langtexCommand->prompt);
+// 			ComputationResult optionsResult = computeLangtexCommand(langtexCommand->options);
+// 			ComputationResult answersResult = computeLangtexCommand(langtexCommand->answers);
+// 			if (parametersResult.succeed && answersResult.succeed && optionsResult.succeed && promptResult.succeed) {
+// 				// Handle the exercise logic, e.g., storing or printing the result.
+// 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
+// 			} else {
+// 				logError(_logger, "Failed to compute exercise components.");
+// 				return _invalidComputation();
+// 			}
+// 			break;
+// 		case LANGTEX_DIALOG:
+// 		case LANGTEX_TABLE:
+// 			ComputationResult commandListResult = computeLangtexCommandList(langtexCommand->langtexCommandList);
+// 			if (parametersResult.succeed && commandListResult.succeed) {
+// 				// Handle dialog or table logic, e.g., storing or printing the result.
+// 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
+// 			} else {
+// 				logError(_logger, "Failed to compute command list in dialog or table command.");
+// 				return _invalidComputation();
+// 			}
+// 			break;
+// 		case LANGTEX_SPEAKER:
+// 		case LANGTEX_PROMPT:
+// 		case LANGTEX_BLOCK:
+// 			ComputationResult contentResult = computeContent(langtexCommand->content);
+// 			if (parametersResult.succeed && contentResult.succeed) {
+// 				// Handle speaker, prompt, or block logic, e.g., storing or printing the result.
+// 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
+// 			} else {
+// 				logError(_logger, "Failed to compute content in speaker, prompt, or block command.");
+// 				return _invalidComputation();
+// 			}
+// 			break;
+// 		case LANGTEX_ROW:
+// 		case LANGTEX_OPTIONS:
+// 		case LANGTEX_ANSWERS:
+// 			ComputationResult contentListResult = computeContentList(langtexCommand->contentList);
+// 			if (parametersResult.succeed && contentListResult.succeed) {
+// 				// Handle row, options, or answers logic, e.g., storing or printing the result.
+// 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
+// 			} else {
+// 				logError(_logger, "Failed to compute content list in row, options, or answers command.");
+// 				return _invalidComputation();
+// 			}
+// 			break;
+// 		case LANGTEX_LANGUAGE:
+// 			ComputationResult textListResult = computeTextList(langtexCommand->textList);
+// 			if (parametersResult.succeed && textListResult.succeed) {
+// 				// Handle language command logic, e.g., storing or printing the result.
+// 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
+// 			} else {
+// 				logError(_logger, "Failed to compute text list in language command.");
+// 				return _invalidComputation();
+// 			}
+// 			break;
+// 		case LANGTEX_FILL:
+// 			ComputationResult textResult = computeText(langtexCommand->text);
+// 			if (parametersResult.succeed && textResult.succeed) {
+// 				// Handle fill command logic, e.g., storing or printing the result.
+// 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
+// 			} else {
+// 				logError(_logger, "Failed to compute text in fill command.");
+// 				return _invalidComputation();
+// 			}
+// 			break;
+// 		default:
+// 			logError(_logger, "Unknown langtex command type: %d", langtexCommand->type);
+// 			return _invalidComputation();
+// 	}
 
 // TODO: all of these functions need an actual computation success implementation.
 ComputationResult computeLangtexCommand(LangtexCommand * langtexCommand) {
@@ -90,24 +178,9 @@ ComputationResult computeLangtexCommand(LangtexCommand * langtexCommand) {
 			ComputationResult leftContentResult = computeContent(langtexCommand->leftContent);
 			ComputationResult rightContentResult = computeContent(langtexCommand->rightContent);
 			if (parametersResult.succeed && leftContentResult.succeed && rightContentResult.succeed) {
-				// Handle the translation logic, e.g., storing or printing the result.
-				// For now, we just return a successful computation with a placeholder value.
 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
 			} else {
 				logError(_logger, "Failed to compute left or right content in translation command.");
-				return _invalidComputation();
-			}
-			// Handle translation command
-			break;
-		case LANGTEX_EXERCISE:
-			ComputationResult promptResult = computeLangtexCommand(langtexCommand->prompt);
-			ComputationResult optionsResult = computeLangtexCommand(langtexCommand->options);
-			ComputationResult answersResult = computeLangtexCommand(langtexCommand->answers);
-			if (parametersResult.succeed && answersResult.succeed && optionsResult.succeed && promptResult.succeed) {
-				// Handle the exercise logic, e.g., storing or printing the result.
-				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
-			} else {
-				logError(_logger, "Failed to compute exercise components.");
 				return _invalidComputation();
 			}
 			break;
@@ -122,63 +195,63 @@ ComputationResult computeLangtexCommand(LangtexCommand * langtexCommand) {
 				return _invalidComputation();
 			}
 			break;
+		case LANGTEX_ROW:
+		case LANGTEX_OPTIONS:
+		case LANGTEX_ANSWERS:
+			ComputationResult contentListResult = computeContentList(langtexCommand->contentList);
+			if (parametersResult.succeed && contentListResult.succeed) {
+				return (ComputationResult){.succeed = true, .value = 0};
+			} else {
+				logError(_logger, "Failed to compute content list in row, options, or answers command.");
+				return _invalidComputation();
+			}
+			break;
 		case LANGTEX_SPEAKER:
 		case LANGTEX_PROMPT:
 		case LANGTEX_BLOCK:
 			ComputationResult contentResult = computeContent(langtexCommand->content);
 			if (parametersResult.succeed && contentResult.succeed) {
-				// Handle speaker, prompt, or block logic, e.g., storing or printing the result.
 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
 			} else {
 				logError(_logger, "Failed to compute content in speaker, prompt, or block command.");
 				return _invalidComputation();
 			}
 			break;
-		case LANGTEX_ROW:
-		case LANGTEX_OPTIONS:
-		case LANGTEX_ANSWERS:
-			ComputationResult contentListResult = computeContentList(langtexCommand->contentList);
-			if (parametersResult.succeed && contentListResult.succeed) {
-				// Handle row, options, or answers logic, e.g., storing or printing the result.
-				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
-			} else {
-				logError(_logger, "Failed to compute content list in row, options, or answers command.");
-				return _invalidComputation();
-			}
-			break;
-		case LANGTEX_LANGUAGE:
-			ComputationResult textListResult = computeTextList(langtexCommand->textList);
-			if (parametersResult.succeed && textListResult.succeed) {
-				// Handle language command logic, e.g., storing or printing the result.
-				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
-			} else {
-				logError(_logger, "Failed to compute text list in language command.");
-				return _invalidComputation();
-			}
-			break;
-		case LANGTEX_FILL:
-			ComputationResult textResult = computeText(langtexCommand->text);
-			if (parametersResult.succeed && textResult.succeed) {
-				// Handle fill command logic, e.g., storing or printing the result.
-				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
-			} else {
-				logError(_logger, "Failed to compute text in fill command.");
-				return _invalidComputation();
-			}
-			break;
-		default:
-			logError(_logger, "Unknown langtex command type: %d", langtexCommand->type);
-			return _invalidComputation();
 	}
-	return _invalidComputation(); // Placeholder return, actual logic needed.
+		return _invalidComputation(); 
 }
+
+ComputationResult computeLangtexCommandList(LangtexCommandList * langtexCommandList) {
+	if (langtexCommandList != NULL) {
+		ComputationResult commandResult = computeLangtexCommand(langtexCommandList->command);
+		if (commandResult.succeed) {
+			ComputationResult nextCommandResult = computeLangtexCommandList(langtexCommandList->next);
+			if (nextCommandResult.succeed) {
+				return (ComputationResult){
+					.succeed = true,
+					.value = 0
+				}; 
+			} else {
+				return _invalidComputation();
+			}
+		}
+	}
+	return (ComputationResult){
+					.succeed = true,
+					.value = 0 
+				}; 
+}
+
+
 
 ComputationResult computeCommand(Command * command) {
 	switch (command->type){
-		case SIMPLE: return (ComputationResult){.succeed = true, .value = 0}; //todo hacer algo con simpleCommand
+		// case SIMPLE: return (ComputationResult){.succeed = true, .value = 0}; //todo hacer algo con simpleCommand
 		case PARAMETERIZED:  
 		//todo hacer algo con parameterizedCommand
+			logDebugging(_logger, "In compute COMMAND function, is the list null? %s", command->parameterizedContentList == NULL ? "YES" : "NO");
 			ComputationResult result = computeContentList(command->parameterizedContentList);
+			break;
 		case ENVIRONMENT:
 			ComputationResult textResult = computeText(command->environmentLeftText);
 			ComputationResult parametersResult = computeContent(command->environmentParameters);
@@ -220,6 +293,8 @@ ComputationResult computeTextList(TextList * textList){
 
 //todo: is this list well handled like this?
 ComputationResult computeContentList(ContentList * contentList){
+	logDebugging(_logger, "In compute CONTENT LIST, is the list null? %s", contentList == NULL ? "YES" : "NO");
+	
 	if (contentList != NULL) {
 		ComputationResult contentResult = computeContent(contentList->content);
 		if (contentResult.succeed) {
@@ -235,26 +310,11 @@ ComputationResult computeContentList(ContentList * contentList){
 			}
 		}
 	}
-	return _invalidComputation(); 
-}
-
-ComputationResult computeLangtexCommandList(LangtexCommandList * LangtexCommandList){
-	if (LangtexCommandList != NULL) {
-		ComputationResult commandResult = computeLangtexCommand(LangtexCommandList->command);
-		if (commandResult.succeed) {
-			ComputationResult nextCommandResult = computeLangtexCommandList(LangtexCommandList->next);
-			if (nextCommandResult.succeed) {
-				return (ComputationResult){
+	return (ComputationResult){
 					.succeed = true,
 					.value = 0 
 					// .value = something
 				}; 
-			} else {
-				return _invalidComputation();
-			}
-		}
-	}
-	return _invalidComputation(); 
 }
 
 ComputationResult computeParam(LangtexParam* param){
@@ -281,5 +341,9 @@ ComputationResult computeParamList(LangtexParamList * paramList) {
 			}
 		}
 	}
-	return _invalidComputation(); 
+	return (ComputationResult){
+					.succeed = true,
+					.value = 0 
+					// .value = something
+				};
 }

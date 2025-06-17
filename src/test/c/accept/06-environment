@@ -2,8 +2,5 @@
     \centering
     \begin{tabularx}{\textwidth}{| c | c | c |}
         \hline
-        Alpha     & Beta     & Gamma     \\ \hline
-        0         & 2        & 4         \\ \hline
-        1         & 3        & 5         \\ \hline
     \end{tabularx}
 \end{table}

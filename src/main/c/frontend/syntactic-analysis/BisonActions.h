@@ -23,8 +23,8 @@ void shutdownBisonActionsModule();
 
  Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content);
  Content * AppendContentSemanticAction(Element * element, Content * content);
- Content * SingleContentSemanticAction(Element * element);
- Command * SimpleCommandSemanticAction(char * command);
+//  Content * SingleContentSemanticAction(Element * element);
+//  Command * SimpleCommandSemanticAction(char * command);
  Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs);
  Command * EnvironmentCommandSemanticAction(Text * text, Content * params, ContentList * args, Content * content, Text * text2);
  Text * TextSemanticAction(char * text);

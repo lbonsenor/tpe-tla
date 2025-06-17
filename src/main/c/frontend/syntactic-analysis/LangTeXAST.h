@@ -93,6 +93,7 @@ struct LangtexCommand{
         Content * content;
     };
     // Usage: row
+
     struct {
         ContentList * contentList;
     };
@@ -137,7 +138,7 @@ struct Answer{
 };
 
 /* Langtex Parameters */
-
+// [!translate]{lang="kr"}
 struct LangtexParam {
     char * key;
     union {
@@ -157,7 +158,7 @@ struct LangtexParamList {
 
 struct Content{
     union{
-        Element * element;
+        // Element * element;
         struct {
             Element * sequenceElement;
             Content * sequenceContent;
@@ -183,11 +184,11 @@ struct TextList{
 struct Command{
     union{
         // \command
-		struct {
-			char * simpleCommand;
-		};
+		// struct {
+		// 	char * simpleCommand;
+		// };
 
-        // \begin{...}...\end{...}
+        // \begin{...}...\end{...} -> environment
         struct {
             Text * environmentLeftText;
             Content * environmentParameters;
@@ -195,7 +196,7 @@ struct Command{
             Content * environmentContent;
         };
 
-        // \command{...}
+        // \command{...} -> parameterized
         struct {
             char * parameterizedCommand;
             ContentList * parameterizedContentList;

@@ -126,8 +126,7 @@ program:
 /* =========================== ESSENTIALS ========================== */
 
 content:
-	element															{ $$ = SingleContentSemanticAction($1); }	
-	|element content  												{ $$ = AppendContentSemanticAction($1, $2); }
+	element content  												{ $$ = AppendContentSemanticAction($1, $2); }
 	| %empty														{ $$ = NULL; }
 	;
 
