@@ -35,86 +35,17 @@ static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *
  * Creates the prologue of the generated output, a Latex document that renders
  * a tree thanks to the Forest package.
 */
-// static void _generatePrologue(void) {
-// 	_output(0, "%s",
-// 		// "\\input{preamble.tex}",
-//         "\\begin{document}"
-// 	);
-// }
-
 static void _generatePrologue(void) {
-    _output(0, "%s",
-        "% Must be compiled with XeLaTeX\n"
-        "\n"
-        "% Font & CJK\n"
-        "\\usepackage{fontspec}\n"
-        "\\newfontfamily\\ipafont{Charis SIL}\n"
-        "\\usepackage{xeCJK}\n"
-        "\n"
-        "\\setCJKsansfont{DotumChe}\n"
-        "\\setCJKmainfont[\n"
-        "  Path = ./fonts/,\n"
-        "  UprightFont = NotoSansKR-Regular.ttf,\n"
-        "  BoldFont = NotoSerifKR-Bold.ttf,\n"
-        "  SansFont = NotoSerifKR-Regular.ttf\n"
-        "]{NotoSansKR}\n"
-        "\n"
-        "% Math\n"
-        "\\usepackage{amsmath,amssymb}\n"
-        "\n"
-        "% Layout\n"
-        "\\usepackage{graphicx}\n"
-        "\\usepackage{geometry}\n"
-        "\\usepackage{titlesec}\n"
-        "\\usepackage{multicol}\n"
-        "\\geometry{margin=1in}\n"
-        "\n"
-        "% Hyperlinks and bookmarks\n"
-        "\\usepackage{hyperref}\n"
-        "\\usepackage{bookmark}\n"
-        "\n"
-        "% Color boxes\n"
-        "\\usepackage[most]{tcolorbox}\n"
-        "\n"
-        "\\usepackage{tabularx, cellspace}\n"
-        "\\usepackage{menukeys}\n"
-        "\\usepackage{indentfirst}\n"
-        "\\usepackage{glossaries}\n"
-        "\\usepackage{tikz}\n"
-        "\\usepackage{array}\n"
-        "\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}\n"
-        "\n"
-        "\\titleformat{\\chapter}[hang]{\\normalfont\\huge\\bfseries}{\\thechapter.}{1em}{}\n"
-        "\n"
-        "% Custom Korean vocab box\n"
-        "\\tcbset{\n"
-        "  box/.style={\n"
-        "    enhanced,\n"
-        "    attach boxed title to top center={yshift=-3mm,yshifttext=-1mm},\n"
-        "    title=#1\n"
-        "  }\n"
-        "}\n"
-        "\n"
-        "\\newcolumntype{C}{|X|}\n"
-        "\n"
-        "\\newcommand{\\ipa}[1]{{\\ipafont /#1/}}\n"
-        "\n"
-        "\\newcommand{\\spacedstack}[1]{\\vspace{0.3ex}\\shortstack{#1}\\vspace{0.3ex}}\n"
-        "\n"
-        "\\newcommand\\rom[3][]{\n"
-        "  \\ifx\\relax#1\\relax\n"
-        "    $\\overset{\\text{\\color{red}#3}}{\\text{#2}}$\n"
-        "  \\else\n"
-        "    $\\underset{\\textbf{#1}}{\\overset{\\text{\\color{red}#3}}{\\text{#2}}}$\n"
-        "  \\fi\n"
-        "}\n"
-        "\n"
-        "\\newcommand{\\cross}{$\\times$}\n"
-        "\n"
-        "\\begin{document}\n"
-    );
+	_output(0, "%s",
+		"\\documentclass{article}\n\n"
+		"\\usepackage[utf8]{inputenc}\n"
+		"\\usepackage{xeCJK}\n"
+		"\\usepackage{array}\n"
+		"\\usepackage{amsmath}\n"
+		"\\usepackage{xcolor}\n\n"
+		"\\begin{document}\n\n"
+	);
 }
-
 
 /**
  * Creates the epilogue of the generated output, that is, the final lines that
@@ -123,7 +54,7 @@ static void _generatePrologue(void) {
 
 static void _generateEpilogue(const int value) {
 	_output(0, "%s",
-		"\n\\end{document}\n\n"
+		"\\end{document}\n\n"
 	);
 }
 
@@ -254,92 +185,19 @@ static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *
     _generateLangtexCommand(level, langtexCommandList->command);
     _generateLangtexCommandList(level, langtexCommandList->next);
 }
-
-static void _generateTranslateCommand(unsigned int level, LangtexCommand * command) {
-    char *text = command->leftContent->sequenceElement->text->text;
-    if (!text) return;
-    
-    char* romanizedWord = romanizeHangul(text);
-    
-    if (romanizedWord) {
-        _output(level, "\\rom[]{%s}{%s}{%s}", 
-               text, 
-               romanizedWord, 
-               command->rightContent->sequenceElement->text->text);
-        free(romanizedWord);
-    }
-}
-
-// static void _generateTranslateCommand(unsigned int level, LangtexCommand * command) {
-//     setlocale(LC_ALL, "en_US.UTF-8");
-
-//     // char * to wchar_t
-//     char *narrow = command->leftContent->sequenceElement->text->text;
-//     logError(_logger, "Narrow: %s", narrow);
-//     if (!narrow) return;
-
-//     size_t wlen = mbstowcs(NULL, narrow, 0);
-//     if (wlen == (size_t)-1) {
-//         // Error en la conversión
-//         logError(_logger, "Error: Invalid multibyte sequence\n");
-//         return;
-//     }
-
-//     // wchar_t *wide = malloc((wlen + 1) * sizeof(wchar_t));
-//     // mbstowcs(wide, narrow, wlen + 1);
-
-//     // Asignar memoria (+1 para null terminator)
-//     wchar_t *wide = malloc((wlen + 1) * sizeof(wchar_t));
-//     if (!wide) return;
-    
-//     // Hacer la conversión real
-//     size_t result = mbstowcs(wide, narrow, wlen + 1);
-//     if (result == (size_t)-1) {
-//         // Error en la conversión
-//         printf("Error: Conversion failed\n");
-//         free(wide);
-//         return;
-//     }
-    
-//     // Asegurar null termination
-//     wide[wlen] = L'\0';
-    
-//     char* romanizedWord = romanizeHangul(wide);
-
-//     if (romanizedWord) {
-//         _output(level, "\\rom[]{%s}{%s}{%s}", 
-//                command->leftContent->sequenceElement->text->text, 
-//                romanizedWord, 
-//                command->rightContent->sequenceElement->text->text);
-//         free(romanizedWord);
-//     }
-    
-//     free(wide);
-
-    // _output(level, "\\rom[]{%s}{%s}{%s}", command->leftContent->sequenceElement->text->text, romanizedWord, command->rightContent->sequenceElement->text->text);
-    // free(wide);
-    // free(romanizedWord);
-    // despues cambiarlo para que pueda recibir tambien leftContent y rightContent si hay mas de un elemento
-    // ademas SequenceElement puede tener un langtex command o un latex command o text.
-    // Por ahora solo funciona para [!translate](){text1}{text2}{text3}
-
-
-    // _output(level, "[!translate]");
-    // _generateParamList(level, command->parameters);
-    // _output(level, "{");
-    // _generateContent(level, command->leftContent);
-    // _output(level, "}{");
-    // _generateContent(level, command->rightContent);
-    // _output(level, "}\n");
-    // _generateRomanization(level, command->leftContent);
-
-// }
 // TODO: change to LATEX format
 static void _generateLangtexCommand(unsigned int level, LangtexCommand *command) {
     if (!command) return;
     switch (command->type) {
         case LANGTEX_TRANSLATE:
-            _generateTranslateCommand(level, command);
+			_output(level, "[!translate]");
+            _generateParamList(level, command->parameters);
+            _output(level, "{");
+            _generateContent(level, command->leftContent);
+            _output(level, "}{");
+            _generateContent(level, command->rightContent);
+            _output(level, "}\n");
+			// _generateRomanization(level, command->leftContent);
             break;
         case LANGTEX_DIALOG:
 		    _output(level, "[!dialog]");
@@ -363,7 +221,7 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
             _output(level, "}\n");
             break;
         // case LANGTEX_TABLE:
-        //     _output(level, "[!hebrew_table]");
+        //     _output(level, "[!table]");
         //     _generateParamList(level, command->parameters);
         //     _output(level, "{\n");
         //     _generateContent(level + 1, command->leftContent);

@@ -1,4 +1,3 @@
-#include "romanize.h"
 #include <locale.h>
 #include <stdio.h>
 #include <wchar.h>
@@ -8,7 +7,7 @@
 #define BASE 0x0410
 #define LAST 0x044F
 
-const char *cyrillic_table[LAST - BASE + 1] = {
+const char *table[LAST - BASE + 1] = {
     "A",  "B",  "V",  "G",  "D",  "E",  "Zh", "Z",  "I",  "Y",   // А-Й
     "K",  "L",  "M",  "N",  "O",  "P",  "R",  "S",  "T",  "U",   // К-У
     "F",  "Kh", "Ts", "Ch", "Sh", "Shch", NULL, "Y", NULL, "E", // Ф-Э
@@ -21,7 +20,7 @@ const char *cyrillic_table[LAST - BASE + 1] = {
 
 const char *romanizeCyrillicChar(wchar_t c) {
     if (c >= BASE && c <= LAST) {  // Covers А-Я and а-я
-        return cyrillic_table[c - BASE];
+        return table[c - BASE];
     }
     return NULL;  // Unsupported character
 }
@@ -50,11 +49,11 @@ char *romanizeCyrillic(const wchar_t *input) {
     return output;
 }
 
-// int main() {
-//     setlocale(LC_ALL, "en_US.UTF-8");
-//     wchar_t* word = L"В чащах юга жил бы цитрус? Да, но фальшивый экземпляр";
-//     char* s = romanizeCyrillic(word);
-//     wprintf(L"Input: %ls\nOutput: %s\n", word, s);
+int main() {
+    setlocale(LC_ALL, "en_US.UTF-8");
+    wchar_t* word = L"В чащах юга жил бы цитрус? Да, но фальшивый экземпляр";
+    char* s = romanizeCyrillic(word);
+    wprintf(L"Input: %ls\nOutput: %s\n", word, s);
 
-//     return 0;
-// }
+    return 0;
+}

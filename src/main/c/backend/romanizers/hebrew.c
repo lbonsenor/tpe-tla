@@ -1,4 +1,3 @@
-#include "romanize.h"
 #include <stdio.h>
 #include <wchar.h>
 #include <locale.h>
@@ -9,7 +8,7 @@
 #define LAST 0x05EA
 #define MAX_BUF 512
 
-const char *hebrew_table[LAST - BASE + 1] = {
+const char *table[LAST - BASE + 1] = {
     "",  "b", "g", "d", "h", "v", "z", "kh", "t", "y",   // א - י
     "k", "k", "l", "m", "m", "n", "n", "s", "", "p",     // כ - פ
     "p", "ts", "ts", "k", "r", "sh", "t"                 // צ - ת
@@ -17,7 +16,7 @@ const char *hebrew_table[LAST - BASE + 1] = {
 
 const char* get_hebrew_consonant(wchar_t c) {
     if (c >= BASE && c <= LAST) {
-        return hebrew_table[c - BASE];
+        return table[c - BASE];
     }
     return NULL;
 }
@@ -93,17 +92,17 @@ char* romanizeHebrew(const wchar_t* input) {
     return output;
 }
 
-// int main() {
-//     // setlocale(LC_ALL, "");
-//     setlocale(LC_ALL, "en_US.UTF-8");
-//     wchar_t* phrase = L"שָׁלוֹם עוֹלָם";  // "Shalom olam"
-//     char* romanized = romanizeHebrew(phrase);
-//     if (romanized) {
-//         wprintf(L"Input: %ls\nOutput: %s\n", phrase, romanized);
-//         free(romanized);
-//     } else {
-//         printf("Failed to romanize input.\n");
-//     }
+int main() {
+    setlocale(LC_ALL, "");
 
-//     return 0;
-// }
+    wchar_t* phrase = L"שָׁלוֹם עוֹלָם";  // "Shalom olam"
+    char* romanized = romanizeHebrew(phrase);
+    if (romanized) {
+        wprintf(L"Input: %ls\nOutput: %s\n", phrase, romanized);
+        free(romanized);
+    } else {
+        printf("Failed to romanize input.\n");
+    }
+
+    return 0;
+}
