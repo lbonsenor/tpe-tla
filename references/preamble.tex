@@ -1,0 +1,66 @@
+% Must be compiled with XeLaTeX
+
+% Font & CJK
+\usepackage{fontspec}
+\newfontfamily\ipafont{Charis SIL}
+\usepackage{xeCJK}
+
+\setCJKsansfont{DotumChe}
+\setCJKmainfont[
+  Path = ./fonts/,
+  UprightFont = NotoSansKR-Regular.ttf,
+  BoldFont = NotoSerifKR-Bold.ttf,
+  SansFont = NotoSerifKR-Regular.ttf
+]{NotoSansKR}
+
+% Math
+\usepackage{amsmath,amssymb}
+
+% Layout
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{multicol}
+\geometry{margin=1in}
+
+% Hyperlinks and bookmarks
+\usepackage{hyperref}
+\usepackage{bookmark}
+
+% Color boxes
+\usepackage[most]{tcolorbox}
+
+\usepackage{tabularx, cellspace}
+\usepackage{menukeys}
+\usepackage{indentfirst}
+\usepackage{glossaries}
+\usepackage{tikz}
+\usepackage{array}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+
+\titleformat{\chapter}[hang]{\normalfont\huge\bfseries}{\thechapter.}{1em}{}
+
+% Custom Korean vocab box
+\tcbset{
+  box/.style={
+    enhanced,
+    attach boxed title to top center={yshift=-3mm,yshifttext=-1mm},
+    title=#1
+  }
+}
+
+\newcolumntype{C}{|X|}
+
+\newcommand{\ipa}[1]{{\ipafont /#1/}}
+
+\newcommand{\spacedstack}[1]{\vspace{0.3ex}\shortstack{#1}\vspace{0.3ex}}
+
+\newcommand\rom[3][]{
+  \ifx\relax#1\relax
+    $\overset{\text{\color{red}#3}}{\text{#2}}$
+  \else
+    $\underset{\textbf{#1}}{\overset{\text{\color{red}#3}}{\text{#2}}}$
+  \fi
+}
+
+\newcommand{\cross}{$\times$}

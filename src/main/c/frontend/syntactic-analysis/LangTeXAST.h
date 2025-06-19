@@ -84,7 +84,7 @@ struct LangtexCommand{
         Content * leftContent;
         Content * rightContent;
     };
-    // Usage: dialog, table
+    // Usage: dialog, hebrew_table
     struct {
         LangtexCommandList * langtexCommandList;
     };
