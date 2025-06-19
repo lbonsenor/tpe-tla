@@ -71,6 +71,10 @@ add_executable(Compiler
 	src/main/c/shared/String.c
 	# Add more *.c files if needed (otherwise, they won't be compiled).
 	src/main/c/frontend/syntactic-analysis/LangTeXAST.c
+	# Romanizers
+	src/main/c/backend/romanizers/hangul.c
+	src/main/c/backend/romanizers/hebrew.c
+	src/main/c/backend/romanizers/russian.c
 )
 
 # Link final project and libraries.

@@ -114,10 +114,10 @@ ComputationResult computeText(Text * text){
 // 		case LANGTEX_TABLE:
 // 			ComputationResult commandListResult = computeLangtexCommandList(langtexCommand->langtexCommandList);
 // 			if (parametersResult.succeed && commandListResult.succeed) {
-// 				// Handle dialog or table logic, e.g., storing or printing the result.
+// 				// Handle dialog or hebrew_table logic, e.g., storing or printing the result.
 // 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
 // 			} else {
-// 				logError(_logger, "Failed to compute command list in dialog or table command.");
+// 				logError(_logger, "Failed to compute command list in dialog or hebrew_table command.");
 // 				return _invalidComputation();
 // 			}
 // 			break;
@@ -188,10 +188,10 @@ ComputationResult computeLangtexCommand(LangtexCommand * langtexCommand) {
 		case LANGTEX_TABLE:
 			ComputationResult commandListResult = computeLangtexCommandList(langtexCommand->langtexCommandList);
 			if (parametersResult.succeed && commandListResult.succeed) {
-				// Handle dialog or table logic, e.g., storing or printing the result.
+				// Handle dialog or hebrew_table logic, e.g., storing or printing the result.
 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
 			} else {
-				logError(_logger, "Failed to compute command list in dialog or table command.");
+				logError(_logger, "Failed to compute command list in dialog or hebrew_table command.");
 				return _invalidComputation();
 			}
 			break;
