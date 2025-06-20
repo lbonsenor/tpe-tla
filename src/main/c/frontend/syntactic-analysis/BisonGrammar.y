@@ -166,7 +166,7 @@ commandParams:
 /* ============================ LANGTEX ============================ */
 
 langtexCommand:
-	TRANSLATE_COMMAND parameters OPEN_BRACE text CLOSE_BRACE OPEN_BRACE text CLOSE_BRACE  
+	TRANSLATE_COMMAND parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
 																	{ $$ = TranslateSemanticAction($2, $4, $7); }
 	| DIALOG_COMMAND parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
 																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_DIALOG); }

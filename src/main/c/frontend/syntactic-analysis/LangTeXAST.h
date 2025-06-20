@@ -81,8 +81,8 @@ struct LangtexCommand{
     union {
     // Usage: translate
     struct {
-        Text * leftText;
-        Text * rightText;
+        Content * leftText;
+        Content * rightText;
     };
     // Usage: dialog, hebrew_table
     struct {

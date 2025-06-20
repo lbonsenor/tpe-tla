@@ -178,7 +178,7 @@ LangtexCommand * LangtexContentListSemanticAction(LangtexParamList * parameters,
     return rowCommand;
 }
 
-LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Text *leftText, Text *rightText) {
+LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftText, Content *rightText) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = parameters;

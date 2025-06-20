@@ -22,8 +22,8 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
     if (langtexCommand != NULL){
         switch (langtexCommand->type) {
             case LANGTEX_TRANSLATE:
-                releaseText(langtexCommand->rightText);
-                releaseText(langtexCommand->leftText);
+                releaseContent(langtexCommand->rightText);
+                releaseContent(langtexCommand->leftText);
                 releaseParamList(langtexCommand->parameters); 
                 break;
             case LANGTEX_DIALOG:

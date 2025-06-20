@@ -1,1 +1,5 @@
-[!translate](lang="korean"){안녕}{hello}
+[!translate](int=0, lang="ko"){\textit{\color{red}{hola}}}{\textbf{안녕}}
+[!table](cols=2){
+    [!row](header=true, hi="ko"){hi}{there}
+    [!row](lang="ko"){herro}{[!translate](lang="zh"){hola}{hola}}
+}
