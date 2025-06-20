@@ -43,6 +43,7 @@ static char *_checkTranslateParam(LangtexParamList *paramList);
 static char * _checkSpeakerParam(LangtexParamList *paramList);
 static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command);
 static void _generateDiaglogCommand(unsigned int level, LangtexCommand *command);
+static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
 static void _start_buffering();
 static char *_stop_buffering();
 /**
@@ -361,6 +362,10 @@ static void _generateDiaglogCommand(unsigned int level, LangtexCommand *command)
 // }
 }
 
+static void _generateExerciseCommand(unsigned int level, LangtexCommand *command){
+
+}
+
 // TODO: change to LATEX format
 static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
 {
@@ -385,7 +390,7 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
         // _output(level, "{\n");
         // _generateContent(level + 1, command->leftContent);
         // _output(level, "}\n");
-        
+
     // case LANGTEX_TABLE:
     //     _output(level, "[!hebrew_table]");
     //     _generateParamList(level, command->parameters);
