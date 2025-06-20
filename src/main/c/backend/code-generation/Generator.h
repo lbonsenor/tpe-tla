@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <wchar.h>
+#include <stdbool.h>
 
 /** Initialize module's internal state. */
 void initializeGeneratorModule();

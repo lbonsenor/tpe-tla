@@ -25,7 +25,6 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
-
 %%
 "[!translate]"                      { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), TRANSLATE_COMMAND); }
 "[!dialog]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), DIALOG_COMMAND); }
@@ -62,6 +61,7 @@
 
 \[                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACKET); }
 \]                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACKET); }
+
 
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 

@@ -75,6 +75,7 @@ add_executable(Compiler
 	src/main/c/backend/romanizers/hangul.c
 	src/main/c/backend/romanizers/hebrew.c
 	src/main/c/backend/romanizers/russian.c
+	src/main/c/backend/romanizers/romanize.c
 )
 
 # Link final project and libraries.

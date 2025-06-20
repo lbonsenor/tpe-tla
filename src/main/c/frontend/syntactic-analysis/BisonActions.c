@@ -178,12 +178,12 @@ LangtexCommand * LangtexContentListSemanticAction(LangtexParamList * parameters,
     return rowCommand;
 }
 
-LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftContent, Content *rightContent) {
+LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Text *leftText, Text *rightText) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = parameters;
-	langtexCommand->leftContent = leftContent;
-	langtexCommand->rightContent = rightContent;
+	langtexCommand->leftText = leftText;
+	langtexCommand->rightText = rightText;
 	langtexCommand->type = LANGTEX_TRANSLATE;
 	return langtexCommand;
 }

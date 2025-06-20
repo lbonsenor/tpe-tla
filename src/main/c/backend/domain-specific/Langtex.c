@@ -175,8 +175,8 @@ ComputationResult computeLangtexCommand(LangtexCommand * langtexCommand) {
 	ComputationResult parametersResult = computeParamList(langtexCommand->parameters);
 	switch (langtexCommand->type) {
 		case LANGTEX_TRANSLATE:
-			ComputationResult leftContentResult = computeContent(langtexCommand->leftContent);
-			ComputationResult rightContentResult = computeContent(langtexCommand->rightContent);
+			ComputationResult leftContentResult = computeText(langtexCommand->leftText);
+			ComputationResult rightContentResult = computeText(langtexCommand->rightText);
 			if (parametersResult.succeed && leftContentResult.succeed && rightContentResult.succeed) {
 				return (ComputationResult){.succeed = true, .value = 0}; // Placeholder value
 			} else {

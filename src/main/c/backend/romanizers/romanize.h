@@ -8,5 +8,6 @@ char* romanizeHangul(const char* utf8_input);
 // char* romanizeHangul(const wchar_t* input);
 char* romanizeHebrew(const wchar_t* input);
 char* romanizeCyrillic(const wchar_t* input);
+char * romanize(const char* lang,const char * input);
 
 #endif
