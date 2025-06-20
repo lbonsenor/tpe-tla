@@ -1,6 +1,11 @@
-[!translate](lang="korean"){안녕}{hello}
+[!translate](lang="kr"){안녕}{hello}
+
+[!translate](lang="ru"){В чащах юга жил бы цитрус? Да, но фальшивый экземпляр}{a}
+
+[!translate](lang="heb"){שָׁלוֹם עוֹלָם}{a}
+[!translate](lang="heb"){דַג סְקַרָן שָׁט בַּיָּם מְאוּכְזָב וּלְפֶתַע מָצָא חֲבֵרָה טוֹבָה}{a}
 
 [!dialog](){
-    [!speaker](name="john", age=12, hi=true, hi="hiila"){[!translate](lang="korean"){ho}{a}}
+    [!speaker](name="john", age=12, hi=true, hi="hiila"){hello}
     [!speaker](name="steve", age=12, hi=true, hi="hiila"){hello Country}
 }

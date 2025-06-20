@@ -19,35 +19,22 @@ const char *cyrillic_table[LAST - BASE + 1] = {
     "yu", "ya"  // ю-я
 };
 
-const char *romanizeCyrillicChar(wchar_t c) {
+char *decomposeCyrillicChar(uint32_t c) {
     if (c >= BASE && c <= LAST) {  // Covers А-Я and а-я
-        return cyrillic_table[c - BASE];
+        char* ret = malloc(5);
+        snprintf(ret, 5, "%s", cyrillic_table[c - BASE]);
+
+        return ret;
     }
+
+    if (c < 128) {
+        char* ret = malloc(2);
+        ret[0] = (char)c;
+        ret[1] = '\0';
+        return ret;
+    }
+
     return NULL;  // Unsupported character
-}
-
-char *romanizeCyrillic(const wchar_t *input) {
-    // Estimate size: max 4 Latin chars per Cyrillic letter
-    size_t max_output_size = wcslen(input) * 4 + 1;
-    char *output = malloc(max_output_size);
-    if (!output) return NULL;
-
-    output[0] = '\0';  // Start with empty string
-
-    for (size_t i = 0; input[i] != L'\0'; ++i) {
-        const char *latin = romanizeCyrillicChar(input[i]);
-        if (latin) {
-            strcat(output, latin);
-        } else {
-            // For non-Cyrillic characters, just copy as-is (if ASCII)
-            if (input[i] < 128) {
-                char ascii[2] = { (char)input[i], '\0' };
-                strcat(output, ascii);
-            }
-        }
-    }
-
-    return output;
 }
 
 // int main() {

@@ -270,17 +270,17 @@ static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *
 
 static char *_checkTranslateParam(LangtexParamList *paramList)
 {
-    logError(_logger, "Checking for language parameter in translate command.");
+    logDebugging(_logger, "Checking for language parameter in translate command.");
     char *language = NULL;
     if (paramList != NULL)
     {
-        logError(_logger, "Parameter list is not NULL, checking parameters.");
+        logDebugging(_logger, "Parameter list is not NULL, checking parameters.");
         while (paramList->param != NULL)
         {
-            logError(_logger, "Checking parameter: %s", paramList->param->key);
+            logDebugging(_logger, "Checking parameter: %s", paramList->param->key);
             if (paramList->param->type == STRING_PARAMETER && strcmp(paramList->param->key, "lang") == 0)
             {
-                logError(_logger, "Found language parameter: %s", paramList->param->value.stringParam);
+                logDebugging(_logger, "Found language parameter: %s", paramList->param->value.stringParam);
                 return paramList->param->value.stringParam;
                 break;
             }
@@ -325,7 +325,7 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     _start_buffering();
     _generateText(level, command->rightText);
     char *right_text = _stop_buffering();
-    logError(_logger, "command paramteres NULL? %s", command->parameters == NULL ? "true" : "false");
+    logDebugging(_logger, "command paramteres NULL? %s", command->parameters == NULL ? "true" : "false");
     char *language = _checkTranslateParam(command->parameters);
     if (!language)
     {
@@ -337,12 +337,12 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
 
     char *romanizedWord = romanize(language, left_text);
 
-        _output(level, "\\rom[%s]{%s}{%s}",
-                right_text,     // hola
-                left_text,      // caracteres especiales 안녕하세요
-                romanizedWord); // romanizacion
+    _output(level, "\\rom[%s]{%s}{%s}\n",
+            right_text,     // hola
+            left_text,      // caracteres especiales 안녕하세요
+            romanizedWord); // romanizacion
     
-    if (!romanizedWord) free(romanizedWord);
+    free(romanizedWord);
     free(left_text);
     free(right_text);
 }
