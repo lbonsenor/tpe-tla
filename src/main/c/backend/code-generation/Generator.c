@@ -40,7 +40,9 @@ static void _generateParamList(unsigned int level, LangtexParamList *list);
 static void _generateParam(unsigned int level, LangtexParam *param);
 static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *langtexCommandList);
 static char *_checkTranslateParam(LangtexParamList *paramList);
-
+static char * _checkSpeakerParam(LangtexParamList *paramList);
+static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command);
+static void _generateDiaglogCommand(unsigned int level, LangtexCommand *command);
 static void _start_buffering();
 static char *_stop_buffering();
 /**
@@ -259,26 +261,10 @@ static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *
     _generateLangtexCommandList(level, langtexCommandList->next);
 }
 
-// static void _generateTranslateCommand(unsigned int level, LangtexCommand * command) {
-//     char *text = command->leftContent->sequenceElement->text->text;
-//     if (!text) return;
-
-//     char* romanizedWord = romanizeHangul(text);
-
-//     if (romanizedWord) {
-//         _output(level, "\\rom[]{%s}{%s}{%s}",
-//                text,
-//                romanizedWord,
-//                command->rightContent->sequenceElement->text->text);
-//         free(romanizedWord);
-//     }
-// }
-
 static char *_checkTranslateParam(LangtexParamList *paramList)
 {
     logError(_logger, "Checking for language parameter in translate command.");
     char *language = NULL;
-    logError(_logger, "Initial language: %s", language ? language : "NULL");
     if (paramList != NULL)
     {
         logError(_logger, "Parameter list is not NULL, checking parameters.");
@@ -299,15 +285,34 @@ static char *_checkTranslateParam(LangtexParamList *paramList)
     }
     return language;
 }
-// TODO: Falta la parte de los params!
+
+static char * _checkSpeakerParam(LangtexParamList *paramList){
+
+    char *name = "(unknown) Speaker";
+    if (paramList != NULL)
+    {
+        while (paramList->param != NULL)
+        {
+            if (paramList->param->type == STRING_PARAMETER && strcmp(paramList->param->key, "name") == 0)
+            {
+                name = paramList->param->value.stringParam;
+                break;
+            }
+            // TODO : are we going to include other parameters? ex. (name="john", age=12, hi=true, hi="hiila")
+            else
+            {
+                paramList = paramList->next;
+            }
+        }
+    }
+    return name;
+}
+
 static void _generateTranslateCommand(unsigned int level, LangtexCommand *command)
 {
-    // if (!command->leftText || !command->rightText)
-    //     return;
 
     _start_buffering();
     _generateText(level, command->leftText);
-    // _generateContent(level, command->leftContent);
     char *left_text = _stop_buffering();
 
     _start_buffering();
@@ -322,22 +327,38 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     }
 
     char *romanizedWord = romanize(language, left_text);
-    if (romanizedWord)
-    {
+
         _output(level, "\\rom[%s]{%s}{%s}",
                 right_text,     // hola
                 left_text,      // caracteres especiales 안녕하세요
                 romanizedWord); // romanizacion
-        free(romanizedWord);
-    } else {
-        _output(level, "\\rom[%s]{%s}{}",
-                right_text,     // hola
-                left_text);
-    }
-
-    // free(romanizedWord);
+    
+    if (!romanizedWord) free(romanizedWord);
     free(left_text);
     free(right_text);
+}
+
+static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command)
+{
+    if (!command)
+        return;
+    
+    char * speakerName = _checkSpeakerParam(command->parameters);
+    _output(level, "\\textbf{%s:}", _checkSpeakerParam(command->parameters));
+    _generateContent(level, command->content);
+    _output(level, "\n");
+}
+
+static void _generateDiaglogCommand(unsigned int level, LangtexCommand *command)
+{
+    if (!command)
+        return;
+    
+    _output(level, "\n\\begin{tabbing}\n");
+//     _generateParamList(level, command->parameters);
+    _generateLangtexCommandList(level + 1, command->langtexCommandList);
+    _output(level, "\\end{tabbing}\n");
+// }
 }
 
 // TODO: change to LATEX format
@@ -351,26 +372,20 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
         _generateTranslateCommand(level, command);
         break;
     case LANGTEX_DIALOG:
-        // _output(level, "[!dialog]");
-        // _generateParamList(level, command->parameters);
-        // _output(level, "{\n");
-        // _generateLangtexCommandList(level + 1, command->langtexCommandList);
-        // _output(level, "}\n");
+        _generateDiaglogCommand(level, command);
         break;
     case LANGTEX_SPEAKER:
-        // _output(level, "[!speaker]");
-        // _generateParamList(level, command->parameters);
-        // _output(level, "{\n");
-        // _generateContent(level + 1, command->content);
-        // _output(level, "}\n");
+        _generateSpeakerCommand(level, command);
         break;
     case LANGTEX_EXERCISE:
+        _generateExerciseCommand(level, command);
+        break;
         // _output(level, "[!exercise]");
         // _generateParamList(level, command->parameters);
         // _output(level, "{\n");
         // _generateContent(level + 1, command->leftContent);
         // _output(level, "}\n");
-        break;
+        
     // case LANGTEX_TABLE:
     //     _output(level, "[!hebrew_table]");
     //     _generateParamList(level, command->parameters);

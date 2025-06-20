@@ -21,6 +21,6 @@ char *romanize(const char *lang, const char *input)
     else
     {
         // Unsupported language - this is an error
-        return NULL;
+        return " ";
     }
 }
