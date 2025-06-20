@@ -44,6 +44,12 @@ static char * _checkSpeakerParam(LangtexParamList *paramList);
 static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command);
 static void _generateDiaglogCommand(unsigned int level, LangtexCommand *command);
 static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
+static void _generateTableCommand(unsigned int level, LangtexCommand *command);
+static void _generateRowCommand(unsigned int level, LangtexCommand *command);
+static void _generateAnswersCommand(unsigned int level, LangtexCommand *command);
+static void _generatePromptCommand(unsigned int level, LangtexCommand *command);
+static void _generateBlockCommand(unsigned int level, LangtexCommand *command);
+static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
 static void _start_buffering();
 static char *_stop_buffering();
 /**
@@ -324,6 +330,8 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     if (!language)
     {
         logError(_logger, "No language parameter found in translate command.");
+        free(left_text);
+        free(right_text);
         return;
     }
 
@@ -344,7 +352,6 @@ static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command)
     if (!command)
         return;
     
-    char * speakerName = _checkSpeakerParam(command->parameters);
     _output(level, "\\textbf{%s:}", _checkSpeakerParam(command->parameters));
     _generateContent(level, command->content);
     _output(level, "\n");
@@ -356,13 +363,33 @@ static void _generateDiaglogCommand(unsigned int level, LangtexCommand *command)
         return;
     
     _output(level, "\n\\begin{tabbing}\n");
+// TODO: which params could dialog have?
 //     _generateParamList(level, command->parameters);
     _generateLangtexCommandList(level + 1, command->langtexCommandList);
     _output(level, "\\end{tabbing}\n");
-// }
 }
 
 static void _generateExerciseCommand(unsigned int level, LangtexCommand *command){
+
+}
+
+static void _generateTableCommand(unsigned int level, LangtexCommand *command){
+
+}
+
+static void _generateRowCommand(unsigned int level, LangtexCommand *command){
+
+}
+
+static void _generateBlockCommand(unsigned int level, LangtexCommand *command){
+
+}
+
+static void _generatePromptCommand(unsigned int level, LangtexCommand *command){
+
+}
+
+static void _generateAnswersCommand(unsigned int level, LangtexCommand *command){
 
 }
 
@@ -391,28 +418,35 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
         // _generateContent(level + 1, command->leftContent);
         // _output(level, "}\n");
 
-    // case LANGTEX_TABLE:
+    case LANGTEX_TABLE:
+        _generateTableCommand(level, command);
+        break;
     //     _output(level, "[!hebrew_table]");
     //     _generateParamList(level, command->parameters);
     //     _output(level, "{\n");
     //     _generateContent(level + 1, command->leftContent);
     //     _output(level, "}\n");
-    //     break;
-    // case LANGTEX_ROW:
+    case LANGTEX_ROW:
+        _generateRowCommand(level, command);
+        break;
     //     _output(level, "[!row]");
     //     _generateParamList(level, command->parameters);
     //     _output(level, "{");
     //     _generateContent(level + 1, command->leftContent);
     //     _output(level, "}");
-    //     break;
-    // case LANGTEX_BLOCK:
+
+    case LANGTEX_BLOCK:
+        _generateBlockCommand(level, command);
+        break;
     //     _output(level, "[!block]");
     //     _generateParamList(level, command->parameters);
     //     _output(level, "{\n");
     //     _generateContent(level + 1, command->leftContent);
     //     _output(level, "}\n");
     //     break;
-    // case LANGTEX_PROMPT:
+    case LANGTEX_PROMPT:
+        _generatePromptCommand(level, command);
+        break;
     //     _output(level, "[!prompt]");
     //     _generateParamList(level, command->parameters);
     //     _output(level, "{\n");
@@ -426,7 +460,9 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
     //     _generateContent(level + 1, command->leftContent);
     //     _output(level, "}\n");
     //     break;
-    // case LANGTEX_ANSWERS:
+    case LANGTEX_ANSWERS:
+        _generateAnswersCommand(level, command);
+        break;
     //     _output(level, "[!answers]");
     //     _generateParamList(level, command->parameters);
     //     _output(level, "{\n");

@@ -1,6 +1,6 @@
 [!translate](lang="korean"){안녕}{hello}
 
 [!dialog](){
-    [!speaker](name="john", age=12, hi=true, hi="hiila"){hello World}
+    [!speaker](name="john", age=12, hi=true, hi="hiila"){[!translate](lang="korean"){ho}{a}}
     [!speaker](name="steve", age=12, hi=true, hi="hiila"){hello Country}
 }
