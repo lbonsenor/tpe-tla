@@ -1,28 +1,28 @@
-#include "Generator.h"
+// #include "Generator.h"
 
-/* MODULE INTERNAL STATE */
+// /* MODULE INTERNAL STATE */
 
-static char *_output_buffer = NULL;
-static size_t _buffer_size = 0;
-static size_t _buffer_pos = 0;
-static bool _use_buffer = false;
+// static char *_output_buffer = NULL;
+// static size_t _buffer_size = 0;
+// static size_t _buffer_pos = 0;
+// static bool _use_buffer = false;
 
-const char _indentationCharacter = ' ';
-const char _indentationSize = 4;
-static Logger *_logger = NULL;
+// const char _indentationCharacter = ' ';
+// const char _indentationSize = 4;
+// static Logger *_logger = NULL;
 
-void initializeGeneratorModule()
-{
-    _logger = createLogger("Generator");
-}
+// void initializeGeneratorModule()
+// {
+//     _logger = createLogger("Generator");
+// }
 
-void shutdownGeneratorModule()
-{
-    if (_logger != NULL)
-    {
-        destroyLogger(_logger);
-    }
-}
+// void shutdownGeneratorModule()
+// {
+//     if (_logger != NULL)
+//     {
+//         destroyLogger(_logger);
+//     }
+// }
 
 /** PRIVATE FUNCTIONS */
 static void _generateProgram(Program *program);
@@ -63,202 +63,202 @@ static char *_stop_buffering();
 // 	);
 // }
 
-static void _generatePrologue(void)
-{
-    _output(0, "%s",
-            "% Must be compiled with XeLaTeX\n"
-            "\n"
-            "% Font & CJK\n"
-            "\\usepackage{fontspec}\n"
-            "\\newfontfamily\\ipafont{Charis SIL}\n"
-            "\\usepackage{xeCJK}\n"
-            "\n"
-            "\\setCJKsansfont{DotumChe}\n"
-            "\\setCJKmainfont[\n"
-            "  Path = ./fonts/,\n"
-            "  UprightFont = NotoSansKR-Regular.ttf,\n"
-            "  BoldFont = NotoSerifKR-Bold.ttf,\n"
-            "  SansFont = NotoSerifKR-Regular.ttf\n"
-            "]{NotoSansKR}\n"
-            "\n"
-            "% Math\n"
-            "\\usepackage{amsmath,amssymb}\n"
-            "\n"
-            "% Layout\n"
-            "\\usepackage{graphicx}\n"
-            "\\usepackage{geometry}\n"
-            "\\usepackage{titlesec}\n"
-            "\\usepackage{multicol}\n"
-            "\\geometry{margin=1in}\n"
-            "\n"
-            "% Hyperlinks and bookmarks\n"
-            "\\usepackage{hyperref}\n"
-            "\\usepackage{bookmark}\n"
-            "\n"
-            "% Color boxes\n"
-            "\\usepackage[most]{tcolorbox}\n"
-            "\n"
-            "\\usepackage{tabularx, cellspace}\n"
-            "\\usepackage{menukeys}\n"
-            "\\usepackage{indentfirst}\n"
-            "\\usepackage{glossaries}\n"
-            "\\usepackage{tikz}\n"
-            "\\usepackage{array}\n"
-            "\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}\n"
-            "\n"
-            "\\titleformat{\\chapter}[hang]{\\normalfont\\huge\\bfseries}{\\thechapter.}{1em}{}\n"
-            "\n"
-            "% Custom Korean vocab box\n"
-            "\\tcbset{\n"
-            "  box/.style={\n"
-            "    enhanced,\n"
-            "    attach boxed title to top center={yshift=-3mm,yshifttext=-1mm},\n"
-            "    title=#1\n"
-            "  }\n"
-            "}\n"
-            "\n"
-            "\\newcolumntype{C}{|X|}\n"
-            "\n"
-            "\\newcommand{\\ipa}[1]{{\\ipafont /#1/}}\n"
-            "\n"
-            "\\newcommand{\\spacedstack}[1]{\\vspace{0.3ex}\\shortstack{#1}\\vspace{0.3ex}}\n"
-            "\n"
-            "\\newcommand\\rom[3][]{\n"
-            "  \\ifx\\relax#1\\relax\n"
-            "    $\\overset{\\text{\\color{red}#3}}{\\text{#2}}$\n"
-            "  \\else\n"
-            "    $\\underset{\\textbf{#1}}{\\overset{\\text{\\color{red}#3}}{\\text{#2}}}$\n"
-            "  \\fi\n"
-            "}\n"
-            "\n"
-            "\\newcommand{\\cross}{$\\times$}\n"
-            "\n"
-            "\\begin{document}\n\n");
-}
-
-/**
- * Creates the epilogue of the generated output, that is, the final lines that
- * completes a valid Latex document.
- */
-
-static void _generateEpilogue(const int value)
-{
-    _output(0, "%s",
-            "\n\n\\end{document}\n\n");
-}
-
-/**
- * Generates the output of the program.
- */
-// static void _generateProgram(Program * program) {
-// 	_generateExpression(3, program->expression);
+// static void _generatePrologue(void)
+// {
+//     _output(0, "%s",
+//             "% Must be compiled with XeLaTeX\n"
+//             "\n"
+//             "% Font & CJK\n"
+//             "\\usepackage{fontspec}\n"
+//             "\\newfontfamily\\ipafont{Charis SIL}\n"
+//             "\\usepackage{xeCJK}\n"
+//             "\n"
+//             "\\setCJKsansfont{DotumChe}\n"
+//             "\\setCJKmainfont[\n"
+//             "  Path = ./fonts/,\n"
+//             "  UprightFont = NotoSansKR-Regular.ttf,\n"
+//             "  BoldFont = NotoSerifKR-Bold.ttf,\n"
+//             "  SansFont = NotoSerifKR-Regular.ttf\n"
+//             "]{NotoSansKR}\n"
+//             "\n"
+//             "% Math\n"
+//             "\\usepackage{amsmath,amssymb}\n"
+//             "\n"
+//             "% Layout\n"
+//             "\\usepackage{graphicx}\n"
+//             "\\usepackage{geometry}\n"
+//             "\\usepackage{titlesec}\n"
+//             "\\usepackage{multicol}\n"
+//             "\\geometry{margin=1in}\n"
+//             "\n"
+//             "% Hyperlinks and bookmarks\n"
+//             "\\usepackage{hyperref}\n"
+//             "\\usepackage{bookmark}\n"
+//             "\n"
+//             "% Color boxes\n"
+//             "\\usepackage[most]{tcolorbox}\n"
+//             "\n"
+//             "\\usepackage{tabularx, cellspace}\n"
+//             "\\usepackage{menukeys}\n"
+//             "\\usepackage{indentfirst}\n"
+//             "\\usepackage{glossaries}\n"
+//             "\\usepackage{tikz}\n"
+//             "\\usepackage{array}\n"
+//             "\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}\n"
+//             "\n"
+//             "\\titleformat{\\chapter}[hang]{\\normalfont\\huge\\bfseries}{\\thechapter.}{1em}{}\n"
+//             "\n"
+//             "% Custom Korean vocab box\n"
+//             "\\tcbset{\n"
+//             "  box/.style={\n"
+//             "    enhanced,\n"
+//             "    attach boxed title to top center={yshift=-3mm,yshifttext=-1mm},\n"
+//             "    title=#1\n"
+//             "  }\n"
+//             "}\n"
+//             "\n"
+//             "\\newcolumntype{C}{|X|}\n"
+//             "\n"
+//             "\\newcommand{\\ipa}[1]{{\\ipafont /#1/}}\n"
+//             "\n"
+//             "\\newcommand{\\spacedstack}[1]{\\vspace{0.3ex}\\shortstack{#1}\\vspace{0.3ex}}\n"
+//             "\n"
+//             "\\newcommand\\rom[3][]{\n"
+//             "  \\ifx\\relax#1\\relax\n"
+//             "    $\\overset{\\text{\\color{red}#3}}{\\text{#2}}$\n"
+//             "  \\else\n"
+//             "    $\\underset{\\textbf{#1}}{\\overset{\\text{\\color{red}#3}}{\\text{#2}}}$\n"
+//             "  \\fi\n"
+//             "}\n"
+//             "\n"
+//             "\\newcommand{\\cross}{$\\times$}\n"
+//             "\n"
+//             "\\begin{document}\n\n");
 // }
-static void _generateProgram(Program *program)
-{
-    if (program && program->content)
-    {
-        _generateContent(0, program->content);
-    }
-}
 
-static void _generateContent(unsigned int level, Content *content)
-{
-    if (!content)
-        return;
-    _generateElement(level, content->sequenceElement);
-    _generateContent(level, content->sequenceContent);
-}
+// /**
+//  * Creates the epilogue of the generated output, that is, the final lines that
+//  * completes a valid Latex document.
+//  */
 
-static void _generateCommand(unsigned int level, Command *command)
-{
-    if (!command)
-        return;
-    switch (command->type)
-    {
-    case PARAMETERIZED:
-        _output(level, "%s", command->parameterizedCommand);
-        _output(level, "{");
-        _generateContentList(level, command->parameterizedContentList);
-        _output(level, "}");
-        break;
-    case ENVIRONMENT:
-        _output(level, "\\begin{%s}", command->environmentLeftText->text);
-        _generateContentList(level, command->environmentCommandArgs);
-        _output(level, "[");
-        _generateContent(level, command->environmentParameters);
-        _output(level, "]\n");
-        _generateContent(level + 1, command->environmentContent);
-        _output(level, "\\end{%s}\n", command->environmentLeftText->text);
-        break;
-    }
-}
+// static void _generateEpilogue(const int value)
+// {
+//     _output(0, "%s",
+//             "\n\n\\end{document}\n\n");
+// }
 
-static void _generateText(unsigned int level, Text *text)
-{
-    if (!text)
-        return;
-    _output(level, "%s", text->text);
-}
+// /**
+//  * Generates the output of the program.
+//  */
+// // static void _generateProgram(Program * program) {
+// // 	_generateExpression(3, program->expression);
+// // }
+// static void _generateProgram(Program *program)
+// {
+//     if (program && program->content)
+//     {
+//         _generateContent(0, program->content);
+//     }
+// }
 
-static void _generateContentList(unsigned int level, ContentList *contentList)
-{
-    if (!contentList)
-        return;
-    _generateContent(level, contentList->content);
-    _generateContentList(level, contentList->next);
-}
+// static void _generateContent(unsigned int level, Content *content)
+// {
+//     if (!content)
+//         return;
+//     _generateElement(level, content->sequenceElement);
+//     _generateContent(level, content->sequenceContent);
+// }
 
-static void _generateElement(unsigned int level, Element *element)
-{
-    if (!element)
-        return;
+// static void _generateCommand(unsigned int level, Command *command)
+// {
+//     if (!command)
+//         return;
+//     switch (command->type)
+//     {
+//     case PARAMETERIZED:
+//         _output(level, "%s", command->parameterizedCommand);
+//         _output(level, "{");
+//         _generateContentList(level, command->parameterizedContentList);
+//         _output(level, "}");
+//         break;
+//     case ENVIRONMENT:
+//         _output(level, "\\begin{%s}", command->environmentLeftText->text);
+//         _generateContentList(level, command->environmentCommandArgs);
+//         _output(level, "[");
+//         _generateContent(level, command->environmentParameters);
+//         _output(level, "]\n");
+//         _generateContent(level + 1, command->environmentContent);
+//         _output(level, "\\end{%s}\n", command->environmentLeftText->text);
+//         break;
+//     }
+// }
 
-    switch (element->type)
-    {
-    case LANGTEX_COMMAND:
-        _generateLangtexCommand(level, element->langtexCommand);
-        break;
-    case LATEX_COMMAND:
-        _generateCommand(level, element->command);
-        break;
-    case LATEX_TEXT:
-        _output(level, "%s", element->text->text);
-        break;
-    default:
-        logError(_logger, "Unknown element type: %d", element->type);
-    }
-}
+// static void _generateText(unsigned int level, Text *text)
+// {
+//     if (!text)
+//         return;
+//     _output(level, "%s", text->text);
+// }
 
-static void _generateParamList(unsigned int level, LangtexParamList *list)
-{
-    if (list == NULL)
-        return;
-    _output(level, "(");
-    _generateParam(level, list->param);
-    _generateParamList(level, list->next);
-    _output(level, ")");
-}
+// static void _generateContentList(unsigned int level, ContentList *contentList)
+// {
+//     if (!contentList)
+//         return;
+//     _generateContent(level, contentList->content);
+//     _generateContentList(level, contentList->next);
+// }
 
-static void _generateParam(unsigned int level, LangtexParam *param)
-{
-    if (param == NULL)
-        return;
-    switch (param->type)
-    {
-    case STRING_PARAMETER:
-        _output(level, "%s=\"%s\"", param->key, param->value.stringParam);
-        break;
-    case INTEGER_PARAMETER:
-        _output(level, "%s=%d", param->key, param->value.intParam);
-        break;
-    case BOOLEAN_PARAMETER:
-        _output(level, "%s=%s", param->key, param->value.boolParam ? "true" : "false");
-        break;
-    default:
-        logError(_logger, "Unknown parameter type: %d", param->type);
-        break;
-    }
-}
+// static void _generateElement(unsigned int level, Element *element)
+// {
+//     if (!element)
+//         return;
+
+//     switch (element->type)
+//     {
+//     case LANGTEX_COMMAND:
+//         _generateLangtexCommand(level, element->langtexCommand);
+//         break;
+//     case LATEX_COMMAND:
+//         _generateCommand(level, element->command);
+//         break;
+//     case LATEX_TEXT:
+//         _output(level, "%s", element->text->text);
+//         break;
+//     default:
+//         logError(_logger, "Unknown element type: %d", element->type);
+//     }
+// }
+
+// static void _generateParamList(unsigned int level, LangtexParamList *list)
+// {
+//     if (list == NULL)
+//         return;
+//     _output(level, "(");
+//     _generateParam(level, list->param);
+//     _generateParamList(level, list->next);
+//     _output(level, ")");
+// }
+
+// static void _generateParam(unsigned int level, LangtexParam *param)
+// {
+//     if (param == NULL)
+//         return;
+//     switch (param->type)
+//     {
+//     case STRING_PARAMETER:
+//         _output(level, "%s=\"%s\"", param->key, param->value.stringParam);
+//         break;
+//     case INTEGER_PARAMETER:
+//         _output(level, "%s=%d", param->key, param->value.intParam);
+//         break;
+//     case BOOLEAN_PARAMETER:
+//         _output(level, "%s=%s", param->key, param->value.boolParam ? "true" : "false");
+//         break;
+//     default:
+//         logError(_logger, "Unknown parameter type: %d", param->type);
+//         break;
+//     }
+// }
 
 static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *langtexCommandList)
 {
@@ -499,92 +499,92 @@ static char *_indentation(const unsigned int level)
 // 	va_end(arguments);
 // }
 
-/**  */
+// /**  */
 
-// Funciones para manejar el buffer
-static void _start_buffering()
-{
-    _buffer_size = 2048;
-    _output_buffer = malloc(_buffer_size);
-    _buffer_pos = 0;
-    _use_buffer = true;
-    if (_output_buffer)
-    {
-        _output_buffer[0] = '\0';
-    }
-}
+// // Funciones para manejar el buffer
+// static void _start_buffering()
+// {
+//     _buffer_size = 2048;
+//     _output_buffer = malloc(_buffer_size);
+//     _buffer_pos = 0;
+//     _use_buffer = true;
+//     if (_output_buffer)
+//     {
+//         _output_buffer[0] = '\0';
+//     }
+// }
 
-static char *_stop_buffering()
-{
-    _use_buffer = false;
-    char *result = _output_buffer;
-    _output_buffer = NULL;
-    _buffer_size = 0;
-    _buffer_pos = 0;
-    return result;
-}
+// static char *_stop_buffering()
+// {
+//     _use_buffer = false;
+//     char *result = _output_buffer;
+//     _output_buffer = NULL;
+//     _buffer_size = 0;
+//     _buffer_pos = 0;
+//     return result;
+// }
 
-// Version modificada de _output que admite modo buffer
-static void _output(const unsigned int indentationLevel, const char *const format, ...)
-{
-    va_list arguments;
-    va_start(arguments, format);
+// // Version modificada de _output que admite modo buffer
+// static void _output(const unsigned int indentationLevel, const char *const format, ...)
+// {
+//     va_list arguments;
+//     va_start(arguments, format);
 
-    if (_use_buffer && _output_buffer)
-    {
-        // Modo buffer: escribir al string
-        char *indentation = _indentation(indentationLevel);
-        char *effectiveFormat = concatenate(2, indentation, format);
+//     if (_use_buffer && _output_buffer)
+//     {
+//         // Modo buffer: escribir al string
+//         char *indentation = _indentation(indentationLevel);
+//         char *effectiveFormat = concatenate(2, indentation, format);
 
-        // Calcular el tamaño necesario
-        va_list args_copy;
-        va_copy(args_copy, arguments);
-        int needed_chars = vsnprintf(NULL, 0, effectiveFormat, args_copy);
-        va_end(args_copy);
+//         // Calcular el tamaño necesario
+//         va_list args_copy;
+//         va_copy(args_copy, arguments);
+//         int needed_chars = vsnprintf(NULL, 0, effectiveFormat, args_copy);
+//         va_end(args_copy);
 
-        // Redimensionar buffer si es necesario
-        size_t needed_size = _buffer_pos + needed_chars + 1;
-        if (needed_size > _buffer_size)
-        {
-            _buffer_size = needed_size * 2;
-            char *new_buffer = realloc(_output_buffer, _buffer_size);
-            if (new_buffer)
-            {
-                _output_buffer = new_buffer;
-            }
-        }
+//         // Redimensionar buffer si es necesario
+//         size_t needed_size = _buffer_pos + needed_chars + 1;
+//         if (needed_size > _buffer_size)
+//         {
+//             _buffer_size = needed_size * 2;
+//             char *new_buffer = realloc(_output_buffer, _buffer_size);
+//             if (new_buffer)
+//             {
+//                 _output_buffer = new_buffer;
+//             }
+//         }
 
-        // Escribir al buffer
-        if (_output_buffer)
-        {
-            vsprintf(_output_buffer + _buffer_pos, effectiveFormat, arguments);
-            _buffer_pos += needed_chars;
-        }
+//         // Escribir al buffer
+//         if (_output_buffer)
+//         {
+//             vsprintf(_output_buffer + _buffer_pos, effectiveFormat, arguments);
+//             _buffer_pos += needed_chars;
+//         }
 
-        free(effectiveFormat);
-        free(indentation);
-    }
-    else
-    {
-        // Modo normal: el codigo og del profe
-        char *indentation = _indentation(indentationLevel);
-        char *effectiveFormat = concatenate(2, indentation, format);
-        vfprintf(stdout, effectiveFormat, arguments);
-        fflush(stdout);
-        free(effectiveFormat);
-        free(indentation);
-    }
+//         free(effectiveFormat);
+//         free(indentation);
+//     }
+//     else
+//     {
+//         // Modo normal: el codigo og del profe
+//         char *indentation = _indentation(indentationLevel);
+//         char *effectiveFormat = concatenate(2, indentation, format);
+//         vfprintf(stdout, effectiveFormat, arguments);
+//         fflush(stdout);
+//         free(effectiveFormat);
+//         free(indentation);
+//     }
 
-    va_end(arguments);
-}
+//     va_end(arguments);
+// }
 
-/** PUBLIC FUNCTIONS */
+// /** PUBLIC FUNCTIONS */
 
-void generate(CompilerState *compilerState)
-{
-    logDebugging(_logger, "Generating LaNgTeX output...");
-    _generatePrologue();
-    _generateProgram(compilerState->abstractSyntaxtTree);
-    _generateEpilogue(compilerState->value);
-    logDebugging(_logger, "Generation is done.");
-}
+// void generate(CompilerState *compilerState)
+// {
+//     logDebugging(_logger, "Generating LaNgTeX output...");
+//     _generatePrologue();
+//     _generateProgram(compilerState->abstractSyntaxtTree);
+//     _generateEpilogue(compilerState->value);
+//     logDebugging(_logger, "Generation is done.");
+// }

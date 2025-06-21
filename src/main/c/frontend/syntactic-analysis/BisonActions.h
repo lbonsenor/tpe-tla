@@ -45,7 +45,7 @@ LangtexCommand * LangtexContentListSemanticAction(LangtexParamList * parameters,
 
   /* Langtex semantic actions - specific */
 
-LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Text * leftContent, Text * rightContent);
+LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Content * leftContent, Content * rightContent);
 LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, LangtexCommandList * langtexCommandList);
 LangtexCommand * ExerciseSemanticAction(LangtexParamList * parameters, LangtexCommand * commandPrompt, LangtexCommand *commandOptions, LangtexCommand * commandAnswers, LangtexCommandType type);
 LangtexCommand * LanguageSemanticAction(TextList * textList, LangtexCommandType type);

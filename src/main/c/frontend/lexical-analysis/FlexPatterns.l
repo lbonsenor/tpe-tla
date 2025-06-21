@@ -37,7 +37,7 @@
 "[!answer]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), ANSWER_COMMAND); }
 "[!useLanguage]"                    { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), LANGUAGE_COMMAND); }
 "[!block]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), BLOCK_COMMAND);}
-"[!fill]"                           { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
+"[!fill]"                           { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
 
 \\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
