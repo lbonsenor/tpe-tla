@@ -319,11 +319,11 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
 {
 
     _start_buffering();
-    _generateText(level, command->leftText);
+    _generateContent(level, command->leftText);
     char *left_text = _stop_buffering();
 
     _start_buffering();
-    _generateText(level, command->rightText);
+    _generateContent(level, command->rightText);
     char *right_text = _stop_buffering();
     logDebugging(_logger, "command paramteres NULL? %s", command->parameters == NULL ? "true" : "false");
     char *language = _checkTranslateParam(command->parameters);
