@@ -1,27 +1,6 @@
-[!translate](int=0, lang="ko"){\textit{\color{red}{hola}}}{\textbf{안녕}}
-[!table](cols=2){
+[!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
+[!table](cols=2)
+{
     [!row](header=true, hi="ko"){hi}{there}
-    [!row](lang="ko"){herro}{[!translate](lang="zh"){hola}{hola}}
-}
-
-[!dialog](){
-    [!speaker](name="Alice"){[!translate](lang="zh"){안녕}{hola}}
-    [!speaker](name="Bob", age=12){hii}
-}
-
-[!block](title="Vocabulary", title="Hii", lang="ko"){
-    [!translate](lang="zh"){안녕}{hola}
-    [!translate](lang="ko"){hola}{안녕}
-    [!translate](lang="en"){hola}{hello}
-    [!translate](lang="fr"){hola}{bonjour}
-}
-
-[!exercise](type="multiple-choice", title="Ejercicio de completar"){
-    [!prompt]{Completa la frase: 我 [!fill] 吃饭}  
-    [!options]{想}{有}{去}
-    [!answer]{1}{2}
-}
-[!exercise](type="single-choice", title="Ejercicio de traducción"){
-    [!prompt]{Traduce: Me gusta el cafe}
-    [!answer]{我喜欢咖啡}
+    [!row](lang="ko"){herro}{[!translate](lang="ko"){hola}{hola}}
 }

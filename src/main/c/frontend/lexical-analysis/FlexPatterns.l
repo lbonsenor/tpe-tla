@@ -39,8 +39,6 @@
 "[!block]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), BLOCK_COMMAND);}
 "[!fill]"                           { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
 
-\\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); }
-
 <PARAM>,[[:space:]]*                { return CommaLexemeAction(createLexicalAnalyzerContext()); }
 <PARAM>"="                          { return EqualsLexemeAction(createLexicalAnalyzerContext()); }           
 <PARAM>[[:digit:]]+					{ return ParameterLexemeAction(createLexicalAnalyzerContext(), INTEGER_PARAM); }
@@ -61,15 +59,19 @@
 
 \[                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACKET); }
 \]                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACKET); }
+[\n]                                { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
+[[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 
-[[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-[^\\{}#\$%\^_~\[\]]+               { return TextLexemeAction(createLexicalAnalyzerContext()); }
+[^\\{}#\$%\^_~\[\]]+                { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 .									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
 
+/* \\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); } */
+
 #include "FlexExport.h"
+

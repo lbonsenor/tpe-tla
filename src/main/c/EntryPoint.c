@@ -50,7 +50,7 @@ const int main(const int count, const char **arguments)
 		SemanticAnalysisStatus semanticResult = analyzeProgram(program);
 		if (semanticResult == SEMANTIC_ANALYSIS_ACCEPT)
 		{
-			// generate(&compilerState);
+			generate(&compilerState);
 		}
 		else
 		{

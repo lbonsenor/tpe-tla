@@ -11,11 +11,11 @@ char *romanize(const char *lang, const char *input)
     if (input == NULL)
         return " ";
 
-    if (strcmp(lang, "kr") == 0)
+    if (strcmp(lang, "ko") == 0)
     {
         return genericRomanize(input, 7, &decomposeHangulChar);
     }
-    else if (strcmp(lang, "heb") == 0)
+    else if (strcmp(lang, "he") == 0)
     {
         // Hebrew is too complex and it needs it's own romanizer
         return romanizeHebrew(input);
