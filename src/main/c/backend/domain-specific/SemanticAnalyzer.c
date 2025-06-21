@@ -6,13 +6,6 @@ boolean initializeSemanticAnalyzer(CompilerState *state)
 {
     _logger = createLogger("SemanticAnalyzer");
     logDebugging(_logger, "Initializing semantic analyzer for [!translate]");
-
-    // Make sure we have a symbol table
-    if (!state->globalSymbolTable)
-    {
-        state->globalSymbolTable = createSymbolTable();
-    }
-    return true;
 }
 
 void shutdownSemanticAnalyzer(void)
@@ -542,20 +535,7 @@ SemanticAnalysisStatus analyzeTranslateCommand(CompilerState *state, LangtexComm
             current = current->next;
         }
     }
-
-    if (state->globalSymbolTable)
-    {
-        // Add language to symbol table if it's not already there
-        if (languageCode && !isLanguageDeclared(state->globalSymbolTable, languageCode))
-        {
-
-            addLanguage(state->globalSymbolTable, languageCode);
-            logDebugging(_logger, "Added language '%s' to symbol table", languageCode);
-        }
-
-        logDebugging(_logger, "[!translate] command validation passed");
-        return SEMANTIC_ANALYSIS_ACCEPT;
-    }
+    return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
 // without duplicate param warning -- just using the first one
@@ -635,10 +615,6 @@ SemanticAnalysisStatus analyzeTableCommand(CompilerState *state, LangtexCommand 
 
         isFirstRow = false; // after first row
         current = current->next;
-    }
-
-    if (state->globalSymbolTable)
-    {
     }
 
     return SEMANTIC_ANALYSIS_ACCEPT;

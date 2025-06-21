@@ -37,17 +37,8 @@ const int main(const int count, const char **arguments)
 	// Begin compilation process.
 	CompilerState compilerState = {
 		.abstractSyntaxtTree = NULL,
-		.succeed = false,
-		.globalSymbolTable = createSymbolTable(),
-		// .config = NULL,
-		// .inDialogContext = false,
-		// .inExerciseContext = false,
-		// .inTableContext = false,
-		.warningCount = 0,
-		// NEW: Initialize semantic analysis fields
-		.currentPhase = PHASE_LEXICAL,
-		.errorCount = 0,
-		.semanticAnalysisComplete = false};
+		.succeed = false
+	};
 
 	initializeSemanticAnalyzer(&compilerState);
 
@@ -84,28 +75,10 @@ const int main(const int count, const char **arguments)
 		compilationStatus = FAILED;
 	}
 
-	if (compilerState.globalSymbolTable)
-	{
-		int langCount, translationCount, usedLangCount;
-		getSymbolTableStats(compilerState.globalSymbolTable, &langCount);
-
-		logDebugging(logger, "=== SEMANTIC ANALYSIS RESULTS ===");
-		logDebugging(logger, "Languages found: %d", langCount);
-
-		// Print full symbol table
-
-		printf("\n");
-		printSymbolTable(compilerState.globalSymbolTable);
-		logDebugging(logger, "================================");
-	}
-
 	logDebugging(logger, "Releasing AST resources...");
 	releaseProgram(program);
 	logDebugging(logger, "Releasing modules resources...");
-	if (compilerState.globalSymbolTable)
-	{
-		destroySymbolTable(compilerState.globalSymbolTable);
-	}
+
 	// shutdownGeneratorModule();
 	// shutdownLangtexModule();
 	// shutdownCalculatorModule();
@@ -118,31 +91,4 @@ const int main(const int count, const char **arguments)
 	logDebugging(logger, "Compilation is done.");
 	destroyLogger(logger);
 	return compilationStatus;
-}
-
-// TODO: this should be in CompilerState.c
-void addSemanticError(CompilerState *state, const char *message)
-{
-	if (state)
-	{
-		state->errorCount++;
-		state->succeed = false;
-		// You can expand this to store actual error messages later
-		printf("Semantic Error: %s\n", message);
-	}
-}
-
-void addSemanticWarning(CompilerState *state, const char *message)
-{
-	if (state)
-	{
-		state->warningCount++;
-		// You can expand this to store actual warning messages later
-		printf("Semantic Warning: %s\n", message);
-	}
-}
-
-boolean hasSemanticErrors(CompilerState *state)
-{
-	return state ? state->errorCount > 0 : true;
 }
