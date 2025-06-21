@@ -6,6 +6,8 @@
 #include "../../shared/CompilerState.h"
 #include "../../shared/Logger.h"
 #include "../../shared/SymbolTable.h"
+#include <stdlib.h>
+
 
 /**
  * Semantic analysis status codes
@@ -64,6 +66,11 @@ SemanticAnalysisStatus analyzeTranslateCommand(CompilerState* state, LangtexComm
 
 SemanticAnalysisStatus analyzeTableCommand(CompilerState *state, LangtexCommand *command);
 SemanticAnalysisStatus analyzeRowCommand(CompilerState *state, LangtexCommand *command, int expectedCols);
+SemanticAnalysisStatus analyzeDialogCommand(CompilerState *state, LangtexCommand *command);
+SemanticAnalysisStatus analyzeSpeakerCommand(CompilerState *state, LangtexCommand *command);
+SemanticAnalysisStatus analyzeBlockCommand(CompilerState *state, LangtexCommand *command);
+SemanticAnalysisStatus analyzeExerciseCommand(CompilerState *state, LangtexCommand *command);
+
 
 /* PARAMETER HELPERS */
 
@@ -80,5 +87,9 @@ boolean checkNestingRules(CompilerState* state, LangtexCommandType commandType);
 static boolean validateLatexInCommand(Command *command);
 static boolean validateLatexInElement(Element *element);
 static boolean validateLatexInContent(Content *content);
-
+static boolean validateSpeakerContent(CompilerState* state, Content *content);
+static boolean validateSpeakerElement(CompilerState * state, Element *element);
+static boolean validatePromptContent(CompilerState *state, Content *content);
+static boolean validateSingleChoiceExercise(CompilerState *state, LangtexCommand *prompt, LangtexCommand *answer);
+static boolean validateMultipleChoiceExercise(CompilerState *state, LangtexCommand *prompt, LangtexCommand *options, LangtexCommand *answers);
 #endif
