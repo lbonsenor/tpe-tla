@@ -24,6 +24,7 @@ const int main(const int count, const char **arguments)
 	initializeBisonActionsModule();
 	initializeSyntacticAnalyzerModule();
 	initializeRenameMeModule();
+	initializeSemanticAnalyzer();
 	// initializeCalculatorModule();
 	// initializeLangtexModule();
 	// initializeGeneratorModule();
@@ -40,7 +41,6 @@ const int main(const int count, const char **arguments)
 		.succeed = false
 	};
 
-	initializeSemanticAnalyzer(&compilerState);
 
 	const SyntacticAnalysisStatus syntacticAnalysisStatus = parse(&compilerState);
 	CompilationStatus compilationStatus = SUCCEED;
@@ -56,7 +56,7 @@ const int main(const int count, const char **arguments)
 		// 	generate(&compilerState);
 		// }
 
-		SemanticAnalysisStatus semanticResult = analyzeProgram(&compilerState, program);
+		SemanticAnalysisStatus semanticResult = analyzeProgram(program);
 		if (semanticResult == SEMANTIC_ANALYSIS_ACCEPT)
 		{
 			// generate(&compilerState);

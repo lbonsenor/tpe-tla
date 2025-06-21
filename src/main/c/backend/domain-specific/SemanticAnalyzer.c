@@ -2,13 +2,13 @@
 
 static Logger *_logger = NULL;
 
-boolean initializeSemanticAnalyzer(CompilerState *state)
+void initializeSemanticAnalyzer()
 {
     _logger = createLogger("SemanticAnalyzer");
     logDebugging(_logger, "Initializing semantic analyzer for [!translate]");
 }
 
-void shutdownSemanticAnalyzer(void)
+void shutdownSemanticAnalyzer()
 {
     if (_logger)
     {
@@ -192,27 +192,27 @@ static boolean validateLatexInElement(Element *element)
 }
 
 /* HELPER FUNCTIONS FOR SPEAKER COMMAND */
-static boolean validateSpeakerContent(CompilerState *state, Content *content)
+static boolean validateSpeakerContent(Content *content)
 {
     if (!content)
         return true;
 
     if (content->type == SEQUENCE)
     {
-        if (!validateSpeakerElement(state, content->sequenceElement))
+        if (!validateSpeakerElement(content->sequenceElement))
             return false;
-        return validateSpeakerContent(state, content->sequenceContent);
+        return validateSpeakerContent(content->sequenceContent);
     }
     else if (content->type == ELEMENT)
     {
-        return validateSpeakerElement(state, content->sequenceElement);
+        return validateSpeakerElement(content->sequenceElement);
     }
 
     logError(_logger, "[!speaker] unexpected content type: %d", content->type);
     return false;
 }
 
-static boolean validateSpeakerElement(CompilerState *state, Element *el)
+static boolean validateSpeakerElement(Element *el)
 {
     if (!el)
         return true;
@@ -229,7 +229,7 @@ static boolean validateSpeakerElement(CompilerState *state, Element *el)
             logError(_logger, "[!speaker] only [!translate] allowed inside [!speaker], got: %d", el->langtexCommand->type);
             return false;
         }
-        return analyzeTranslateCommand(state, el->langtexCommand) == SEMANTIC_ANALYSIS_ACCEPT;
+        return analyzeTranslateCommand(el->langtexCommand) == SEMANTIC_ANALYSIS_ACCEPT;
     default:
         logError(_logger, "[!speaker] invalid element type: %d", el->type);
         return false;
@@ -238,14 +238,14 @@ static boolean validateSpeakerElement(CompilerState *state, Element *el)
 
 /* HELPER FUNCTIONS FOR EXERCISE COMMAND */
 
-static boolean validatePromptContent(CompilerState *state, Content *content)
+static boolean validatePromptContent(Content *content)
 {
     if (!content)
         return true;
 
     if (content->type == SEQUENCE)
     {
-        if (!validateSpeakerElement(state, content->sequenceElement))
+        if (!validateSpeakerElement(content->sequenceElement))
         {
             if (content->sequenceElement->type == LANGTEX_COMMAND && content->sequenceElement->langtexCommand->type == LANGTEX_FILL)
             {
@@ -256,7 +256,7 @@ static boolean validatePromptContent(CompilerState *state, Content *content)
                 return false;
             }
         }
-        return validatePromptContent(state, content->sequenceContent);
+        return validatePromptContent(content->sequenceContent);
     }
     else if (content->type == ELEMENT)
     {
@@ -266,7 +266,7 @@ static boolean validatePromptContent(CompilerState *state, Content *content)
             logDebugging(_logger, "[!fill] found in prompt content");
             return true;
         }
-        return validateSpeakerElement(state, content->sequenceElement);
+        return validateSpeakerElement(content->sequenceElement);
     }
 
     logError(_logger, "[!speaker] unexpected content type: %d", content->type);
@@ -275,7 +275,7 @@ static boolean validatePromptContent(CompilerState *state, Content *content)
 
 /* HELPER FUNCTIONS FOR EXERCISE COMMAND */
 
-static boolean validateSingleChoiceExercise(CompilerState *state, LangtexCommand *prompt, LangtexCommand *answer)
+static boolean validateSingleChoiceExercise(LangtexCommand *prompt, LangtexCommand *answer)
 {
     if (prompt->type != LANGTEX_PROMPT || answer->type != LANGTEX_ANSWERS)
     {
@@ -284,7 +284,7 @@ static boolean validateSingleChoiceExercise(CompilerState *state, LangtexCommand
     }
     if (prompt->content)
     {
-        if (!validateSpeakerContent(state, prompt->content))
+        if (!validateSpeakerContent(prompt->content))
         {
             logError(_logger, "[!exercise] invalid LaTeX content in prompt");
             return false;
@@ -295,7 +295,7 @@ static boolean validateSingleChoiceExercise(CompilerState *state, LangtexCommand
     if (answer->contentList)
     {
         ContentList *current = answer->contentList;
-        if (!validateSpeakerContent(state, current->content))
+        if (!validateSpeakerContent(current->content))
         {
             logError(_logger, "[!exercise] invalid LaTeX content in options");
             return false;
@@ -311,7 +311,7 @@ static boolean validateSingleChoiceExercise(CompilerState *state, LangtexCommand
     return false;
 }
 
-static boolean validateMultipleChoiceExercise(CompilerState *state, LangtexCommand *prompt, LangtexCommand *options, LangtexCommand *answers)
+static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCommand *options, LangtexCommand *answers)
 {
     if (prompt->type != LANGTEX_PROMPT || options->type != LANGTEX_OPTIONS || answers->type != LANGTEX_ANSWERS)
     {
@@ -321,7 +321,7 @@ static boolean validateMultipleChoiceExercise(CompilerState *state, LangtexComma
     // esto siempre es cierto -> chequear que [!fill] este si o si
     if (prompt->content)
     {
-        if (!validatePromptContent(state, prompt->content))
+        if (!validatePromptContent(prompt->content))
         {
             logError(_logger, "[!exercise] invalid LaTeX content in prompt");
             return false;
@@ -335,7 +335,7 @@ static boolean validateMultipleChoiceExercise(CompilerState *state, LangtexComma
         ContentList *current = options->contentList;
         while (current)
         {
-            if (!validateSpeakerContent(state, current->content))
+            if (!validateSpeakerContent(current->content))
             {
                 logError(_logger, "[!exercise] invalid LaTeX content in options");
                 return false;
@@ -388,7 +388,7 @@ static boolean validateMultipleChoiceExercise(CompilerState *state, LangtexComma
 }
 /* PUBLIC FUNCTIONS */
 
-SemanticAnalysisStatus analyzeProgram(CompilerState *state, Program *program)
+SemanticAnalysisStatus analyzeProgram(Program *program)
 {
     if (!program || !program->content)
     {
@@ -397,10 +397,10 @@ SemanticAnalysisStatus analyzeProgram(CompilerState *state, Program *program)
     }
 
     logDebugging(_logger, "Starting semantic analysis");
-    return analyzeContent(state, program->content);
+    return analyzeContent(program->content);
 }
 
-SemanticAnalysisStatus analyzeContent(CompilerState *state, Content *content)
+SemanticAnalysisStatus analyzeContent(Content *content)
 {
     if (!content)
     {
@@ -410,25 +410,25 @@ SemanticAnalysisStatus analyzeContent(CompilerState *state, Content *content)
     if (content->type == SEQUENCE)
     {
         // Analyze current element
-        SemanticAnalysisStatus status = analyzeElement(state, content->sequenceElement);
+        SemanticAnalysisStatus status = analyzeElement(content->sequenceElement);
         if (status != SEMANTIC_ANALYSIS_ACCEPT)
         {
             return status;
         }
 
         // Analyze rest of content
-        return analyzeContent(state, content->sequenceContent);
+        return analyzeContent(content->sequenceContent);
     }
     else
     {
-        return analyzeElement(state, content->sequenceElement);
+        return analyzeElement(content->sequenceElement);
     }
 
     logError(_logger, "Unexpected content type: %d", content->type);
     return SEMANTIC_ANALYSIS_ERROR;
 }
 
-SemanticAnalysisStatus analyzeElement(CompilerState *state, Element *element)
+SemanticAnalysisStatus analyzeElement(Element *element)
 {
     if (!element)
     {
@@ -438,7 +438,7 @@ SemanticAnalysisStatus analyzeElement(CompilerState *state, Element *element)
     switch (element->type)
     {
     case LANGTEX_COMMAND:
-        return analyzeLangtexCommand(state, element->langtexCommand);
+        return analyzeLangtexCommand(element->langtexCommand);
 
     case LATEX_COMMAND:
     case LATEX_TEXT:
@@ -451,7 +451,7 @@ SemanticAnalysisStatus analyzeElement(CompilerState *state, Element *element)
     }
 }
 
-SemanticAnalysisStatus analyzeLangtexCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeLangtexCommand(LangtexCommand *command)
 {
     if (!command)
     {
@@ -461,19 +461,19 @@ SemanticAnalysisStatus analyzeLangtexCommand(CompilerState *state, LangtexComman
     switch (command->type)
     {
     case LANGTEX_TRANSLATE:
-        return analyzeTranslateCommand(state, command);
+        return analyzeTranslateCommand(command);
         break;
     case LANGTEX_TABLE:
-        return analyzeTableCommand(state, command);
+        return analyzeTableCommand(command);
         break;
     case LANGTEX_DIALOG:
-        return analyzeDialogCommand(state, command);
+        return analyzeDialogCommand(command);
         break;
     case LANGTEX_BLOCK:
-        return analyzeBlockCommand(state, command);
+        return analyzeBlockCommand(command);
         break;
     case LANGTEX_EXERCISE:
-        return analyzeExerciseCommand(state, command);
+        return analyzeExerciseCommand(command);
         break;
     default:
         logError(_logger, "Unknown LangTeX command type: %d", command->type);
@@ -484,7 +484,7 @@ SemanticAnalysisStatus analyzeLangtexCommand(CompilerState *state, LangtexComman
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-SemanticAnalysisStatus analyzeTranslateCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeTranslateCommand(LangtexCommand *command)
 {
     logDebugging(_logger, "Analyzing [!translate] command");
 
@@ -539,7 +539,7 @@ SemanticAnalysisStatus analyzeTranslateCommand(CompilerState *state, LangtexComm
 }
 
 // without duplicate param warning -- just using the first one
-SemanticAnalysisStatus analyzeTableCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeTableCommand(LangtexCommand *command)
 {
     // For now, we accept all table commands
     logDebugging(_logger, "Analyzing [!table] command");
@@ -607,7 +607,7 @@ SemanticAnalysisStatus analyzeTableCommand(CompilerState *state, LangtexCommand 
             }
         }
 
-        if (analyzeRowCommand(state, langtexCommand, cols) != SEMANTIC_ANALYSIS_ACCEPT)
+        if (analyzeRowCommand(langtexCommand, cols) != SEMANTIC_ANALYSIS_ACCEPT)
         {
             logError(_logger, "[!table] error analyzing [!row] command");
             return SEMANTIC_ANALYSIS_ERROR;
@@ -620,7 +620,7 @@ SemanticAnalysisStatus analyzeTableCommand(CompilerState *state, LangtexCommand 
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-SemanticAnalysisStatus analyzeRowCommand(CompilerState *state, LangtexCommand *command, int expectedCols)
+SemanticAnalysisStatus analyzeRowCommand(LangtexCommand *command, int expectedCols)
 {
     logDebugging(_logger, "Analyzing [!row] command");
 
@@ -680,7 +680,7 @@ SemanticAnalysisStatus analyzeRowCommand(CompilerState *state, LangtexCommand *c
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-SemanticAnalysisStatus analyzeDialogCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeDialogCommand(LangtexCommand *command)
 {
     // For now, we accept all table commands
     logDebugging(_logger, "Analyzing [!dialog] command");
@@ -745,7 +745,7 @@ SemanticAnalysisStatus analyzeDialogCommand(CompilerState *state, LangtexCommand
             return SEMANTIC_ANALYSIS_ERROR;
         }
 
-        SemanticAnalysisStatus status = analyzeSpeakerCommand(state, langtexCommand);
+        SemanticAnalysisStatus status = analyzeSpeakerCommand(langtexCommand);
         if (status != SEMANTIC_ANALYSIS_ACCEPT)
         {
             logError(_logger, "[!dialog] error analyzing [!speaker] or [!block] command");
@@ -760,7 +760,7 @@ SemanticAnalysisStatus analyzeDialogCommand(CompilerState *state, LangtexCommand
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-SemanticAnalysisStatus analyzeSpeakerCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeSpeakerCommand(LangtexCommand *command)
 {
     logDebugging(_logger, "Analyzing [!speaker] command");
 
@@ -800,7 +800,7 @@ SemanticAnalysisStatus analyzeSpeakerCommand(CompilerState *state, LangtexComman
         }
     }
 
-    if (!validateSpeakerContent(state, command->content))
+    if (!validateSpeakerContent(command->content))
     {
         return SEMANTIC_ANALYSIS_ERROR;
     }
@@ -810,7 +810,7 @@ SemanticAnalysisStatus analyzeSpeakerCommand(CompilerState *state, LangtexComman
 }
 
 // using duplicate validation and warning
-SemanticAnalysisStatus analyzeBlockCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeBlockCommand(LangtexCommand *command)
 {
     logDebugging(_logger, "Analyzing [!block] command");
 
@@ -859,7 +859,7 @@ SemanticAnalysisStatus analyzeBlockCommand(CompilerState *state, LangtexCommand 
         current = current->next;
     }
 
-    if (!validateSpeakerContent(state, command->content))
+    if (!validateSpeakerContent(command->content))
     {
         return SEMANTIC_ANALYSIS_ERROR;
     }
@@ -868,7 +868,7 @@ SemanticAnalysisStatus analyzeBlockCommand(CompilerState *state, LangtexCommand 
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-SemanticAnalysisStatus analyzeExerciseCommand(CompilerState *state, LangtexCommand *command)
+SemanticAnalysisStatus analyzeExerciseCommand(LangtexCommand *command)
 {
     logDebugging(_logger, "Analyzing [!exercise] command");
 
@@ -929,7 +929,7 @@ SemanticAnalysisStatus analyzeExerciseCommand(CompilerState *state, LangtexComma
             logError(_logger, "[!exercise] [!fill] command must have prompt, answers, and options");
             return SEMANTIC_ANALYSIS_ERROR;
         }
-        if (validateMultipleChoiceExercise(state, command->prompt, command->options, command->answers))
+        if (validateMultipleChoiceExercise(command->prompt, command->options, command->answers))
         {
             logDebugging(_logger, "[!exercise] [!multiple-choice] command validation passed");
             return SEMANTIC_ANALYSIS_ACCEPT;
@@ -951,7 +951,7 @@ SemanticAnalysisStatus analyzeExerciseCommand(CompilerState *state, LangtexComma
         {
             logWarning(_logger, "[!exercise] [!single-choice] command should not have options");
         }
-        if (validateSingleChoiceExercise(state, command->prompt, command->answers))
+        if (validateSingleChoiceExercise(command->prompt, command->answers))
         {
             logDebugging(_logger, "[!exercise] [!single-choice] command validation passed");
             return SEMANTIC_ANALYSIS_ACCEPT;
@@ -967,27 +967,27 @@ SemanticAnalysisStatus analyzeExerciseCommand(CompilerState *state, LangtexComma
 }
 
 /* STUB FUNCTIONS - Not needed for functions, but required by interface */
-SemanticAnalysisStatus analyzeLatexCommand(CompilerState *state, Command *command)
+SemanticAnalysisStatus analyzeLatexCommand(Command *command)
 {
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-boolean validateParameters(CompilerState *state, LangtexParamList *params, LangtexCommandType expectedFor)
+boolean validateParameters(LangtexParamList *params, LangtexCommandType expectedFor)
 {
     return true;
 }
 
-boolean validateParameter(CompilerState *state, LangtexParam *param, const char *expectedName, LangtexParamType expectedType)
+boolean validateParameter(LangtexParam *param, const char *expectedName, LangtexParamType expectedType)
 {
     return true;
 }
 
-boolean validateContext(CompilerState *state, LangtexCommandType commandType)
+boolean validateContext(LangtexCommandType commandType)
 {
     return true;
 }
 
-boolean checkNestingRules(CompilerState *state, LangtexCommandType commandType)
+boolean checkNestingRules(LangtexCommandType commandType)
 {
     return true;
 }
