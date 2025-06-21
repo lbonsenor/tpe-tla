@@ -19,51 +19,15 @@ typedef enum {
 } SemanticAnalysisStatus;
 
 /* MODULE MANAGEMENT */
-
-/**
- * Initialize the semantic analyzer
- */
 void initializeSemanticAnalyzer();
-
-/**
- * Shutdown the semantic analyzer
- */
 void shutdownSemanticAnalyzer();
 
 /* MAIN ANALYSIS FUNCTIONS */
-
-/**
- * Analyze a complete program
- */
 SemanticAnalysisStatus analyzeProgram(Program* program);
-
-/**
- * Analyze program content
- */
 SemanticAnalysisStatus analyzeContent(Content* content);
-
-/**
- * Analyze an element
- */
 SemanticAnalysisStatus analyzeElement(Element* element);
-
-/**
- * Analyze a LangTeX command
- */
 SemanticAnalysisStatus analyzeLangtexCommand(LangtexCommand* command);
-
-/**
- * Analyze a LaTeX command (stub for now)
- */
-SemanticAnalysisStatus analyzeLatexCommand(Command* command);
-
-/* TRANSLATE-SPECIFIC ANALYSIS */
-
-/**
- * Analyze [!translate] command specifically
- */
 SemanticAnalysisStatus analyzeTranslateCommand(LangtexCommand* command);
-
 SemanticAnalysisStatus analyzeTableCommand(LangtexCommand *command);
 SemanticAnalysisStatus analyzeRowCommand(LangtexCommand *command, int expectedCols);
 SemanticAnalysisStatus analyzeDialogCommand(LangtexCommand *command);
@@ -72,18 +36,8 @@ SemanticAnalysisStatus analyzeBlockCommand(LangtexCommand *command);
 SemanticAnalysisStatus analyzeExerciseCommand(LangtexCommand *command);
 
 
-/* PARAMETER HELPERS */
-
-/**
- * Get parameter by name from parameter list
- */
+/* HELPER FUNCTIONS */
 LangtexParam* getParameter(LangtexParamList* params, const char* name);
-
-/* STUB FUNCTIONS - Required by interface but not implemented yet */
-boolean validateParameters(LangtexParamList* params, LangtexCommandType expectedFor);
-boolean validateParameter(LangtexParam* param, const char* expectedName, LangtexParamType expectedType);
-boolean validateContext(LangtexCommandType commandType);
-boolean checkNestingRules(LangtexCommandType commandType);
 static boolean validateLatexInCommand(Command *command);
 static boolean validateLatexInElement(Element *element);
 static boolean validateLatexInContent(Content *content);

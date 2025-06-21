@@ -1,6 +1,5 @@
 #include "backend/code-generation/Generator.h"
 #include "backend/domain-specific/SemanticAnalyzer.h"
-// #include "backend/domain-specific/Calculator.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/LangTeXAST.h"
 // #include "frontend/syntactic-analysis/AbstractSyntaxTree.h"
@@ -19,15 +18,12 @@
 const int main(const int count, const char **arguments)
 {
 	Logger *logger = createLogger("EntryPoint");
-	// initializeSymbolTableModule();
 	initializeFlexActionsModule();
 	initializeBisonActionsModule();
 	initializeSyntacticAnalyzerModule();
 	initializeRenameMeModule();
 	initializeSemanticAnalyzer();
-	// initializeCalculatorModule();
-	// initializeLangtexModule();
-	// initializeGeneratorModule();
+	initializeGeneratorModule();
 
 	// Logs the arguments of the application.
 	for (int k = 0; k < count; ++k)
@@ -50,11 +46,6 @@ const int main(const int count, const char **arguments)
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
 		logDebugging(logger, "Validating the input program...");
-		// ComputationResult computationResult = computeContent(program->content);
-		// if (computationResult.succeed) {
-		// 	compilerState.value = computationResult.value;
-		// 	generate(&compilerState);
-		// }
 
 		SemanticAnalysisStatus semanticResult = analyzeProgram(program);
 		if (semanticResult == SEMANTIC_ANALYSIS_ACCEPT)
@@ -79,15 +70,12 @@ const int main(const int count, const char **arguments)
 	releaseProgram(program);
 	logDebugging(logger, "Releasing modules resources...");
 
-	// shutdownGeneratorModule();
-	// shutdownLangtexModule();
-	// shutdownCalculatorModule();
+	shutdownGeneratorModule();
 	shutdownSemanticAnalyzer();
 	shutdownRenameMeModule();
 	shutdownSyntacticAnalyzerModule();
 	shutdownBisonActionsModule();
 	shutdownFlexActionsModule();
-	// shutdownSymbolTableModule();
 	logDebugging(logger, "Compilation is done.");
 	destroyLogger(logger);
 	return compilationStatus;

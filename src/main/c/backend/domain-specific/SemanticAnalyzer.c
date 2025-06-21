@@ -965,29 +965,3 @@ SemanticAnalysisStatus analyzeExerciseCommand(LangtexCommand *command)
         return SEMANTIC_ANALYSIS_ERROR;
     }
 }
-
-/* STUB FUNCTIONS - Not needed for functions, but required by interface */
-SemanticAnalysisStatus analyzeLatexCommand(Command *command)
-{
-    return SEMANTIC_ANALYSIS_ACCEPT;
-}
-
-boolean validateParameters(LangtexParamList *params, LangtexCommandType expectedFor)
-{
-    return true;
-}
-
-boolean validateParameter(LangtexParam *param, const char *expectedName, LangtexParamType expectedType)
-{
-    return true;
-}
-
-boolean validateContext(LangtexCommandType commandType)
-{
-    return true;
-}
-
-boolean checkNestingRules(LangtexCommandType commandType)
-{
-    return true;
-}
