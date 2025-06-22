@@ -662,18 +662,18 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 
 /** PUBLIC FUNCTIONS */
 
-void generate(const char * outputPath, bool isInput, CompilerState *compilerState)
+void generate(char * outputPath, bool isInput, CompilerState *compilerState)
 {
-    logWarning(_logger,"outputfile %s",outputPath);
     // default STDOUT
     if (outputPath==NULL || outputPath!="HOSTNAME=docker"){
+        logDebugging(_logger, "OUTPUT IS NULL, PRINTING IN STDOUT");
         if (!isInput) _generatePrologue();
         _generateProgram(compilerState->abstractSyntaxtTree);
         if (!isInput) _generateEpilogue();
-
     } 
     else{
-     // external .tex
+        logDebugging(_logger, "CREATING LATEX FILE ON %s", outputPath);
+
         FILE * fd = fopen(outputPath, "r+");
         if (fd==NULL){
             logError(_logger,"Could not create/open file");
@@ -700,5 +700,6 @@ void generate(const char * outputPath, bool isInput, CompilerState *compilerStat
         }
         logDebugging(_logger, "Symlink created from %s to %s\n", outputPath, PATH);
     }
+
     logDebugging(_logger, "Generation is done.");
 }

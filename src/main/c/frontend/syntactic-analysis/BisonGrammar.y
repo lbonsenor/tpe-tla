@@ -95,7 +95,6 @@
 %type <content> content
 %type <contentList> commandArgs
 %type <content> commandParams
-%type <textList> textArgs
 %type <element> element
 %type <command> command
 %type <text> text
@@ -138,11 +137,6 @@ element:
 
 commandArgs:
 	OPEN_BRACE content CLOSE_BRACE commandArgs						{ $$ = ContentListSemanticAction($2, $4); }
-	| %empty														{ $$ = NULL; }
-	;
-
-textArgs:
-	OPEN_BRACE text CLOSE_BRACE textArgs 							{ $$ = TextListSemanticAction($2, $4); }
 	| %empty														{ $$ = NULL; }
 	;
 

@@ -10,6 +10,7 @@
 #include "shared/Logger.h"
 #include "shared/String.h"
 #include <getopt.h>
+#include <string.h>
 
 /**i
  * The main entry-point of the entire application. If you use "strtok" to
@@ -28,7 +29,13 @@ const int main(const int count, char **arguments)
 
 	int opt;
     bool input_flag = false;
-    char *output_path = NULL;
+    char *output_path;
+
+	for (int i = 0; i < count; i++)
+	{
+		logInformation(logger, "Argument %d: %s", i, arguments[i]);
+	}
+	
 
 	// Logs the arguments of the application.
 	    struct option long_options[] = {
@@ -36,15 +43,15 @@ const int main(const int count, char **arguments)
         {0, 0, 0, 0}
     };
 
-    while (count > 1 && (opt = getopt_long(count, arguments, "io:", long_options, NULL)) != -1) {
+    while (count > 1 && (opt = getopt_long(count, arguments, "o:i", long_options, NULL)) != -1) {
         switch (opt) {
             case 'o':
                 output_path = optarg;
-				logDebugging(_logger, "Output Path is %s", output_path);
+				logDebugging(logger, "Output Path is %s", output_path);
                 break;
             case 'i':
                 input_flag = true;
-				logDebugging(_logger, "Compiling in input mode (no prologue)");
+				logDebugging(logger, "Compiling in input mode (no prologue)");
                 break;
             default:
                 break;
