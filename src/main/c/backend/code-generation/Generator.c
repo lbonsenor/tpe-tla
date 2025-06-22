@@ -671,7 +671,7 @@ void generate(char * outputPath, bool isInput, CompilerState *compilerState)
         if (!isInput) _generateEpilogue();
     } 
     else{
-        FILE * fd = fopen(outputPath, "rw");
+        FILE * fd = fopen(outputPath, "w");
         if (fd==NULL){
             logError(_logger,"Could not create/open file");
             return;
