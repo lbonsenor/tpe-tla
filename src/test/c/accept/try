@@ -20,6 +20,15 @@
 }
 
 
-[!block](title="Hola"){
+[!block](title="Hola")
+{
     [!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
+}
+
+[!dialog](title="Dialogo")
+{
+    [!speaker](name="후안"){[!translate](lang="ko"){안녕}{hola}}
+    [!speaker](name="Maria"){Hola Juan, como estas?}
+    [!speaker](name="Juan"){Muy bien, gracias. Y tu?}
+    [!speaker](name="Maria"){Bien, gracias.}
 }

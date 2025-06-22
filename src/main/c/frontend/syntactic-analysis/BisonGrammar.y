@@ -170,8 +170,8 @@ commandParams:
 langtexCommand:
 	TRANSLATE_COMMAND parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
 																	{ $$ = TranslateSemanticAction($2, $4, $7); }
-	| DIALOG_COMMAND parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
-																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_DIALOG); }
+	| DIALOG_COMMAND parameters OPEN_BRACE NEWLINE speakerCommands CLOSE_BRACE
+																	{ $$ = LangtexCommandListSemanticAction($2, $5, LANGTEX_DIALOG); }
 	| TABLE_COMMAND parameters OPEN_BRACE NEWLINE rowCommands CLOSE_BRACE 
 																	{ $$ = LangtexCommandListSemanticAction($2, $5, LANGTEX_TABLE); }
 	| EXERCISE_COMMAND parameters OPEN_BRACE NEWLINE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 

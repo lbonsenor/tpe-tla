@@ -362,9 +362,10 @@ static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command)
     if (!command)
         return;
 
-    _output(level, "\\textbf{%s:}", _checkSpeakerParam(command->parameters));
+    _output(0, "\n\t\\speaker{%s}", getParameter(command->parameters, "name")->value.stringParam);
+    _output(0, "{");
     _generateContent(level, command->content);
-    _output(level, "\n");
+    _output(0, "}");
 }
 
 static void _generateDialogCommand(unsigned int level, LangtexCommand *command)
@@ -372,9 +373,9 @@ static void _generateDialogCommand(unsigned int level, LangtexCommand *command)
     if (!command)
         return;
 
-    _output(level, "\n\\begin{tabbing}\n");
-    _generateLangtexCommandList(level + 1, command->langtexCommandList);
-    _output(level, "\\end{tabbing}\n");
+    _output(level, "\n\\begin{dialog}");
+    _generateLangtexCommandList(level, command->langtexCommandList);
+    _output(level, "\n\\end{dialog}");
 }
  
 static void _generateTableCommand(unsigned int level, LangtexCommand *command)

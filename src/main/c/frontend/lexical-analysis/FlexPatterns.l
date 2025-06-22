@@ -60,13 +60,15 @@
 \[                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACKET); }
 \]                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACKET); }
 
+"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
+
+\n                                  { return NEWLINE; }
+
 [ \t\r]+                            { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 
 [^\\{}#\$%\^_~\[\]\n]+              { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
-\n                                  { return NEWLINE; }
 
-"%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 
 .									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
