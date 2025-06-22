@@ -29,7 +29,7 @@ const int main(const int count, char **arguments)
 
 	int opt;
     bool input_flag = false;
-    char *output_path;
+    char *output_path = NULL;
 
 	for (int i = 0; i < count; i++)
 	{

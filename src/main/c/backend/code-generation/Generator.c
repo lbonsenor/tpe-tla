@@ -664,39 +664,74 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 
 void generate(char * outputPath, bool isInput, CompilerState *compilerState)
 {
-    // default STDOUT
-    if (outputPath==NULL){
-        if (!isInput) _generatePrologue();
-        _generateProgram(compilerState->abstractSyntaxtTree);
-        if (!isInput) _generateEpilogue();
-    } 
-    else{
-        FILE * fd = fopen(outputPath, "w");
-        if (fd==NULL){
-            logError(_logger,"Could not create/open file");
+    FILE *original_stdout = NULL;
+    if (outputPath != NULL) {
+        FILE *fd = fopen(outputPath, "w");
+        if (fd == NULL) {
+            logError(_logger, "Could not create/open file: %s", outputPath);
             return;
         }
+        
+        logDebugging(_logger, "Generating LaNgTeX output to file: %s", outputPath);
+        
+        // Save original stdout and redirect to file
+        original_stdout = stdout;
+        stdout = fd;
+    } else {
+        logDebugging(_logger, "Generating LaNgTeX output to stdout");
+    }
 
-        logDebugging(_logger, "Generating LaNgTeX output...");
+    // Generate the content
+    if (!isInput) _generatePrologue();
+    _generateProgram(compilerState->abstractSyntaxtTree);
+    if (!isInput) _generateEpilogue();
 
-        if (!isInput) _generatePrologue();
-        _generateProgram(compilerState->abstractSyntaxtTree);
-        if (!isInput) _generateEpilogue();
-
-        // fclose
-        if (fclose(fd)!=0){
-            logError(_logger,"Error while closing file");
+    // Restore stdout if we redirected it
+    if (outputPath != NULL && original_stdout != NULL) {
+        FILE *fd = stdout;
+        stdout = original_stdout;
+        
+        if (fclose(fd) != 0) {
+            logError(_logger, "Error while losing file");
         }
-
-
-        const char *PATH = "../../../../../references/preamble.tex";
-
-        if (symlink(PATH, outputPath) == -1) {
-            logError(_logger, "Failed to create LaNgTex Preamble symlink");
-            return;
-        }
-        logDebugging(_logger, "Symlink created from %s to %s\n", outputPath, PATH);
+        
+        logDebugging(_logger, "Output written to: %s", outputPath);
     }
 
     logDebugging(_logger, "Generation is done.");
+    // default STDOUT
+    // if (outputPath==NULL){
+    //     if (!isInput) _generatePrologue();
+    //     _generateProgram(compilerState->abstractSyntaxtTree);
+    //     if (!isInput) _generateEpilogue();
+    // } 
+    // else{
+    //     FILE * fd = fopen(outputPath, "w");
+    //     if (fd==NULL){
+    //         logError(_logger,"Could not create/open file");
+    //         return;
+    //     }
+
+    //     logDebugging(_logger, "Generating LaNgTeX output...");
+
+    //     if (!isInput) _generatePrologue();
+    //     _generateProgram(compilerState->abstractSyntaxtTree);
+    //     if (!isInput) _generateEpilogue();
+
+    //     // fclose
+    //     if (fclose(fd)!=0){
+    //         logError(_logger,"Error while closing file");
+    //     }
+
+
+    //     const char *PATH = "../../../../../references/preamble.tex";
+
+    //     if (symlink(PATH, outputPath) == -1) {
+    //         logError(_logger, "Failed to create LaNgTex Preamble symlink");
+    //         return;
+    //     }
+    //     logDebugging(_logger, "Symlink created from %s to %s\n", outputPath, PATH);
+    // }
+
+    // logDebugging(_logger, "Generation is done.");
 }
