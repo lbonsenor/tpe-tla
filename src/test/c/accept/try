@@ -1,18 +1,25 @@
-Hola! Como te va?
-Esto es un test
-
 [!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
-
 [!table](cols=2){
     [!row](header=true, hi="ko"){hi}{there}
     [!row](lang="ko"){herro}{[!translate](lang="ko"){hola}{hola}}
+    [!row](lang="ko"){herro}{[!translate](lang="ko"){hola}{hola}}
 }
 
-[!exercise](type="fill"){
-    [!prompt]{hello}
-    [!answer]{hello}
+[!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
+
+[!exercise](type="multiple-choice", title="Mc exericse")
+{
+    [!prompt]{The landmark [!fill] is known for its vast trees}
+    [!options]{Hello}{World}{5}{lo siento}{:(}{[!translate](lang="ko"){hola}{hola}}{}{hola}{[!translate](lang="ko"){hola}{hola}}{}{hola}{[!translate](lang="ko"){hola}{hola}}{}{hola}
+    [!answer]{1}{5}{6}
+}
+[!exercise](type="single-choice", title="Single choice")
+{
+    [!prompt]{How many fingers does a human have?}
+    [!answer]{Me gusta el cafe}
 }
 
-[!block](title="Hello"){
-    hello
+
+[!block](title="Hola"){
+    [!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
 }

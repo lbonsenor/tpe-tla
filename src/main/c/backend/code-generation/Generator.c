@@ -41,17 +41,18 @@ static void _generateParamList(unsigned int level, LangtexParamList *list);
 static void _generateParam(unsigned int level, LangtexParam *param);
 static void _generateLangtexCommandList(unsigned int level, LangtexCommandList *langtexCommandList);
 static char *_checkTranslateParam(LangtexParamList *paramList);
-static char * _checkSpeakerParam(LangtexParamList *paramList);
+static char *_checkSpeakerParam(LangtexParamList *paramList);
 static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command);
 static void _generateDialogCommand(unsigned int level, LangtexCommand *command);
 static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
 static void _generateTableCommand(unsigned int level, LangtexCommand *command);
 static void _generateRowCommand(unsigned int level, LangtexCommand *command);
-static void _generateAnswersOrOptionsCommand(char * message, unsigned int level, LangtexCommand *command);
+static void _generateAnswersCommand(unsigned int level, LangtexCommand *answersCommand, ContentList *optionsContentList);
+static void _generateOptionsCommand(unsigned int level,  LangtexCommand *command);
 static void _generatePromptCommand(unsigned int level, LangtexCommand *command);
 static void _generateBlockCommand(unsigned int level, LangtexCommand *command);
 static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
-static void _generateFillCommand(unsigned int level,LangtexCommand *command);
+static void _generateFillCommand(unsigned int level, LangtexCommand *command);
 static void _start_buffering();
 static char *_stop_buffering();
 
@@ -292,7 +293,8 @@ static char *_checkTranslateParam(LangtexParamList *paramList)
     return language;
 }
 
-static char * _checkSpeakerParam(LangtexParamList *paramList){
+static char *_checkSpeakerParam(LangtexParamList *paramList)
+{
 
     char *name = "(unknown) Speaker";
     if (paramList != NULL)
@@ -314,7 +316,6 @@ static char * _checkSpeakerParam(LangtexParamList *paramList){
     return name;
 }
 
-
 static void _generateTranslateCommand(unsigned int level, LangtexCommand *command)
 {
 
@@ -322,15 +323,13 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     _generateContent(level, command->leftText);
     char *left_content = _stop_buffering();
 
-    _start_buffering();
-    _generateContent(level, command->rightText);
-    char *right_content = _stop_buffering();
+    // _start_buffering();
+    // _generateContent(level, command->rightText);
+    // char *right_content = _stop_buffering();
     char *language = _checkTranslateParam(command->parameters);
     if (!language)
     {
         logError(_logger, "No language parameter found in translate command.");
-        free(left_content);
-        free(right_content);
         return;
     }
 
@@ -339,25 +338,30 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     {
         logError(_logger, "Failed to romanize the word: %s", left_content);
         free(left_content);
-        free(right_content);
+        // free(right_content);
         return;
     }
 
-    _output(level, "\\rom[%s]{%s}{%s}",
-            right_content,     // translation
-            left_content,      // caracteres especiales 안녕하세요
-            romanizedWord); // romanizacion
+    _output(level, "\\rom[");
+    _generateContent(level, command->rightText); // right content
+    _output(level, "]{%s}{%s}", left_content, romanizedWord);
     
+           
+    // _output(level, "\\rom[%s]{%s}{%s}",
+    //         right_content,  // translation
+    //         left_content,   // caracteres especiales 안녕하세요
+    //         romanizedWord!=NULL? romanizedWord : "this is null!! " ); // romanizacion
+
     free(romanizedWord);
     free(left_content);
-    free(right_content);
+    // free(right_content);
 }
 
 static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command)
 {
     if (!command)
         return;
-    
+
     _output(level, "\\textbf{%s:}", _checkSpeakerParam(command->parameters));
     _generateContent(level, command->content);
     _output(level, "\n");
@@ -367,36 +371,14 @@ static void _generateDialogCommand(unsigned int level, LangtexCommand *command)
 {
     if (!command)
         return;
-    
+
     _output(level, "\n\\begin{tabbing}\n");
     _generateLangtexCommandList(level + 1, command->langtexCommandList);
     _output(level, "\\end{tabbing}\n");
 }
-
-// IF Prompt: ToggleExercise
-// ELSE: Exercise
-static void _generateExerciseCommand(unsigned int level, LangtexCommand *command){
-    if (!command)
-    {
-        return;
-    }
-    LangtexParam * exerciseType = getParameter(command->parameters,"type");
-    LangtexParam * exerciseTitle = getParameter(command->parameters,"title");
-    _output(level,"\\textbf{%s}\n",exerciseTitle ? exerciseTitle->value.stringParam : "Exercise");
-    _generateLangtexCommand(level,command->prompt);
-    if (strcmp(exerciseType->value.stringParam,"fill")==0) _generateLangtexCommand(level,command->options);
-    _generateLangtexCommand(level,command->answers);
-    
-}
-/*
-** [!table](lines=false, header=true)
-** \\begin{tabular}{c|c|c}
-** \\textbf{asd} & \\textbf{asd} & 
-** \\end{tabular}
-*/
-
-
-static void _generateTableCommand(unsigned int level, LangtexCommand *command){ 
+ 
+static void _generateTableCommand(unsigned int level, LangtexCommand *command)
+{
     if (!command)
     {
         return;
@@ -411,7 +393,7 @@ static void _generateTableCommand(unsigned int level, LangtexCommand *command){
             cols = colsParam->value.intParam;
         }
     }
-    
+
     LangtexCommandList *current = command->langtexCommandList;
 
     // in latex: |c|c|c|c|
@@ -419,84 +401,163 @@ static void _generateTableCommand(unsigned int level, LangtexCommand *command){
     char *columCs = malloc(maxlen);
     columCs[0] = '|';
     columCs[1] = '\0';
-    for (int i = 0; i < cols;i++){
-       strcat(columCs,"c|");
+    for (int i = 0; i < cols; i++)
+    {
+        strcat(columCs, "c|");
     }
 
-    _output(level, "\\begin{tabular}{%s}\n",columCs);
+    _output(level, "\\begin{tabular}{%s}\n", columCs);
     free(columCs);
-    while (current != NULL) {
+    while (current != NULL)
+    {
         LangtexCommand *rowCommand = current->command; // [!row]
-        
-        _generateRowCommand(level+1, rowCommand);
+
+        _generateRowCommand(level + 1, rowCommand);
         current = current->next;
-        
     }
     _output(level, "\\end{tabular}\n");
-
 }
 
-static void _generateRowCommand(unsigned int level, LangtexCommand *command){
+static void _generateRowCommand(unsigned int level, LangtexCommand *command)
+{
     if (!command)
     {
         return;
     }
     ContentList *current = command->contentList;
     _output(level, "");
-    LangtexParam * param = getParameter(command->parameters,"header"); 
+    LangtexParam *param = getParameter(command->parameters, "header");
 
     bool isHeader = param != NULL && param->value.boolParam;
 
-    while (current != NULL){
-        if (isHeader) _output(0, "\\textbf{");
+    while (current != NULL)
+    {
+        if (isHeader)
+            _output(0, "\\textbf{");
         _generateContent(0, current->content);
-        if (isHeader) _output(0, "}");
+        if (isHeader)
+            _output(0, "}");
         current = current->next;
-        if(current != NULL) _output(0, " & ");
-        else _output(level, "\n");
+        if (current != NULL)
+            _output(0, " & ");
+        else
+            _output(level, "\n");
     }
 }
 
-
-static void _generateBlockCommand(unsigned int level, LangtexCommand *command){
+static void _generateBlockCommand(unsigned int level, LangtexCommand *command)
+{
     if (!command)
     {
         return;
     }
     _output(level, "\\begin{tcolorbox}[box={%s}]\n", command->parameters ? command->parameters->param->value.stringParam : "Block");
-    _generateContent(level,command->content);
-    _output(level,"\\end{tcolorbox}");
+    _generateContent(level, command->content);
+    _output(level, "\\end{tcolorbox}");
 }
 
-static void _generatePromptCommand(unsigned int level, LangtexCommand *command){
+
+// IF Prompt: ToggleExercise
+// ELSE: Exercise
+static void _generateExerciseCommand(unsigned int level, LangtexCommand *command)
+{
     if (!command)
     {
         return;
     }
-    logDebugging(_logger, "Generating prompt");
-    _generateContent(level,command->content);
+    LangtexParam *exerciseType = getParameter(command->parameters, "type");
+    LangtexParam *exerciseTitle = getParameter(command->parameters, "title");
+    _output(level, "\\Exercise\n\t{");
+    _generateLangtexCommand(level, command->prompt);
+    _output(level, "}[");
+   
+    if (command->options!=NULL){
+        _generateOptionsCommand(level, command->options);
+    }
+    _output(level, "][");
+    _generateAnswersCommand(level, command->answers, command->options ? command->options->contentList : NULL);
+    _output(level, "][%s]", exerciseTitle ? exerciseTitle->value.stringParam : "");
 }
-    
-static void _generateAnswersOrOptionsCommand(char * message, unsigned int level, LangtexCommand *command){
+
+static void _generatePromptCommand(unsigned int level, LangtexCommand *command)
+{
     if (!command)
     {
         return;
     }
-    ContentList *current = command->contentList;
-    _output(level, "\\textbf{%s:} ", message);
+    _generateContent(level, command->content);
+}
 
-    while (current != NULL){
+static void _generateOptionsCommand(unsigned int level,  LangtexCommand *command)
+{ 
+    if (!command)
+    {
+        return ;
+    }
+    ContentList* current = command->contentList;
+    int count = 0;
+    while (current != NULL)
+    {
         _generateContent(0, current->content);
         current = current->next;
-        if(current != NULL) _output(0, " , ");
-        else _output(level, "\n");
+        if (current != NULL)
+            _output(0, ", ");
     }
 }
-static void _generateFillCommand(unsigned int level,LangtexCommand *command){
-    _output(level,"_______");
-    _generateText(level, command->text);
+
+static void _generateAnswersCommand(unsigned int level, LangtexCommand *answersCommand, ContentList *optionsContentList)
+{
+    if (!answersCommand)
+    {
+        return;
+    }
+    if (optionsContentList == NULL)
+    {
+        ContentList *current = answersCommand->contentList;
+        _generateContent(level, current->content);
+    } else {
+        //multiple answers
+        ContentList *currentAnswers = answersCommand->contentList;
+        //save the digits in an array
+        int size = 10;
+        int * answers = malloc(sizeof(int) * size);
+        int count = 0;
+
+        while (currentAnswers != NULL) {
+            // ya validado que va a ser un digito desde semantic analyzer
+            int digit = atoi(currentAnswers->content->sequenceElement->text->text);
+            answers[count++] = digit;
+            if (count >= size) {
+                logDebugging(_logger, "Increasing answers array size from %d to %d", 10, 20);
+                answers = realloc(answers, sizeof(int) * (count + size));
+            }
+            currentAnswers = currentAnswers->next;
+        }
+        int iterator = 1;
+        // {3}{1}{2}
+        // 3 ==1 ? no, sigo. 1==1? si, imprimo.
+        while(optionsContentList != NULL)
+        {
+            for (int i = 0; i < count; i++){
+                if (answers[i]==iterator){
+                    _generateContent(level, optionsContentList->content);
+                    if (i < count - 1)
+                        _output(level, ",");
+                    break;
+                }
+            }
+            iterator++;
+            optionsContentList = optionsContentList->next;
+        }
+        free(answers);
+    }
 }
 
+static void _generateFillCommand(unsigned int level, LangtexCommand *command)
+{
+    _output(level, "\\fillLine ");
+    _generateText(level, command->text); // TODO: look at fill later in bison grammar
+}
 
 // TODO: change to LATEX format
 static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
@@ -530,14 +591,14 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
         _generatePromptCommand(level, command);
         break;
     case LANGTEX_FILL:
-        _generateFillCommand(level,command);
+        _generateFillCommand(level, command);
         break;
-    case LANGTEX_ANSWERS:
-        _generateAnswersOrOptionsCommand("Answer",level, command);
-        break;
-    case LANGTEX_OPTIONS:
-        _generateAnswersOrOptionsCommand("Options",level, command);
-        break;
+    // case LANGTEX_ANSWERS:
+    //     _generateAnswersCommand(level, command, char *options[], int arraySize);
+    //     break;
+    // case LANGTEX_OPTIONS:
+    //     _generateptionsCommand(level, command);
+    //     break;
     default:
         _output(level, "%% Unsupported command type: %d\\n", command->type);
     }

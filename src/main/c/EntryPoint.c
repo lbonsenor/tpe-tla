@@ -54,7 +54,7 @@ const int main(const int count, const char **arguments)
 		}
 		else
 		{
-			logError(logger, "The computation phase rejects the input program.");
+			logError(logger, "The semantic analysis phase rejects the input program.");
 			compilationStatus = FAILED;
 		}
 		// ...end of the Backend. -----------------------------------------------------------------

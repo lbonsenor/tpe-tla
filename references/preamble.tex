@@ -5,13 +5,11 @@
 \newfontfamily\ipafont{Charis SIL}
 \usepackage{xeCJK}
 
-\setCJKsansfont{DotumChe}
-\setCJKmainfont[
-  Path = ./fonts/,
-  UprightFont = NotoSansKR-Regular.ttf,
-  BoldFont = NotoSerifKR-Bold.ttf,
-  SansFont = NotoSerifKR-Regular.ttf
-]{NotoSansKR}
+% Hyphenation rules
+\usepackage{hyphenat}
+\hyphenation{ма-те-ма-ти-ка вос-ста-нав-ли-вать}
+
+\usepackage[russian,english, korean, hebrew]{babel}
 
 % Math
 \usepackage{amsmath,amssymb}
@@ -26,6 +24,9 @@
 % Hyperlinks and bookmarks
 \usepackage{hyperref}
 \usepackage{bookmark}
+
+\usepackage{xparse}
+\usepackage{calc}
 
 % Color boxes
 \usepackage[most]{tcolorbox}
@@ -64,3 +65,87 @@
 }
 
 \newcommand{\cross}{$\times$}
+
+\newcounter{togglelayer}
+
+\newenvironment{dialogue}{\begin{tabular}{@{} lll @{}}}{\end{tabular}}
+
+\newenvironment{block}{\begin{tcolorbox}[colframe=black, title=Block, fonttitle=\bfseries]}{\end{tcolorbox}}
+
+\newcommand{\speaker}[4]{
+    \textbf{#1:} & 
+    $\underset{\text{(#3)}}{\textit{#2}}$ & #4 \\
+}
+
+\newcommand{\vocabulary}[6]{
+    \begin{center}
+    \begin{minipage}[t]{0.33\textwidth}
+    \begin{tcolorbox}[colframe=black, title=Vocabulary, fonttitle=\bfseries]
+        {\centering
+        \Large
+        \rom[#1]{#2}{#3} \\[0.5em]
+        \rule{\linewidth}{0.4pt} \\[0.5em]
+        }
+        
+        \scriptsize
+        \hspace*{-0.5em}
+        \begin{tabular}{l}
+            \textbf{Ejemplo:} #4 \\
+            (#5) \\
+            \textit{#6}
+        \end{tabular}
+    \end{tcolorbox}
+    \end{minipage}
+    \end{center}
+}
+
+
+\NewDocumentCommand{\ToggleExercise}{o m o o}{
+    \stepcounter{togglelayer} % increment counter
+    \edef\thislayer{layer\thetogglelayer} % define layer name
+
+    \begin{tcolorbox}[title={\IfValueTF{#4}{Exercise (Multiple choice)}{Exercise}}, fonttitle=\bfseries, colframe=black]
+        \medskip
+        Complete the phrase: \IfValueTF{#1}{#1}{} \switchocg{\thislayer}{(\underline{\hspace{1cm}})} \IfValueTF{#3}{#3}{}
+    
+        \IfValueTF{#4}{
+        \medskip
+        \textbf{Options:} #4
+        }{}
+        
+        \medskip
+        \textbf{Answer:} \begin{ocg}{Answer \thetogglelayer}{\thislayer}{off}#2\end{ocg}
+    \end{tcolorbox}
+}
+
+\NewDocumentCommand{\ToggleText}{m}{%
+  \stepcounter{togglelayer}%
+  \edef\layerA{toggleA\thetoggletext}%
+  \edef\layerB{toggleB\thetoggletext}%
+  \switchocg{\layerA,\layerB}{%
+    \mbox{%
+      \begin{ocg}{First version}{\layerA}{on}\end{ocg}%
+      \begin{ocg}{Second version}{\layerB}{off}#1\end{ocg}%
+    }%
+  }%
+}
+
+\NewDocumentCommand{\Exercise}{m o o o}{
+    \stepcounter{togglelayer} % increment counter
+    \edef\thislayer{layer\thetogglelayer} % define layer name
+
+    \begin{tcolorbox}[title={\IfValueTF{#4}{#4}{}}, fonttitle=\bfseries, colframe=black]
+        \medskip
+        \IfValueTF{#1}{#1}{}
+        \medskip
+
+        \IfValueTF{#2}{\textbf{Options}: #2}{}
+        
+        \medskip
+        \switchocg{\thislayer}{\textbf{Answer: }} \begin{ocg}{Answer \thetogglelayer}{\thislayer}{off}#3\end{ocg}
+    \end{tcolorbox}
+}
+
+\newcommand{\fillLine}[]{
+    \underline{\hspace{1cm}} 
+}
