@@ -47,11 +47,11 @@ static void _generateDialogCommand(unsigned int level, LangtexCommand *command);
 static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
 static void _generateTableCommand(unsigned int level, LangtexCommand *command);
 static void _generateRowCommand(unsigned int level, LangtexCommand *command);
-static void _generateAnswersCommand(unsigned int level, LangtexCommand *command);
+static void _generateAnswersOrOptionsCommand(char * message, unsigned int level, LangtexCommand *command);
 static void _generatePromptCommand(unsigned int level, LangtexCommand *command);
 static void _generateBlockCommand(unsigned int level, LangtexCommand *command);
 static void _generateExerciseCommand(unsigned int level, LangtexCommand *command);
-static void _generateFillCommand(unsigned int level);
+static void _generateFillCommand(unsigned int level,LangtexCommand *command);
 static void _start_buffering();
 static char *_stop_buffering();
 
@@ -369,8 +369,6 @@ static void _generateDialogCommand(unsigned int level, LangtexCommand *command)
         return;
     
     _output(level, "\n\\begin{tabbing}\n");
-// TODO: which params could dialog have?
-//     _generateParamList(level, command->parameters);
     _generateLangtexCommandList(level + 1, command->langtexCommandList);
     _output(level, "\\end{tabbing}\n");
 }
@@ -382,6 +380,12 @@ static void _generateExerciseCommand(unsigned int level, LangtexCommand *command
     {
         return;
     }
+    LangtexParam * exerciseType = getParameter(command->parameters,"type");
+    LangtexParam * exerciseTitle = getParameter(command->parameters,"title");
+    _output(level,"\\textbf{%s}\n",exerciseTitle ? exerciseTitle->value.stringParam : "Exercise");
+    _generateLangtexCommand(level,command->prompt);
+    if (strcmp(exerciseType->value.stringParam,"fill")==0) _generateLangtexCommand(level,command->options);
+    _generateLangtexCommand(level,command->answers);
     
 }
 /*
@@ -407,13 +411,6 @@ static void _generateTableCommand(unsigned int level, LangtexCommand *command){
             cols = colsParam->value.intParam;
         }
     }
-
-    // LangtexCommand com = command->langtexCommandList->command;
-    // _generateLangtexCommand(langtexCommand);
-    // command(table)->langtexCommandList->
-    // command 
-    // next
-
     
     LangtexCommandList *current = command->langtexCommandList;
 
@@ -476,16 +473,28 @@ static void _generatePromptCommand(unsigned int level, LangtexCommand *command){
     {
         return;
     }
+    logDebugging(_logger, "Generating prompt");
+    _generateContent(level,command->content);
 }
-
-static void _generateAnswersCommand(unsigned int level, LangtexCommand *command){
+    
+static void _generateAnswersOrOptionsCommand(char * message, unsigned int level, LangtexCommand *command){
     if (!command)
     {
         return;
     }
+    ContentList *current = command->contentList;
+    _output(level, "\\textbf{%s:} ", message);
+
+    while (current != NULL){
+        _generateContent(0, current->content);
+        current = current->next;
+        if(current != NULL) _output(0, " , ");
+        else _output(level, "\n");
+    }
 }
-static void _generateFillCommand(unsigned int level){
+static void _generateFillCommand(unsigned int level,LangtexCommand *command){
     _output(level,"_______");
+    _generateText(level, command->text);
 }
 
 
@@ -508,12 +517,6 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
     case LANGTEX_EXERCISE:
         _generateExerciseCommand(level, command);
         break;
-        // _output(level, "[!exercise]");
-        // _generateParamList(level, command->parameters);
-        // _output(level, "{\n");
-        // _generateContent(level + 1, command->leftContent);
-        // _output(level, "}\n");
-
     case LANGTEX_TABLE:
         _generateTableCommand(level, command);
         break;
@@ -526,30 +529,15 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
     case LANGTEX_PROMPT:
         _generatePromptCommand(level, command);
         break;
-    //     _output(level, "[!prompt]");
-    //     _generateParamList(level, command->parameters);
-    //     _output(level, "{\n");
-    //     _generateContent(level + 1, command->leftContent);
-    //     _output(level, "}\n");
-    //     break;
     case LANGTEX_FILL:
-        _generateFillCommand(level);
+        _generateFillCommand(level,command);
         break;
-    //     _output(level, "[!fill]");
-    //     _generateParamList(level, command->parameters);
-    //     _output(level, "{\n");
-    //     _generateContent(level + 1, command->leftContent);
-    //     _output(level, "}\n");
-    //     break;
     case LANGTEX_ANSWERS:
-        _generateAnswersCommand(level, command);
+        _generateAnswersOrOptionsCommand("Answer",level, command);
         break;
-    //     _output(level, "[!answers]");
-    //     _generateParamList(level, command->parameters);
-    //     _output(level, "{\n");
-    //     _generateContent(level + 1, command->leftContent);
-    //     _output(level, "}\n");
-    //     break;
+    case LANGTEX_OPTIONS:
+        _generateAnswersOrOptionsCommand("Options",level, command);
+        break;
     default:
         _output(level, "%% Unsupported command type: %d\\n", command->type);
     }

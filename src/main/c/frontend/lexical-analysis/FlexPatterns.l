@@ -55,7 +55,7 @@
 
 
 [[:space:]]*\{[[:space:]]*          { BEGIN(INITIAL); return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
-[ \t\r]*\}                                   { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
+[ \t\r]*\}                          { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
 
 \[                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACKET); }
 \]                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACKET); }

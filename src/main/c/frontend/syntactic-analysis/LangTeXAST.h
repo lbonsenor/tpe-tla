@@ -88,11 +88,11 @@ struct LangtexCommand{
     struct {
         LangtexCommandList * langtexCommandList;
     };
-    // Usage: speaker
+    // Usage: speaker,prompt
     struct {
         Content * content;
     };
-    // Usage: row
+    // Usage: row, answers, options
 
     struct {
         ContentList * contentList;
