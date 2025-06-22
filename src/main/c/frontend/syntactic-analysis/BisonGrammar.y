@@ -172,12 +172,12 @@ langtexCommand:
 																	{ $$ = TranslateSemanticAction($2, $4, $7); }
 	| DIALOG_COMMAND parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
 																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_DIALOG); }
-	| TABLE_COMMAND parameters OPEN_BRACE rowCommands CLOSE_BRACE 
-																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_TABLE); }
-	| EXERCISE_COMMAND parameters OPEN_BRACE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
-																	{ $$ = ExerciseSemanticAction($2, $4, $5, $6, LANGTEX_EXERCISE); }
-	| BLOCK_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
-																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_BLOCK); }
+	| TABLE_COMMAND parameters OPEN_BRACE NEWLINE rowCommands CLOSE_BRACE 
+																	{ $$ = LangtexCommandListSemanticAction($2, $5, LANGTEX_TABLE); }
+	| EXERCISE_COMMAND parameters OPEN_BRACE NEWLINE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
+																	{ $$ = ExerciseSemanticAction($2, $5, $6, $7, LANGTEX_EXERCISE); }
+	| BLOCK_COMMAND parameters OPEN_BRACE NEWLINE content CLOSE_BRACE
+																	{ $$ = LangtexSimpleContentSemanticAction($2, $5, LANGTEX_BLOCK); }
 	| LANGUAGE_COMMAND textArgs
 																	{ $$ = LanguageSemanticAction($2, LANGTEX_LANGUAGE); }
 	| FILL_COMMAND text
@@ -212,7 +212,7 @@ param:
 		;
 
 	exercisePrompt:
-		PROMPT_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
+		PROMPT_COMMAND parameters OPEN_BRACE content CLOSE_BRACE NEWLINE
 																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_PROMPT);}
 		;
 		
