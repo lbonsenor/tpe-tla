@@ -1,6 +1,10 @@
-[!exercise](type="fill", title="Ejercicio de completar"){
+[!exercise](type="multiple-choice", title="Ejercicio de completar"){
     [!prompt]{How many fingers does a human have?}
     [!options]{Hello}{World}{5}{lo siento}{:(}
-    [!answer]{5}{19}{sadf}
+    [!answer]{5}{3}{1}
 }
 
+[!exercise](type="single-choice", title="Ejercicio de completar"){
+    [!prompt]{How many fingers does a human have?}
+    [!answer]{Five}
+}

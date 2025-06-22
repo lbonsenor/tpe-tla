@@ -1,5 +1,5 @@
-[!dialog](argument=false, age=12, hi=true){
-    [!speaker](name="john", age=12, hi=true, hi="hiila"){[!translate]{ho}{a}}
-    [!speaker](name="john", age=12, hi=true, hi="hiila"){[!translate]{ho}{a}}
-    [!speaker](name="john", age=12, hi=true, hi="hiila"){[!translate]{ho}{a}}
+[!dialog](title="Greeting")
+{
+    [!speaker](name="John"){Hi Mary}
+    [!speaker](name="Mary"){Hi John}
 }

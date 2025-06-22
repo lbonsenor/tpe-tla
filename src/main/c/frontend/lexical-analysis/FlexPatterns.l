@@ -38,6 +38,8 @@
 "[!block]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), BLOCK_COMMAND);}
 "[!fill]"                           { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
 
+\\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); }
+
 <PARAM>,[[:space:]]*                { return CommaLexemeAction(createLexicalAnalyzerContext()); }
 <PARAM>"="                          { return EqualsLexemeAction(createLexicalAnalyzerContext()); }           
 <PARAM>[[:digit:]]+					{ return ParameterLexemeAction(createLexicalAnalyzerContext(), INTEGER_PARAM); }
@@ -73,7 +75,6 @@
 
 %%
 
-/* \\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); } */
 
 #include "FlexExport.h"
 

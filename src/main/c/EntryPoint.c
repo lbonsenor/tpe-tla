@@ -36,26 +36,18 @@ const int main(const int count, char **arguments)
         {0, 0, 0, 0}
     };
 
-    // First non-option argument is the src_path
-    if (count > 1) {
-        optind = 2;  // Skip the first positional argument
-    } else {
-        fprintf(stderr, "Usage: %s /path/to/src [-o path/to/out] [-i|--input]\n", arguments[0]);
-        return 1;
-    }
-
-    while ((opt = getopt_long(count, arguments, "io:", long_options, NULL)) != -1) {
+    while (count > 1 && (opt = getopt_long(count, arguments, "io:", long_options, NULL)) != -1) {
         switch (opt) {
             case 'o':
                 output_path = optarg;
+				logDebugging(_logger, "Output Path is %s", output_path);
                 break;
             case 'i':
                 input_flag = true;
+				logDebugging(_logger, "Compiling in input mode (no prologue)");
                 break;
-            case '?':
             default:
-                fprintf(stderr, "Usage: %s /path/to/src [-o path/to/out] [-i|--input]\n", arguments[0]);
-                return 1;
+                break;
         }
     }
 

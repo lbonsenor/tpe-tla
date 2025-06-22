@@ -187,8 +187,9 @@ static boolean validateSpeakerContent(Content *content)
 
     if (content->type == SEQUENCE)
     {
-        if (!validateSpeakerElement(content->sequenceElement))
+        if (!validateSpeakerElement(content->sequenceElement)) {
             return false;
+        }
         return validateSpeakerContent(content->sequenceContent);
     }
     else if (content->type == ELEMENT)
@@ -214,7 +215,7 @@ static boolean validateSpeakerElement(Element *el)
     case LANGTEX_COMMAND:
         if (el->langtexCommand->type != LANGTEX_TRANSLATE)
         {
-            logError(_logger, "[!speaker] only [!translate] allowed inside [!speaker], got: %d", el->langtexCommand->type);
+            // logError(_logger, "[!speaker] only [!translate] allowed inside [!speaker], got: %d", el->langtexCommand->type);
             return false;
         }
         return analyzeTranslateCommand(el->langtexCommand) == SEMANTIC_ANALYSIS_ACCEPT;
@@ -380,8 +381,7 @@ SemanticAnalysisStatus analyzeProgram(Program *program)
 {
     if (!program || !program->content)
     {
-        logError(_logger, "Empty program");
-        return SEMANTIC_ANALYSIS_REJECT;
+        logWarning(_logger, "Empty program");
     }
 
     logDebugging(_logger, "Starting semantic analysis");
@@ -790,6 +790,7 @@ SemanticAnalysisStatus analyzeSpeakerCommand(LangtexCommand *command)
 
     if (!validateSpeakerContent(command->content))
     {
+        logError(_logger, "[!speaker] only [!translate] allowed inside [!speaker]");
         return SEMANTIC_ANALYSIS_ERROR;
     }
 

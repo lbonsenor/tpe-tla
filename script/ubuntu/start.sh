@@ -6,9 +6,9 @@ BASE_PATH="$(dirname "$0")/../.."
 cd "$BASE_PATH"
 
 
-if [ "$#" -ne 2 || "$#" -ne 3 ]; then
-    echo "Usage: $0 <input file> <output file> -input or Usage: $0 <input file> <output file>"
-fi
+# if [ "$#" -ne 2 ] || [ "$#" -ne 3 ]; then
+#     echo "Usage: $0 <input file> <output file> -input or Usage: $0 <input file> <output file>"
+# fi
 
 
 INPUT="$1"

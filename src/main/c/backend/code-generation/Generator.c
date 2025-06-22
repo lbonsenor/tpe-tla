@@ -118,12 +118,12 @@ static void _generateCommand(unsigned int level, Command *command)
         _output(level, "}");
         break;
     case ENVIRONMENT:
-        _output(level, "\\beg in{%s}", command->environmentLeftText->text);
+        _output(level, "\\begin{%s}", command->environmentLeftText->text);
         _generateContentList(level, command->environmentCommandArgs);
         _output(level, "[");
         _generateContent(level, command->environmentParameters);
         _output(level, "]\n");
-        _generateContent(level + 1, command->environmentContent);
+        _generateContent(level, command->environmentContent);
         _output(level, "\\end{%s}\n", command->environmentLeftText->text);
         break;
     }
@@ -664,7 +664,7 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 
 void generate(const char * outputPath, bool isInput, CompilerState *compilerState)
 {
-    logError(_logger,"outputfile %s",outputPath);
+    logWarning(_logger,"outputfile %s",outputPath);
     // default STDOUT
     if (outputPath==NULL || outputPath!="HOSTNAME=docker"){
         if (!isInput) _generatePrologue();

@@ -1,3 +1,5 @@
 [!dialog]{
-    [!table]{}
+    [!table](cols=1){
+        [!row]{hi}
+    }
 }
