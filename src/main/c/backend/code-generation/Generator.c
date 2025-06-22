@@ -665,16 +665,13 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 void generate(char * outputPath, bool isInput, CompilerState *compilerState)
 {
     // default STDOUT
-    if (outputPath==NULL || outputPath!="HOSTNAME=docker"){
-        logDebugging(_logger, "OUTPUT IS NULL, PRINTING IN STDOUT");
+    if (outputPath==NULL){
         if (!isInput) _generatePrologue();
         _generateProgram(compilerState->abstractSyntaxtTree);
         if (!isInput) _generateEpilogue();
     } 
     else{
-        logDebugging(_logger, "CREATING LATEX FILE ON %s", outputPath);
-
-        FILE * fd = fopen(outputPath, "r+");
+        FILE * fd = fopen(outputPath, "rw");
         if (fd==NULL){
             logError(_logger,"Could not create/open file");
             return;
