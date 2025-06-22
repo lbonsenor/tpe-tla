@@ -53,19 +53,20 @@
 "\\end"                             { return EndCommandLexemeAction(createLexicalAnalyzerContext()); }
 \\[a-zA-Z@]+                        { return CommandLexemeAction(createLexicalAnalyzerContext()); }
 
-<LANGTEX>\{                         { BEGIN(INITIAL); return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
-\{                                  { return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
-\}                                  { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
+
+[[:space:]]*\{[[:space:]]*          { BEGIN(INITIAL); return BraceLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACE); }
+[ \t\r]*\}                                   { return BraceLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACE); }
 
 \[                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), OPEN_BRACKET); }
 \]                                  { return BracketLexemeAction(createLexicalAnalyzerContext(), CLOSE_BRACKET); }
-[\n]                                { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
-[[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
+[ \t\r]+                            { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
+
+[^\\{}#\$%\^_~\[\]\n]+              { return TextLexemeAction(createLexicalAnalyzerContext()); }
+
+\n                                  { return NEWLINE; }
 
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
-
-[^\\{}#\$%\^_~\[\]]+                { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
 .									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 

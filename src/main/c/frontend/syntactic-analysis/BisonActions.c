@@ -121,6 +121,15 @@ Text * TextSemanticAction(char * text){
 	return newText;
 }
 
+Text * NewlineTextSemanticAction(){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Text * newText = calloc(1, sizeof(Text));
+	newText->text = malloc(2);
+	newText->text[0] = '\n';
+	newText->text[1] = '\0';
+	return newText;
+}
+
 Element * CommandElementSemanticAction(Command *command){
     _logSyntacticAnalyzerAction(__FUNCTION__);
 	if (!command) {

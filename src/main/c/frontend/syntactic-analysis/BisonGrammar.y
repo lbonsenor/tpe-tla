@@ -84,6 +84,7 @@
 %token <token> CLOSE_PARENTHESIS
 %token <token> EQUAL
 %token <string> ARGS_PARAM
+%token <token> NEWLINE
 
 /** Param types **/
 %token <integer> INTEGER_PARAM
@@ -148,6 +149,7 @@ textArgs:
 
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }
+	| NEWLINE														{ $$ = NewlineTextSemanticAction(); }												
 	;
 
 /* ============================= LATEX ============================= */
@@ -221,7 +223,7 @@ param:
 		;
 
 	rowCommand:
-		ROW_COMMAND parameters commandArgs							{ $$ = LangtexContentListSemanticAction($2, $3, LANGTEX_ROW); }
+		ROW_COMMAND parameters commandArgs NEWLINE							{ $$ = LangtexContentListSemanticAction($2, $3, LANGTEX_ROW); }
 		;
 
 	/* ========================== SPEAKER ========================== */

@@ -28,6 +28,7 @@ void shutdownBisonActionsModule();
  Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs);
  Command * EnvironmentCommandSemanticAction(Text * text, Content * params, ContentList * args, Content * content, Text * text2);
  Text * TextSemanticAction(char * text);
+ Text * NewlineTextSemanticAction();
  Element * TextElementSemanticAction(Text * text);
  Element * CommandElementSemanticAction(Command * command);
 
