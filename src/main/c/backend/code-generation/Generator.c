@@ -469,14 +469,18 @@ static void _generateExerciseCommand(unsigned int level, LangtexCommand *command
     LangtexParam *exerciseTitle = getParameter(command->parameters, "title");
     _output(level, "\\Exercise\n\t{");
     _generateLangtexCommand(level, command->prompt);
-    _output(level, "}[");
+    _output(level, "}\n\t");
    
     if (command->options!=NULL){
+        _output(level, "[");
         _generateOptionsCommand(level, command->options);
+        _output(level, "]\n\t");
+    } else {
+        _output(level, "[]\n\t");
     }
-    _output(level, "][");
+    _output(level, "[");
     _generateAnswersCommand(level, command->answers, command->options ? command->options->contentList : NULL);
-    _output(level, "][%s]", exerciseTitle ? exerciseTitle->value.stringParam : "");
+    _output(level, "]\n\t[%s]", exerciseTitle ? exerciseTitle->value.stringParam : "");
 }
 
 static void _generatePromptCommand(unsigned int level, LangtexCommand *command)
