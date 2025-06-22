@@ -37,15 +37,7 @@ LangtexParam *getParameter(LangtexParamList *params, const char *name)
 /* SUPPORTED LANGUAGES */
 static const char *SUPPORTED_LANGUAGES[] = {
     "ko", // Korean
-    "zh", // Chinese
-    "ja", // Japanese
-    "es", // Spanish
-    "en", // English
-    "fr", // French
-    "de", // German
-    "it", // Italian
     "ru", // Russian
-    "ar", // Arabic
     "he", // Hebrew
     NULL  // Sentinel
 };
@@ -55,10 +47,6 @@ static const char *ALLOWED_LATEX_COMMANDS[] = {
     "\\textbf",    // Bold text
     "\\textit",    // Italic text
     "\\color",     // Color command
-    "\\red",       // Red color
-    "\\blue",      // Blue color
-    "\\green",     // Green color
-    "\\black",     // Black color
     "\\underline", // Underline
     "\\emph",      // Emphasis
     NULL           // Sentinel
@@ -365,7 +353,7 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
             }
             // check if the text is an integer (its gotta be one of the options of the size)
             // atoi(char* text). If there are no digits at all, the result is 0
-            logError(_logger, "[!exercise] checking answer: %s", current->content->sequenceElement->text->text);
+            logDebugging(_logger, "[!exercise] checking answer: %s", current->content->sequenceElement->text->text);
             int digit = atoi(current->content->sequenceElement->text->text);
             if (digit == 0)
             {
@@ -491,14 +479,14 @@ SemanticAnalysisStatus analyzeTranslateCommand(LangtexCommand *command)
     if (!validateLatexInContent(command->leftText))
     {
         logError(_logger, "[!translate] source text contains invalid LaTeX commands");
-        logError(_logger, "Only these LaTeX commands are allowed: \\textbf, \\textit, \\color, \\red, \\blue, \\green, \\black, \\underline, \\emph");
+        logError(_logger, "Only these LaTeX commands are allowed: \\textbf, \\textit, \\color, \\underline, \\emph");
         return SEMANTIC_ANALYSIS_ERROR;
     }
 
     if (!validateLatexInContent(command->rightText))
     {
         logError(_logger, "[!translate] target text contains invalid LaTeX commands");
-        logError(_logger, "Only these LaTeX commands are allowed: \\textbf, \\textit, \\color, \\red, \\blue, \\green, \\black, \\underline, \\emph");
+        logError(_logger, "Only these LaTeX commands are allowed: \\textbf, \\textit, \\color, \\underline, \\emph");
         return SEMANTIC_ANALYSIS_ERROR;
     }
 

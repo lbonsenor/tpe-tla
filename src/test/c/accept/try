@@ -25,10 +25,10 @@
     [!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
 }
 
-[!dialog](title="Dialogo")
+[!dialog](title="Dialogo", style=1)
 {
     [!speaker](name="후안"){[!translate](lang="ko"){안녕}{hola}}
-    [!speaker](name="Maria"){Hola Juan, como estas?}
+    [!speaker]{Hola Juan, como estas?}
     [!speaker](name="Juan"){Muy bien, gracias. Y tu?}
     [!speaker](name="Maria"){Bien, gracias.}
 }

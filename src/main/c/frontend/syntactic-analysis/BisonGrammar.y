@@ -74,7 +74,6 @@
 %token <token> PROMPT_COMMAND
 %token <token> OPTIONS_COMMAND
 %token <token> ANSWER_COMMAND
-%token <token> LANGUAGE_COMMAND
 %token <token> BLOCK_COMMAND
 %token <token> FILL_COMMAND
 
@@ -178,8 +177,6 @@ langtexCommand:
 																	{ $$ = ExerciseSemanticAction($2, $5, $6, $7, LANGTEX_EXERCISE); }
 	| BLOCK_COMMAND parameters OPEN_BRACE NEWLINE content CLOSE_BRACE
 																	{ $$ = LangtexSimpleContentSemanticAction($2, $5, LANGTEX_BLOCK); }
-	| LANGUAGE_COMMAND textArgs
-																	{ $$ = LanguageSemanticAction($2, LANGTEX_LANGUAGE); }
 	| FILL_COMMAND text
 																	{ $$ = FillSemanticAction($2, LANGTEX_FILL); }
 	;

@@ -60,85 +60,17 @@ static char *_stop_buffering();
  * Creates the prologue of the generated output, a Latex document that renders
  * a tree thanks to the Forest package.
  */
-// static void _generatePrologue(void) {
-// 	_output(0, "%s",
-// 		// "\\input{preamble.tex}",
-//         "\\begin{document}"
-// 	);
-// }
-
-static void _generatePrologue(void)
-{
-    _output(0, "%s",
-            "% Must be compiled with XeLaTeX\n"
-            "\n"
-            "% Font & CJK\n"
-            "\\usepackage{fontspec}\n"
-            "\\newfontfamily\\ipafont{Charis SIL}\n"
-            "\\usepackage{xeCJK}\n"
-            "\n"
-            "\\setCJKsansfont{DotumChe}\n"
-            "\\setCJKmainfont[\n"
-            "  Path = ./fonts/,\n"
-            "  UprightFont = NotoSansKR-Regular.ttf,\n"
-            "  BoldFont = NotoSerifKR-Bold.ttf,\n"
-            "  SansFont = NotoSerifKR-Regular.ttf\n"
-            "]{NotoSansKR}\n"
-            "\n"
-            "% Math\n"
-            "\\usepackage{amsmath,amssymb}\n"
-            "\n"
-            "% Layout\n"
-            "\\usepackage{graphicx}\n"
-            "\\usepackage{geometry}\n"
-            "\\usepackage{titlesec}\n"
-            "\\usepackage{multicol}\n"
-            "\\geometry{margin=1in}\n"
-            "\n"
-            "% Hyperlinks and bookmarks\n"
-            "\\usepackage{hyperref}\n"
-            "\\usepackage{bookmark}\n"
-            "\n"
-            "% Color boxes\n"
-            "\\usepackage[most]{tcolorbox}\n"
-            "\n"
-            "\\usepackage{tabularx, cellspace}\n"
-            "\\usepackage{menukeys}\n"
-            "\\usepackage{indentfirst}\n"
-            "\\usepackage{glossaries}\n"
-            "\\usepackage{tikz}\n"
-            "\\usepackage{array}\n"
-            "\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}\n"
-            "\n"
-            "\\titleformat{\\chapter}[hang]{\\normalfont\\huge\\bfseries}{\\thechapter.}{1em}{}\n"
-            "\n"
-            "% Custom Korean vocab box\n"
-            "\\tcbset{\n"
-            "  box/.style={\n"
-            "    enhanced,\n"
-            "    attach boxed title to top center={yshift=-3mm,yshifttext=-1mm},\n"
-            "    title=#1\n"
-            "  }\n"
-            "}\n"
-            "\n"
-            "\\newcolumntype{C}{|X|}\n"
-            "\n"
-            "\\newcommand{\\ipa}[1]{{\\ipafont /#1/}}\n"
-            "\n"
-            "\\newcommand{\\spacedstack}[1]{\\vspace{0.3ex}\\shortstack{#1}\\vspace{0.3ex}}\n"
-            "\n"
-            "\\newcommand\\rom[3][]{\n"
-            "  \\ifx\\relax#1\\relax\n"
-            "    $\\overset{\\text{\\color{red}#3}}{\\text{#2}}$\n"
-            "  \\else\n"
-            "    $\\underset{\\textbf{#1}}{\\overset{\\text{\\color{red}#3}}{\\text{#2}}}$\n"
-            "  \\fi\n"
-            "}\n"
-            "\n"
-            "\\newcommand{\\cross}{$\\times$}\n"
-            "\n"
-            "\\begin{document}\n\n");
+static void _generatePrologue() {
+	_output(0, "%s\n%s\n%s\n",
+        "\\documentclass[12pt, a4paper, openany]{book}",
+		"\\input{LangTeXPreamble.tex}",
+        "\\begin{document}"
+	);
 }
+
+// \documentclass[12pt, a4paper, openany]{book}
+// \begin{document}
+// \end{document}
 
 /**
  * Creates the epilogue of the generated output, that is, the final lines that
@@ -148,7 +80,7 @@ static void _generatePrologue(void)
 static void _generateEpilogue()
 {
     _output(0, "%s",
-            "\n\n\\end{document}\n\n");
+            "\n\\end{document}");
 }
 
 /**
@@ -362,10 +294,11 @@ static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command)
     if (!command)
         return;
 
-    _output(0, "\n\t\\speaker{%s}", getParameter(command->parameters, "name")->value.stringParam);
-    _output(0, "{");
+    LangtexParam * speakerName = getParameter(command->parameters, "name");
+    _output(level, "\n\t\\speaker[%s]", speakerName ? speakerName->value.stringParam : "");
+    _output(level, "{");
     _generateContent(level, command->content);
-    _output(0, "}");
+    _output(level, "}");
 }
 
 static void _generateDialogCommand(unsigned int level, LangtexCommand *command)
@@ -729,11 +662,43 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 
 /** PUBLIC FUNCTIONS */
 
-void generate(CompilerState *compilerState)
+void generate(const char * outputPath, bool isInput, CompilerState *compilerState)
 {
-    logDebugging(_logger, "Generating LaNgTeX output...");
-    _generatePrologue();
-    _generateProgram(compilerState->abstractSyntaxtTree);
-    _generateEpilogue();
+    logError(_logger,"outputfile %s",outputPath);
+    // default STDOUT
+    if (outputPath==NULL || outputPath!="HOSTNAME=docker"){
+        if (!isInput) _generatePrologue();
+        _generateProgram(compilerState->abstractSyntaxtTree);
+        if (!isInput) _generateEpilogue();
+
+    } 
+    else{
+     // external .tex
+        FILE * fd = fopen(outputPath, "r+");
+        if (fd==NULL){
+            logError(_logger,"Could not create/open file");
+            return;
+        }
+
+        logDebugging(_logger, "Generating LaNgTeX output...");
+
+        if (!isInput) _generatePrologue();
+        _generateProgram(compilerState->abstractSyntaxtTree);
+        if (!isInput) _generateEpilogue();
+
+        // fclose
+        if (fclose(fd)!=0){
+            logError(_logger,"Error while closing file");
+        }
+
+
+        const char *PATH = "../../../../../references/preamble.tex";
+
+        if (symlink(PATH, outputPath) == -1) {
+            logError(_logger, "Failed to create LaNgTex Preamble symlink");
+            return;
+        }
+        logDebugging(_logger, "Symlink created from %s to %s\n", outputPath, PATH);
+    }
     logDebugging(_logger, "Generation is done.");
 }

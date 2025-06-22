@@ -9,13 +9,14 @@
 #include "shared/Environment.h"
 #include "shared/Logger.h"
 #include "shared/String.h"
+#include <getopt.h>
 
-/**
+/**i
  * The main entry-point of the entire application. If you use "strtok" to
  * parse anything inside this project instead of using Flex and Bison, I will
  * find you, and I will kill you (Bryan Mills; "Taken", 2008).
  */
-const int main(const int count, const char **arguments)
+const int main(const int count, char **arguments)
 {
 	Logger *logger = createLogger("EntryPoint");
 	initializeFlexActionsModule();
@@ -25,11 +26,38 @@ const int main(const int count, const char **arguments)
 	initializeSemanticAnalyzer();
 	initializeGeneratorModule();
 
+	int opt;
+    bool input_flag = false;
+    char *output_path = NULL;
+
 	// Logs the arguments of the application.
-	for (int k = 0; k < count; ++k)
-	{
-		logDebugging(logger, "Argument %d: \"%s\"", k, arguments[k]);
-	}
+	    struct option long_options[] = {
+        {"input", no_argument, 0, 'i'},
+        {0, 0, 0, 0}
+    };
+
+    // First non-option argument is the src_path
+    if (count > 1) {
+        optind = 2;  // Skip the first positional argument
+    } else {
+        fprintf(stderr, "Usage: %s /path/to/src [-o path/to/out] [-i|--input]\n", arguments[0]);
+        return 1;
+    }
+
+    while ((opt = getopt_long(count, arguments, "io:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 'o':
+                output_path = optarg;
+                break;
+            case 'i':
+                input_flag = true;
+                break;
+            case '?':
+            default:
+                fprintf(stderr, "Usage: %s /path/to/src [-o path/to/out] [-i|--input]\n", arguments[0]);
+                return 1;
+        }
+    }
 
 	// Begin compilation process.
 	CompilerState compilerState = {
@@ -50,7 +78,7 @@ const int main(const int count, const char **arguments)
 		SemanticAnalysisStatus semanticResult = analyzeProgram(program);
 		if (semanticResult == SEMANTIC_ANALYSIS_ACCEPT)
 		{
-			generate(&compilerState);
+			generate(output_path, input_flag, &compilerState);
 		}
 		else
 		{

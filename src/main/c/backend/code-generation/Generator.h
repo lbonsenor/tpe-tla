@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 /** Initialize module's internal state. */
 void initializeGeneratorModule();
@@ -22,6 +23,6 @@ void shutdownGeneratorModule();
 /**
  * Generates the final output using the current compiler state.
  */
-void generate(CompilerState * compilerState);
+void generate(const char * outputPath, bool isInput, CompilerState *compilerState);
 
 #endif
