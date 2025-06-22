@@ -202,20 +202,20 @@ param:
   	;
 
 	/* ========================= EXERCISE ========================== */
+	exerciseAnswer:
+		ANSWER_COMMAND parameters commandArgs NEWLINE				{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_ANSWERS);}
+		;
+
+	exerciseOptions:
+		OPTIONS_COMMAND parameters commandArgs NEWLINE 				{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_OPTIONS);}
+		| %empty													{ $$ = NULL; }
+		;
+
 	exercisePrompt:
 		PROMPT_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
 																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_PROMPT);}
 		;
 		
-	exerciseOptions:
-		OPTIONS_COMMAND parameters commandArgs 						{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_OPTIONS);}
-		| %empty													{ $$ = NULL; }
-		;
-
-	exerciseAnswer:
-		ANSWER_COMMAND parameters commandArgs						{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_ANSWERS);}
-		;
-	
 	/* ============================ ROW ============================ */
 	rowCommands:
 		rowCommand rowCommands 										{ $$ = AppendLangtexComand($1, $2); }
@@ -234,7 +234,7 @@ param:
 
 	
 	speakerCommand: 
-		SPEAKER_COMMAND parameters OPEN_BRACE content CLOSE_BRACE 
+		SPEAKER_COMMAND parameters OPEN_BRACE content CLOSE_BRACE NEWLINE
 																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_SPEAKER); }
 		;
 

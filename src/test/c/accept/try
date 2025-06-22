@@ -8,8 +8,8 @@ Esto es un test
     [!row](lang="ko"){herro}{[!translate](lang="ko"){hola}{hola}}
 }
 
-[!exercise](type="fill", title="Ejercicio de completar"){
+[!exercise](type="multiple-choice", title="Ejercicio de completar"){
     [!prompt]{How many fingers does a human have?}
-    [!options]{Hello}{World}{5}{1234} 
+    [!options]{Hello}{World}{5}{1234}
     [!answer]{1}{2}{3}
 }
