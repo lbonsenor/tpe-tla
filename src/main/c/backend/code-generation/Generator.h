@@ -23,6 +23,6 @@ void shutdownGeneratorModule();
 /**
  * Generates the final output using the current compiler state.
  */
-void generate(char * outputPath, bool isInput, CompilerState *compilerState);
+void generate(char * outputPath, char * fileName, bool isInput, CompilerState *compilerState);
 
 #endif

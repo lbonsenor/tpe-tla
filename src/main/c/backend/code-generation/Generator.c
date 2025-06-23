@@ -662,13 +662,26 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 
 /** PUBLIC FUNCTIONS */
 
-void generate(char * outputPath, bool isInput, CompilerState *compilerState)
+void generate(char * outputDir, char * fileName, bool isInput, CompilerState *compilerState)
 {
+    char* outputPath = NULL;
     FILE *original_stdout = NULL;
-    if (outputPath != NULL) {
+
+    if (outputDir != NULL) {
+        size_t len = strlen(outputDir);
+        bool needs_slash = (len > 0 && outputDir[len - 1] != '/');
+        outputPath = malloc(strlen(outputDir) + strlen(fileName) + 2); // +1 for '/' or '\0', +1 for '\0'
+
+        if (outputPath == NULL) {
+            logError(_logger, "Memory allocation failed for outputPath.");
+            return;
+        }
+        sprintf(outputPath, "%s%s%s", outputDir, needs_slash ? "/" : "", fileName);
+
         FILE *fd = fopen(outputPath, "w");
         if (fd == NULL) {
             logError(_logger, "Could not create/open file: %s", outputPath);
+            if (!outputPath) free(outputPath);
             return;
         }
         
@@ -687,7 +700,7 @@ void generate(char * outputPath, bool isInput, CompilerState *compilerState)
     if (!isInput) _generateEpilogue();
 
     // Restore stdout if we redirected it
-    if (outputPath != NULL && original_stdout != NULL) {
+    if (outputDir != NULL && original_stdout != NULL) {
         FILE *fd = stdout;
         stdout = original_stdout;
         
@@ -695,10 +708,10 @@ void generate(char * outputPath, bool isInput, CompilerState *compilerState)
             logError(_logger, "Error while losing file");
         }
         
-        logDebugging(_logger, "Output written to: %s", outputPath);
     }
 
     logDebugging(_logger, "Generation is done.");
+    free(outputPath);
     // default STDOUT
     // if (outputPath==NULL){
     //     if (!isInput) _generatePrologue();

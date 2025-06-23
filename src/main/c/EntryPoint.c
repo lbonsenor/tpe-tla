@@ -28,8 +28,9 @@ const int main(const int count, char **arguments)
 	initializeGeneratorModule();
 
 	int opt;
-    bool input_flag = false;
-    char *output_path = NULL;
+    bool inputFlag = false;
+    char *outputDir = NULL;
+	char *fileName = NULL;
 
 	for (int i = 0; i < count; i++)
 	{
@@ -43,20 +44,32 @@ const int main(const int count, char **arguments)
         {0, 0, 0, 0}
     };
 
-    while (count > 1 && (opt = getopt_long(count, arguments, "o:i", long_options, NULL)) != -1) {
+    while (count > 1 && (opt = getopt_long(count, arguments, "id:o:", long_options, NULL)) != -1) {
         switch (opt) {
-            case 'o':
-                output_path = optarg;
-				logDebugging(logger, "Output Path is %s", output_path);
+            case 'd':
+                outputDir = optarg;
+				logInformation(logger, "Output directory is %s", outputDir);
                 break;
+			case 'o':
+				fileName = optarg;
+				logInformation(logger, "File name is %s", fileName);
+				break;
             case 'i':
-                input_flag = true;
-				logDebugging(logger, "Compiling in input mode (no prologue)");
+                inputFlag = true;
+				logInformation(logger, "Compiling in input mode (no prologue)");
                 break;
             default:
                 break;
         }
     }
+
+	if (fileName == NULL)
+	{
+		fileName = calloc(1, 9);
+		strcat(fileName, "main.tex");
+		logInformation(logger, "File name is %s", fileName);
+	}
+	
 
 	// Begin compilation process.
 	CompilerState compilerState = {
@@ -77,7 +90,7 @@ const int main(const int count, char **arguments)
 		SemanticAnalysisStatus semanticResult = analyzeProgram(program);
 		if (semanticResult == SEMANTIC_ANALYSIS_ACCEPT)
 		{
-			generate(output_path, input_flag, &compilerState);
+			generate(outputDir, fileName, inputFlag, &compilerState);
 		}
 		else
 		{
@@ -93,6 +106,7 @@ const int main(const int count, char **arguments)
 		compilationStatus = FAILED;
 	}
 
+	free(fileName);
 	logDebugging(logger, "Releasing AST resources...");
 	releaseProgram(program);
 	logDebugging(logger, "Releasing modules resources...");
