@@ -2,7 +2,6 @@
 #include "backend/domain-specific/SemanticAnalyzer.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/LangTeXAST.h"
-// #include "frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
 #include "frontend/syntactic-analysis/SyntacticAnalyzer.h"
 #include "shared/CompilerState.h"
@@ -51,7 +50,7 @@ const int main(const int count, char **arguments)
 				logInformation(logger, "Output directory is %s", outputDir);
                 break;
 			case 'o':
-				fileName = optarg;
+				fileName = strdup(optarg);
 				logInformation(logger, "File name is %s", fileName);
 				break;
             case 'i':

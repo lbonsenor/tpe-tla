@@ -13,6 +13,8 @@
 #include <wchar.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 /** Initialize module's internal state. */
 void initializeGeneratorModule();

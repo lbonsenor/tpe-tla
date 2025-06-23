@@ -63,14 +63,11 @@ static char *_stop_buffering();
 static void _generatePrologue() {
 	_output(0, "%s\n%s\n%s\n",
         "\\documentclass[12pt, a4paper, openany]{book}",
-		"\\input{LangTeXPreamble.tex}",
+		"\\input{preamble.tex}",
         "\\begin{document}"
 	);
 }
 
-// \documentclass[12pt, a4paper, openany]{book}
-// \begin{document}
-// \end{document}
 
 /**
  * Creates the epilogue of the generated output, that is, the final lines that
@@ -86,9 +83,6 @@ static void _generateEpilogue()
 /**
  * Generates the output of the program.
  */
-// static void _generateProgram(Program * program) {
-// 	_generateExpression(3, program->expression);
-// }
 static void _generateProgram(Program *program)
 {
     if (program && program->content)
@@ -668,9 +662,38 @@ void generate(char * outputDir, char * fileName, bool isInput, CompilerState *co
     FILE *original_stdout = NULL;
 
     if (outputDir != NULL) {
+        // CREATE DIRECTORY IF IT DOESN'T EXIST
+        struct stat st = {0};
+        if (stat(outputDir, &st) == -1) {
+            if (mkdir(outputDir, 0755) == -1) {
+                logError(_logger, "Could not create directory: %s", outputDir);
+                return;
+            }
+            logDebugging(_logger, "Created directory: %s", outputDir);
+        }
+
+        // Create symlink to preamble.tex
+
+        char* preambleLinkPath = malloc(strlen(outputDir) + strlen("/preamble.tex") + 1);
+        sprintf(preambleLinkPath, "%s/preamble.tex", outputDir);
+
+        unlink(preambleLinkPath); // si ya existia, lo borra 
+
+        // Crear nuevo symlink (path relativo desde outputDir)
+        const char* preambleSource = "../references/preamble.tex";
+        if (symlink(preambleSource, preambleLinkPath) == -1) {
+            logError(_logger, "Failed to create preamble symlink: %s -> %s", preambleLinkPath, preambleSource);
+        } else {
+            logDebugging(_logger, "Created preamble symlink: %s -> %s", preambleLinkPath, preambleSource);
+        }
+        
+        free(preambleLinkPath);
+
+        // Make path for output file
+
         size_t len = strlen(outputDir);
         bool needs_slash = (len > 0 && outputDir[len - 1] != '/');
-        outputPath = malloc(strlen(outputDir) + strlen(fileName) + 2); // +1 for '/' or '\0', +1 for '\0'
+        outputPath = malloc(strlen(outputDir) + strlen(fileName) + 2);
 
         if (outputPath == NULL) {
             logError(_logger, "Memory allocation failed for outputPath.");
@@ -681,70 +704,78 @@ void generate(char * outputDir, char * fileName, bool isInput, CompilerState *co
         FILE *fd = fopen(outputPath, "w");
         if (fd == NULL) {
             logError(_logger, "Could not create/open file: %s", outputPath);
-            if (!outputPath) free(outputPath);
+            free(outputPath);
             return;
         }
         
         logDebugging(_logger, "Generating LaNgTeX output to file: %s", outputPath);
         
-        // Save original stdout and redirect to file
         original_stdout = stdout;
         stdout = fd;
     } else {
         logDebugging(_logger, "Generating LaNgTeX output to stdout");
     }
 
-    // Generate the content
     if (!isInput) _generatePrologue();
     _generateProgram(compilerState->abstractSyntaxtTree);
     if (!isInput) _generateEpilogue();
 
-    // Restore stdout if we redirected it
     if (outputDir != NULL && original_stdout != NULL) {
         FILE *fd = stdout;
         stdout = original_stdout;
         
         if (fclose(fd) != 0) {
-            logError(_logger, "Error while losing file");
+            logError(_logger, "Error while closing file");
         }
-        
     }
 
     logDebugging(_logger, "Generation is done.");
     free(outputPath);
-    // default STDOUT
-    // if (outputPath==NULL){
-    //     if (!isInput) _generatePrologue();
-    //     _generateProgram(compilerState->abstractSyntaxtTree);
-    //     if (!isInput) _generateEpilogue();
-    // } 
-    // else{
-    //     FILE * fd = fopen(outputPath, "w");
-    //     if (fd==NULL){
-    //         logError(_logger,"Could not create/open file");
+
+    // if (outputDir != NULL) {
+    //     size_t len = strlen(outputDir);
+    //     bool needs_slash = (len > 0 && outputDir[len - 1] != '/');
+    //     outputPath = malloc(strlen(outputDir) + strlen(fileName) + 2); // +1 for '/' or '\0', +1 for '\0'
+
+    //     if (outputPath == NULL) {
+    //         logError(_logger, "Memory allocation failed for outputPath.");
     //         return;
     //     }
+    //     sprintf(outputPath, "%s%s%s", outputDir, needs_slash ? "/" : "", fileName);
 
-    //     logDebugging(_logger, "Generating LaNgTeX output...");
-
-    //     if (!isInput) _generatePrologue();
-    //     _generateProgram(compilerState->abstractSyntaxtTree);
-    //     if (!isInput) _generateEpilogue();
-
-    //     // fclose
-    //     if (fclose(fd)!=0){
-    //         logError(_logger,"Error while closing file");
-    //     }
-
-
-    //     const char *PATH = "../../../../../references/preamble.tex";
-
-    //     if (symlink(PATH, outputPath) == -1) {
-    //         logError(_logger, "Failed to create LaNgTex Preamble symlink");
+    //     FILE *fd = fopen(outputPath, "w");
+    //     if (fd == NULL) {
+    //         logError(_logger, "Could not create/open file: %s", outputPath);
+    //         if (!outputPath) free(outputPath);
     //         return;
     //     }
-    //     logDebugging(_logger, "Symlink created from %s to %s\n", outputPath, PATH);
+        
+    //     logDebugging(_logger, "Generating LaNgTeX output to file: %s", outputPath);
+        
+    //     // Save original stdout and redirect to file
+    //     original_stdout = stdout;
+    //     stdout = fd;
+    // } else {
+    //     logDebugging(_logger, "Generating LaNgTeX output to stdout");
+    // }
+
+    // // Generate the content
+    // if (!isInput) _generatePrologue();
+    // _generateProgram(compilerState->abstractSyntaxtTree);
+    // if (!isInput) _generateEpilogue();
+
+    // // Restore stdout if we redirected it
+    // if (outputDir != NULL && original_stdout != NULL) {
+    //     FILE *fd = stdout;
+    //     stdout = original_stdout;
+        
+    //     if (fclose(fd) != 0) {
+    //         logError(_logger, "Error while losing file");
+    //     }
+        
     // }
 
     // logDebugging(_logger, "Generation is done.");
+    // free(outputPath);
+
 }
