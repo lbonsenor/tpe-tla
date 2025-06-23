@@ -11,7 +11,7 @@
 #include <getopt.h>
 #include <string.h>
 
-/**i
+/**
  * The main entry-point of the entire application. If you use "strtok" to
  * parse anything inside this project instead of using Flex and Bison, I will
  * find you, and I will kill you (Bryan Mills; "Taken", 2008).
@@ -37,7 +37,6 @@ const int main(const int count, char **arguments)
 	}
 	
 
-	// Logs the arguments of the application.
 	    struct option long_options[] = {
         {"input", no_argument, 0, 'i'},
         {0, 0, 0, 0}

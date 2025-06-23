@@ -21,6 +21,7 @@
 	Content * content;
 	ContentList * contentList;
 	TextList * textList;
+	OptionalNewline * optionalNewline;
 
 	/** Latex **/
 	Command * command; 
@@ -98,6 +99,7 @@
 %type <element> element
 %type <command> command
 %type <text> text
+%type <optionalNewline> optionalNewline
 
 /** LaNgTeX Non-terminals **/
 %type <langtexCommand> langtexCommand speakerCommand rowCommand exercisePrompt exerciseOptions exerciseAnswer
@@ -136,7 +138,7 @@ element:
 	;
 
 commandArgs:
-	OPEN_BRACE content CLOSE_BRACE commandArgs						{ $$ = ContentListSemanticAction($2, $4); }
+	OPEN_BRACE content CLOSE_BRACE commandArgs		{ $$ = ContentListSemanticAction($2, $4); }
 	| %empty														{ $$ = NULL; }
 	;
 
@@ -145,11 +147,16 @@ text:
 	| NEWLINE														{ $$ = NewlineTextSemanticAction(); }												
 	;
 
+optionalNewline:
+	NEWLINE optionalNewline											{ $$ = NULL; }
+	| %empty														{ $$ = NULL; }
+	;
+
 /* ============================= LATEX ============================= */
 
 command:
-	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE commandParams commandArgs content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
-																	{ $$ = EnvironmentCommandSemanticAction($3, $5, $6, $7, $10); }
+	BEGIN_ENVIRONMENT optionalNewline OPEN_BRACE text CLOSE_BRACE commandParams commandArgs content END_ENVIRONMENT optionalNewline OPEN_BRACE text CLOSE_BRACE
+																	{ $$ = EnvironmentCommandSemanticAction($4, $6, $7, $8, $12); }
 	| COMMAND commandArgs
 																	{ $$ = ParameterizedCommandSemanticAction($1,$2); }
 	;
@@ -161,18 +168,18 @@ commandParams:
 /* ============================ LANGTEX ============================ */
 
 langtexCommand:
-	TRANSLATE_COMMAND parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
-																	{ $$ = TranslateSemanticAction($2, $4, $7); }
-	| DIALOG_COMMAND parameters OPEN_BRACE NEWLINE speakerCommands CLOSE_BRACE
-																	{ $$ = LangtexCommandListSemanticAction($2, $5, LANGTEX_DIALOG); }
-	| TABLE_COMMAND parameters OPEN_BRACE NEWLINE rowCommands CLOSE_BRACE 
-																	{ $$ = LangtexCommandListSemanticAction($2, $5, LANGTEX_TABLE); }
-	| EXERCISE_COMMAND parameters OPEN_BRACE NEWLINE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
-																	{ $$ = ExerciseSemanticAction($2, $5, $6, $7, LANGTEX_EXERCISE); }
-	| BLOCK_COMMAND parameters OPEN_BRACE NEWLINE content CLOSE_BRACE
+	TRANSLATE_COMMAND parameters optionalNewline OPEN_BRACE content CLOSE_BRACE optionalNewline OPEN_BRACE content CLOSE_BRACE  
+																	{ $$ = TranslateSemanticAction($2, $5, $9); }
+	| DIALOG_COMMAND parameters optionalNewline OPEN_BRACE optionalNewline speakerCommands CLOSE_BRACE
+																	{ $$ = LangtexCommandListSemanticAction($2, $6, LANGTEX_DIALOG); }
+	| TABLE_COMMAND parameters optionalNewline OPEN_BRACE optionalNewline rowCommands CLOSE_BRACE 
+																	{ $$ = LangtexCommandListSemanticAction($2, $6, LANGTEX_TABLE); }
+	| EXERCISE_COMMAND parameters optionalNewline OPEN_BRACE optionalNewline exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
+																	{ $$ = ExerciseSemanticAction($2, $6, $7, $8, LANGTEX_EXERCISE); }
+	| BLOCK_COMMAND parameters optionalNewline OPEN_BRACE content CLOSE_BRACE
 																	{ $$ = LangtexSimpleContentSemanticAction($2, $5, LANGTEX_BLOCK); }
-	| FILL_COMMAND text
-																	{ $$ = FillSemanticAction($2, LANGTEX_FILL); }
+	| FILL_COMMAND
+																	{ $$ = FillSemanticAction(LANGTEX_FILL); }
 	;
 
 parameters:

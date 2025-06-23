@@ -217,11 +217,10 @@ LangtexCommand * LanguageSemanticAction( TextList * textList, LangtexCommandType
 	return langtexCommand;
 }
 
-LangtexCommand * FillSemanticAction(Text * text, LangtexCommandType type) {
+LangtexCommand * FillSemanticAction(LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = NULL;
-	langtexCommand->text = text;
 	langtexCommand->type = type;
 	return langtexCommand;
 }

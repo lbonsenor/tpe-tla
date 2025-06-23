@@ -94,17 +94,3 @@ char* romanizeHebrew(const char* input) {
 
     return output;
 }
-
-// int main() {
-//     setlocale(LC_ALL, "en_US.UTF-8");
-//     wchar_t* phrase = L"שָׁלוֹם עוֹלָם";  // "Shalom olam"
-//     char* romanized = romanizeHebrew(phrase);
-//     if (romanized) {
-//         wprintf(L"Input: %ls\nOutput: %s\n", phrase, romanized);
-//         free(romanized);
-//     } else {
-//         printf("Failed to romanize input.\n");
-//     }
-
-//     return 0;
-// }

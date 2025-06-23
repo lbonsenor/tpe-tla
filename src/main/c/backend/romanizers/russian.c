@@ -36,12 +36,3 @@ char *decomposeCyrillicChar(uint32_t c) {
 
     return NULL;  // Unsupported character
 }
-
-// int main() {
-//     setlocale(LC_ALL, "en_US.UTF-8");
-//     wchar_t* word = L"В чащах юга жил бы цитрус? Да, но фальшивый экземпляр";
-//     char* s = romanizeCyrillic(word);
-//     wprintf(L"Input: %ls\nOutput: %s\n", word, s);
-
-//     return 0;
-// }

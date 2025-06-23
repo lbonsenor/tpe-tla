@@ -1,5 +1,4 @@
-[!dialog](title="Greeting")
-{
+[!dialog](title="Greeting"){
     [!speaker](name="John"){Hi Mary}
     [!speaker](name="Mary"){Hi John}
 }

@@ -7,8 +7,7 @@
 
 [!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
 
-[!exercise](type="multiple-choice", title="Mc exericse")
-{
+[!exercise](type="multiple-choice", title="Mc exericse"){
     [!prompt]{The landmark [!fill] is known for its vast trees}
     [!options]{Hello}{World}{5}{lo siento}{:(}{[!translate](lang="ko"){hola}{hola}}{}
     [!answer]{1}{5}{6}
@@ -20,12 +19,12 @@
 }
 
 
-[!block](title="Hola")
-{
+[!block](title="Hola"){
     [!translate](int=0, lang="ko"){\textit{\color{red}안녕}}{\textbf{hola}}
 }
 
 [!dialog](title="Dialogo", style=1)
+
 {
     [!speaker](name="후안"){[!translate](lang="ko"){안녕}{hola}}
     [!speaker]{Hola Juan, como estas?}

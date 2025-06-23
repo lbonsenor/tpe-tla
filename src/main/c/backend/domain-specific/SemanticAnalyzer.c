@@ -52,31 +52,52 @@ static const char *ALLOWED_LATEX_COMMANDS[] = {
     NULL           // Sentinel
 };
 
-static const char *PARAMETERS_EXERCISE[] = {
-    "multiple-choice",
-    "single-choice"};
+/* HELPER FUNCTIONS FOR GENERAL COMMAND */
+static boolean validateLangtexContent(Content *content)
+{
+    if (!content)
+        return true;
 
-static const char *PARAMETERS_DIALOG[] = {
-    "title",
-    "style"};
+    if (content->type == SEQUENCE)
+    {
+        if (!validateLangtexElement(content->sequenceElement)) {
+            return false;
+        }
+        return validateLangtexContent(content->sequenceContent);
+    }
+    else if (content->type == ELEMENT)
+    {
+        return validateLangtexElement(content->sequenceElement);
+    }
 
-static const char *PARAMETERS_SPEAKER[] = {
-    "name" // char *
-};
+    logError(_logger, "[!speaker] unexpected content type: %d", content->type);
+    return false;
+}
 
-static const char *PARAMETERS_TABLE[] = {
-    "cols" // integer
-};
+static boolean validateLangtexElement(Element *el)
+{
+    if (!el)
+        return true;
 
-static const char *PARAMETERS_ROW[] = {
-    "header" // boolean
-};
-
-static const char *PARAMETERS_BLOCK[] = {
-    "title"};
+    switch (el->type)
+    {
+    case LATEX_TEXT:
+        return true;
+    case LATEX_COMMAND:
+        return validateLatexInCommand(el->command);
+    case LANGTEX_COMMAND:
+        if (el->langtexCommand->type != LANGTEX_TRANSLATE)
+        {
+            return false;
+        }
+        return analyzeTranslateCommand(el->langtexCommand) == SEMANTIC_ANALYSIS_ACCEPT;
+    default:
+        logError(_logger, "[!speaker] invalid element type: %d", el->type);
+        return false;
+    }
+}
 
 /* HELPER FUNCTIONS FOR TRANSLATE COMMAND */
-
 static boolean isLanguageSupported(const char *langCode)
 {
     if (!langCode)
@@ -135,14 +156,13 @@ static boolean validateLatexInCommand(Command *command)
 static boolean validateLatexInContent(Content *content)
 {
     if (!content)
-        return true; // can be empty
+        return true;
     switch (content->type)
     {
     case ELEMENT:
         return validateLatexInElement(content->sequenceElement);
         break;
     case SEQUENCE:
-        // Recursively validate each element in the sequence
         if (!validateLatexInElement(content->sequenceElement))
         {
             return false;
@@ -151,7 +171,7 @@ static boolean validateLatexInContent(Content *content)
         break;
     default:
         logError(_logger, "Unexpected content type: %d", content->type);
-        return false; // Invalid content type
+        return false;
     }
 }
 
@@ -159,7 +179,6 @@ static boolean validateLatexInElement(Element *element)
 {
     if (!element)
         return true;
-    // If it's a text element, we can check it directly
     switch (element->type)
     {
     case LATEX_TEXT:
@@ -176,57 +195,10 @@ static boolean validateLatexInElement(Element *element)
         return false;
         break;
     }
-    return true; // Other element types are not our concern here
-}
-
-/* HELPER FUNCTIONS FOR SPEAKER COMMAND */
-static boolean validateSpeakerContent(Content *content)
-{
-    if (!content)
-        return true;
-
-    if (content->type == SEQUENCE)
-    {
-        if (!validateSpeakerElement(content->sequenceElement)) {
-            return false;
-        }
-        return validateSpeakerContent(content->sequenceContent);
-    }
-    else if (content->type == ELEMENT)
-    {
-        return validateSpeakerElement(content->sequenceElement);
-    }
-
-    logError(_logger, "[!speaker] unexpected content type: %d", content->type);
-    return false;
-}
-
-static boolean validateSpeakerElement(Element *el)
-{
-    if (!el)
-        return true;
-
-    switch (el->type)
-    {
-    case LATEX_TEXT:
-        return true;
-    case LATEX_COMMAND:
-        return validateLatexInCommand(el->command);
-    case LANGTEX_COMMAND:
-        if (el->langtexCommand->type != LANGTEX_TRANSLATE)
-        {
-            // logError(_logger, "[!speaker] only [!translate] allowed inside [!speaker], got: %d", el->langtexCommand->type);
-            return false;
-        }
-        return analyzeTranslateCommand(el->langtexCommand) == SEMANTIC_ANALYSIS_ACCEPT;
-    default:
-        logError(_logger, "[!speaker] invalid element type: %d", el->type);
-        return false;
-    }
+    return true; 
 }
 
 /* HELPER FUNCTIONS FOR EXERCISE COMMAND */
-
 static boolean validatePromptContent(Content *content)
 {
     if (!content)
@@ -234,7 +206,7 @@ static boolean validatePromptContent(Content *content)
 
     if (content->type == SEQUENCE)
     {
-        if (!validateSpeakerElement(content->sequenceElement))
+        if (!validateLangtexElement(content->sequenceElement))
         {
             if (content->sequenceElement->type == LANGTEX_COMMAND && content->sequenceElement->langtexCommand->type == LANGTEX_FILL)
             {
@@ -249,13 +221,12 @@ static boolean validatePromptContent(Content *content)
     }
     else if (content->type == ELEMENT)
     {
-        // [!fill] text
         if (content->sequenceElement->type == LANGTEX_COMMAND && content->sequenceElement->langtexCommand->type == LANGTEX_FILL)
         {
             logDebugging(_logger, "[!fill] found in prompt content");
             return true;
         }
-        return validateSpeakerElement(content->sequenceElement);
+        return validateLangtexElement(content->sequenceElement);
     }
 
     logError(_logger, "[!speaker] unexpected content type: %d", content->type);
@@ -263,7 +234,6 @@ static boolean validatePromptContent(Content *content)
 }
 
 /* HELPER FUNCTIONS FOR EXERCISE COMMAND */
-
 static boolean validateSingleChoiceExercise(LangtexCommand *prompt, LangtexCommand *answer)
 {
     if (prompt->type != LANGTEX_PROMPT || answer->type != LANGTEX_ANSWERS)
@@ -273,7 +243,7 @@ static boolean validateSingleChoiceExercise(LangtexCommand *prompt, LangtexComma
     }
     if (prompt->content)
     {
-        if (!validateSpeakerContent(prompt->content))
+        if (!validateLangtexContent(prompt->content))
         {
             logError(_logger, "[!exercise] invalid LaTeX content in prompt");
             return false;
@@ -284,7 +254,7 @@ static boolean validateSingleChoiceExercise(LangtexCommand *prompt, LangtexComma
     if (answer->contentList)
     {
         ContentList *current = answer->contentList;
-        if (!validateSpeakerContent(current->content))
+        if (!validateLangtexContent(current->content))
         {
             logError(_logger, "[!exercise] invalid LaTeX content in options");
             return false;
@@ -307,7 +277,6 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
         logError(_logger, "[!exercise] expected prompt, options, and answers commands");
         return false;
     }
-    // esto siempre es cierto -> chequear que [!fill] este si o si
     if (prompt->content)
     {
         if (!validatePromptContent(prompt->content))
@@ -317,14 +286,13 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
         }
     }
 
-    // validar que haya como minimo una option
     int size = 0;
     if (options->contentList)
     {
         ContentList *current = options->contentList;
         while (current)
         {
-            if (!validateSpeakerContent(current->content))
+            if (!validateLangtexContent(current->content))
             {
                 logError(_logger, "[!exercise] invalid LaTeX content in options");
                 return false;
@@ -339,8 +307,6 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
         return false;
     }
 
-    // validar que las answers sean numeros enteros y que el numero sea menor que el size
-    // {}{}{} sequence-> sequenceElement=text sequenceContent=null
     if (answers->contentList)
     {
         ContentList *current = answers->contentList;
@@ -375,6 +341,7 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
     logError(_logger, "[!exercise] at least one answer is required");
     return false;
 }
+
 /* PUBLIC FUNCTIONS */
 
 SemanticAnalysisStatus analyzeProgram(Program *program)
@@ -397,14 +364,12 @@ SemanticAnalysisStatus analyzeContent(Content *content)
 
     if (content->type == SEQUENCE)
     {
-        // Analyze current element
         SemanticAnalysisStatus status = analyzeElement(content->sequenceElement);
         if (status != SEMANTIC_ANALYSIS_ACCEPT)
         {
             return status;
         }
 
-        // Analyze rest of content
         return analyzeContent(content->sequenceContent);
     }
     else
@@ -427,16 +392,17 @@ SemanticAnalysisStatus analyzeElement(Element *element)
     {
     case LANGTEX_COMMAND:
         return analyzeLangtexCommand(element->langtexCommand);
-
+    
+        // all LATEX commands are accepted -> they will be checked by latex
     case LATEX_COMMAND:
     case LATEX_TEXT:
-        // For now, we accept all LaTeX commands and text
         return SEMANTIC_ANALYSIS_ACCEPT;
-
     default:
         logError(_logger, "Unknown element type: %d", element->type);
         return SEMANTIC_ANALYSIS_ERROR;
     }
+    logError(_logger, "Unexpected element type: %d", element->type);
+    return SEMANTIC_ANALYSIS_ERROR;
 }
 
 SemanticAnalysisStatus analyzeLangtexCommand(LangtexCommand *command)
@@ -468,8 +434,8 @@ SemanticAnalysisStatus analyzeLangtexCommand(LangtexCommand *command)
         return SEMANTIC_ANALYSIS_ERROR;
     }
 
-    // Accept all other commands for now
-    return SEMANTIC_ANALYSIS_ACCEPT;
+    logError(_logger, "Unexpected command type: %d", command->type);
+    return SEMANTIC_ANALYSIS_REJECT;
 }
 
 SemanticAnalysisStatus analyzeTranslateCommand(LangtexCommand *command)
@@ -526,10 +492,8 @@ SemanticAnalysisStatus analyzeTranslateCommand(LangtexCommand *command)
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
-// without duplicate param warning -- just using the first one
 SemanticAnalysisStatus analyzeTableCommand(LangtexCommand *command)
 {
-    // For now, we accept all table commands
     logDebugging(_logger, "Analyzing [!table] command");
 
     // honestly this isnt needed because it only enters this function when it knows that the command aint empty and it is of type langtex table duh
@@ -670,7 +634,6 @@ SemanticAnalysisStatus analyzeRowCommand(LangtexCommand *command, int expectedCo
 
 SemanticAnalysisStatus analyzeDialogCommand(LangtexCommand *command)
 {
-    // For now, we accept all table commands
     logDebugging(_logger, "Analyzing [!dialog] command");
 
     // honestly this isnt needed because it only enters this function when it knows that the command aint empty and it is of type langtex table duh
@@ -679,8 +642,6 @@ SemanticAnalysisStatus analyzeDialogCommand(LangtexCommand *command)
         logError(_logger, "Expected [!dialog] command, got: %d", command ? command->type : -1);
         return SEMANTIC_ANALYSIS_REJECT;
     }
-
-    // [!dialog](title="Dialog", style=0)
 
     if (command->parameters)
     {
@@ -743,8 +704,6 @@ SemanticAnalysisStatus analyzeDialogCommand(LangtexCommand *command)
         current = current->next;
     }
 
-    // TODO: add to symbol table if needed
-
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 
@@ -788,7 +747,7 @@ SemanticAnalysisStatus analyzeSpeakerCommand(LangtexCommand *command)
         }
     }
 
-    if (!validateSpeakerContent(command->content))
+    if (!validateLangtexContent(command->content))
     {
         logError(_logger, "[!speaker] only [!translate] allowed inside [!speaker]");
         return SEMANTIC_ANALYSIS_ERROR;
@@ -848,12 +807,11 @@ SemanticAnalysisStatus analyzeBlockCommand(LangtexCommand *command)
         current = current->next;
     }
 
-    if (!validateSpeakerContent(command->content))
+    if (!validateLangtexContent(command->content))
     {
         return SEMANTIC_ANALYSIS_ERROR;
     }
 
-    // For now we accept all block commands
     return SEMANTIC_ANALYSIS_ACCEPT;
 }
 

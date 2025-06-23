@@ -1,2 +1,4 @@
-[!translate](lang="ko"){안녕하\color{red}{세요}}{hola}
+[!translate](lang="ko")
+    {안녕하\color{red}{세요}}
+    {hola}
 [!translate](lang="ko"){안녕하\textit{세요}}{hola}

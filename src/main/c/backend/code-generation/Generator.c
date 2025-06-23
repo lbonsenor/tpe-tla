@@ -488,7 +488,7 @@ static void _generateAnswersCommand(unsigned int level, LangtexCommand *answersC
 static void _generateFillCommand(unsigned int level, LangtexCommand *command)
 {
     _output(level, "\\fillLine ");
-    _generateText(level, command->text); // TODO: look at fill later in bison grammar
+    // TODO: look at fill later in bison grammar
 }
 
 // TODO: change to LATEX format

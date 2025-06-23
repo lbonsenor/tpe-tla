@@ -28,6 +28,7 @@ typedef struct LangtexCommand LangtexCommand;
 typedef struct Program Program;
 typedef struct Content Content;
 typedef struct Element Element;
+typedef struct Text OptionalNewline;
 
 typedef struct LangtexParam LangtexParam;
 typedef struct LangtexParamList LangtexParamList;

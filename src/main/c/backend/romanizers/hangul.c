@@ -60,13 +60,3 @@ char* decomposeHangulChar(uint32_t syllable) {
     
     return ret;
 }
-
-// int main() {
-    //     setlocale(LC_ALL, "en_US.UTF-8");
-    //     wchar_t* word = L"안녕히 가세요";
-    //     char* s = romanizeHangul(word);
-    //     wprintf(L"Input: %ls\nOutput: %s\n", word, s);
-    
-    //     return 0;
-    // }
-    
