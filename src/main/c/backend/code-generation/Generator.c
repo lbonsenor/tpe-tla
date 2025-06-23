@@ -77,7 +77,7 @@ static void _generatePrologue() {
 static void _generateEpilogue()
 {
     _output(0, "%s",
-            "\n\\end{document}");
+            "\n\\end{document}\n");
 }
 
 /**
