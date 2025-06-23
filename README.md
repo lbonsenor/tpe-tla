@@ -20,44 +20,48 @@ Antes de comenzar, asegúrate de tener instalado:
 
 ## 🚀 Instalación
 
-### 1️⃣ Clonar el Repositorio
+### ① Clonar el Repositorio
 
 ```bash
 git clone https://github.com/lbonsenor/tpe-tla.git
 cd tpe-tla
 ```
 
-### 🐳 2️⃣ Construir la imagen de Docker
+### ② Construir la imagen de Docker
 
 Ejecuta el comando correspondiente a tu sistema operativo. **Importante**: Para todos los comandos siguientes, utiliza siempre los scripts de tu sistema operativo correspondiente.
 
 **Linux/MacOS:**
+
 ```bash
 ./script/ubuntu/docker-build.sh
 ```
 
 **Windows:**
+
 ```bash
 ./script/windows/docker-build.sh
 ```
 
-### ⚙️ 3️⃣ Instalar dependencias
+### ③ Instalar dependencias
 
 Ejecuta los siguientes comandos en orden para completar la configuración:
 
 **Instalar dependencias/aplicaciones necesarias:**
+
 ```bash
 ./script/ubuntu/install.sh    # Linux/MacOS
 ./script/windows/install.sh   # Windows
 ```
 
 **Compilar el proyecto:**
+
 ```bash
 ./script/ubuntu/build.sh      # Linux/MacOS
 ./script/windows/build.sh     # Windows
 ```
 
-## 📖 Uso
+## Uso
 
 ### Sintaxis del Comando Principal
 
@@ -79,21 +83,23 @@ Ejecuta los siguientes comandos en orden para completar la configuración:
 |------|-------------|-------------------|---------|
 | `-d <directorio>` | Nombre del directorio de salida | `stdout` (se imprime en terminal) | `-d output` |
 | `-o <archivo>` | Nombre del archivo principal | `main.tex` | `-o documento` |
-| `-i` | Genera solo el contenido sin preámbulo ni epílogo cuando el código LaNgTeX va a ser insertado dentro de un documento LaTeX existente | - | `-i` |
+| `-i` o `--input` | Genera solo el contenido sin preámbulo ni epílogo cuando el código LaNgTeX va a ser insertado dentro de un documento LaTeX existente | `false` | `-i` |
 
 ### Comando Completo por Sistema Operativo
 
 **Linux/MacOS:**
+
 ```bash
-./script/ubuntu/start.sh <inputFile> -d <outputDir> -o <mainOutputFile> [-i]
+./script/ubuntu/start.sh <inputFile> -d <outputDir> -o <mainOutputFile> -i
 ```
 
 **Windows:**
+
 ```bash
-./script/windows/start.sh <inputFile> -d <outputDir> -o <mainOutputFile> [-i]
+./script/windows/start.sh <inputFile> -d <outputDir> -o <mainOutputFile> -i
 ```
 
-## 💡 Ejemplos
+## Ejemplos
 
 ### Ejemplo Básico (Vista en Terminal)
 
@@ -116,7 +122,7 @@ Ejecuta los siguientes comandos en orden para completar la configuración:
 ./script/ubuntu/start.sh src/test/c/accept/fragment -i -d fragments -o content
 ```
 
-### Ejemplo Completo (Recomendado)
+### Ejemplo Completo
 
 ```bash
 # Comando de ejemplo completo para correr el proyecto
@@ -124,6 +130,7 @@ Ejecuta los siguientes comandos en orden para completar la configuración:
 ```
 
 **Este comando genera:**
+
 - 📁 **Directorio `out/`** (se crea si no existe)
 - 📄 **Archivo principal**: `output.tex` (o `main.tex` si no se especifica `-o`)
 - 🔗 **Symlink**: `preamble.tex` que contiene todas las macros de LaNgTeX
@@ -139,7 +146,7 @@ Ejecuta los siguientes comandos en orden para completar la configuración:
 
 ### Estructura de Salida Generada
 
-Cuando ejecutas el comando con `-d` y `-o`, se genera la siguiente estructura:
+Cuando se ejecuta el comando con `-d` y `-o`, se genera la siguiente estructura:
 
 ```
 <outputDir>/
@@ -147,16 +154,18 @@ Cuando ejecutas el comando con `-d` y `-o`, se genera la siguiente estructura:
 └── 🔗 preamble.tex           # Symlink con macros de LaNgTeX
 ```
 
-## 🧪 Testing
+## Testing
 
 Para ejecutar los archivos de prueba y visualizar los resultados progresivamente en terminal:
 
 **Linux/MacOS:**
+
 ```bash
 ./script/ubuntu/test.sh
 ```
 
 **Windows:**
+
 ```bash
 ./script/windows/test.sh
 ```
