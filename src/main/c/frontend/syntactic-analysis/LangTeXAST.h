@@ -28,6 +28,7 @@ typedef struct LangtexCommand LangtexCommand;
 typedef struct Program Program;
 typedef struct Content Content;
 typedef struct Element Element;
+typedef struct Text OptionalNewline;
 
 typedef struct LangtexParam LangtexParam;
 typedef struct LangtexParamList LangtexParamList;
@@ -37,7 +38,7 @@ typedef struct LangtexCommandList LangtexCommandList;
  * Node types for the Abstract Syntax Tree (AST).
  */
 enum ContentType {
-    ELEMENT,
+    // ELEMENT,
     SEQUENCE
 };
 
@@ -81,18 +82,19 @@ struct LangtexCommand{
     union {
     // Usage: translate
     struct {
-        Content * leftContent;
-        Content * rightContent;
+        Content * leftText;
+        Content * rightText;
     };
-    // Usage: dialog, table
+    // Usage: dialog
     struct {
         LangtexCommandList * langtexCommandList;
     };
-    // Usage: speaker
+    // Usage: speaker, prompt
     struct {
         Content * content;
     };
-    // Usage: row
+    // Usage: row, answers, options
+
     struct {
         ContentList * contentList;
     };
@@ -105,10 +107,6 @@ struct LangtexCommand{
     // Usage: language
     struct {
         TextList * textList;
-    };
-    // Usage: fill
-    struct {
-        Text * text;
     };
    };
    LangtexCommandType type;
@@ -137,7 +135,7 @@ struct Answer{
 };
 
 /* Langtex Parameters */
-
+// [!translate]{lang="kr"}
 struct LangtexParam {
     char * key;
     union {
@@ -157,7 +155,7 @@ struct LangtexParamList {
 
 struct Content{
     union{
-        Element * element;
+        // Element * element;
         struct {
             Element * sequenceElement;
             Content * sequenceContent;
@@ -182,12 +180,6 @@ struct TextList{
 
 struct Command{
     union{
-        // \command
-		struct {
-			char * simpleCommand;
-		};
-
-        // \begin{...}...\end{...}
         struct {
             Text * environmentLeftText;
             Content * environmentParameters;
@@ -195,7 +187,6 @@ struct Command{
             Content * environmentContent;
         };
 
-        // \command{...}
         struct {
             char * parameterizedCommand;
             ContentList * parameterizedContentList;

@@ -58,28 +58,6 @@ Content * AppendContentSemanticAction(Element * element, Content * content){
 	return newContent;
 }
 
-Content * SingleContentSemanticAction(Element * element){
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Content * newContent = calloc(1, sizeof(Content));
-	newContent->element = element;
-	newContent->type = ELEMENT;
-	return newContent;
-
-}
-
-Command * SimpleCommandSemanticAction(char * command){
-    _logSyntacticAnalyzerAction(__FUNCTION__);
-    Command * newCommand = calloc(1, sizeof(Command));
-    if (command != NULL) {
-        newCommand->simpleCommand = command;
-    } else {
-        newCommand->simpleCommand = NULL;
-        logError(_logger, "SimpleCommandSemanticAction received NULL command");
-    }
-    newCommand->type = SIMPLE;
-    return newCommand;
-}
-
 Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	logDebugging(_logger, "Matched parameterized command");
@@ -117,6 +95,15 @@ Text * TextSemanticAction(char * text){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Text * newText = calloc(1, sizeof(Text));
 	newText->text = text;
+	return newText;
+}
+
+Text * NewlineTextSemanticAction(){
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Text * newText = calloc(1, sizeof(Text));
+	newText->text = malloc(2);
+	newText->text[0] = '\n';
+	newText->text[1] = '\0';
 	return newText;
 }
 
@@ -177,12 +164,12 @@ LangtexCommand * LangtexContentListSemanticAction(LangtexParamList * parameters,
     return rowCommand;
 }
 
-LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftContent, Content *rightContent) {
+LangtexCommand * TranslateSemanticAction(LangtexParamList *parameters, Content *leftText, Content *rightText) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = parameters;
-	langtexCommand->leftContent = leftContent;
-	langtexCommand->rightContent = rightContent;
+	langtexCommand->leftText = leftText;
+	langtexCommand->rightText = rightText;
 	langtexCommand->type = LANGTEX_TRANSLATE;
 	return langtexCommand;
 }
@@ -207,11 +194,10 @@ LangtexCommand * LanguageSemanticAction( TextList * textList, LangtexCommandType
 	return langtexCommand;
 }
 
-LangtexCommand * FillSemanticAction(Text * text, LangtexCommandType type) {
+LangtexCommand * FillSemanticAction(LangtexCommandType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	LangtexCommand * langtexCommand = calloc(1, sizeof(LangtexCommand));
 	langtexCommand->parameters = NULL;
-	langtexCommand->text = text;
 	langtexCommand->type = type;
 	return langtexCommand;
 }

@@ -21,16 +21,16 @@ void shutdownBisonActionsModule();
 
  /* Latex semantic actions. */
 
- Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content);
- Content * AppendContentSemanticAction(Element * element, Content * content);
- Content * SingleContentSemanticAction(Element * element);
- Command * SimpleCommandSemanticAction(char * command);
- Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs);
- Command * EnvironmentCommandSemanticAction(Text * text, Content * params, ContentList * args, Content * content, Text * text2);
- Text * TextSemanticAction(char * text);
- Element * TextElementSemanticAction(Text * text);
- Element * CommandElementSemanticAction(Command * command);
-
+Program * ContentProgramSemanticAction(CompilerState * compilerState, Content * content);
+Content * AppendContentSemanticAction(Element * element, Content * content);
+//  Content * SingleContentSemanticAction(Element * element);
+//  Command * SimpleCommandSemanticAction(char * command);
+Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs);
+Command * EnvironmentCommandSemanticAction(Text * text, Content * params, ContentList * args, Content * content, Text * text2);
+Text * TextSemanticAction(char * text);
+Text * NewlineTextSemanticAction();
+Element * TextElementSemanticAction(Text * text);
+Element * CommandElementSemanticAction(Command * command);
 
   /* Langtex semantic actions. */
 
@@ -49,7 +49,7 @@ LangtexCommand * TranslateSemanticAction(LangtexParamList * parameters, Content 
 LangtexCommand * DialogSemanticAction(LangtexParamList * parameters, LangtexCommandList * langtexCommandList);
 LangtexCommand * ExerciseSemanticAction(LangtexParamList * parameters, LangtexCommand * commandPrompt, LangtexCommand *commandOptions, LangtexCommand * commandAnswers, LangtexCommandType type);
 LangtexCommand * LanguageSemanticAction(TextList * textList, LangtexCommandType type);
-LangtexCommand * FillSemanticAction(Text * text, LangtexCommandType type);
+LangtexCommand * FillSemanticAction(LangtexCommandType type);
 
 /* Langtex Parameter Type Actions */
 

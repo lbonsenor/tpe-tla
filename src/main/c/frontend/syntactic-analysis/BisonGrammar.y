@@ -21,6 +21,7 @@
 	Content * content;
 	ContentList * contentList;
 	TextList * textList;
+	OptionalNewline * optionalNewline;
 
 	/** Latex **/
 	Command * command; 
@@ -74,7 +75,6 @@
 %token <token> PROMPT_COMMAND
 %token <token> OPTIONS_COMMAND
 %token <token> ANSWER_COMMAND
-%token <token> LANGUAGE_COMMAND
 %token <token> BLOCK_COMMAND
 %token <token> FILL_COMMAND
 
@@ -84,6 +84,7 @@
 %token <token> CLOSE_PARENTHESIS
 %token <token> EQUAL
 %token <string> ARGS_PARAM
+%token <token> NEWLINE
 
 /** Param types **/
 %token <integer> INTEGER_PARAM
@@ -95,10 +96,10 @@
 %type <content> content
 %type <contentList> commandArgs
 %type <content> commandParams
-%type <textList> textArgs
 %type <element> element
 %type <command> command
 %type <text> text
+%type <optionalNewline> optionalNewline
 
 /** LaNgTeX Non-terminals **/
 %type <langtexCommand> langtexCommand speakerCommand rowCommand exercisePrompt exerciseOptions exerciseAnswer
@@ -137,24 +138,25 @@ element:
 	;
 
 commandArgs:
-	OPEN_BRACE content CLOSE_BRACE commandArgs						{ $$ = ContentListSemanticAction($2, $4); }
-	| %empty														{ $$ = NULL; }
-	;
-
-textArgs:
-	OPEN_BRACE text CLOSE_BRACE textArgs 							{ $$ = TextListSemanticAction($2, $4); }
+	OPEN_BRACE content CLOSE_BRACE commandArgs		{ $$ = ContentListSemanticAction($2, $4); }
 	| %empty														{ $$ = NULL; }
 	;
 
 text:
 	TEXT 															{ $$ = TextSemanticAction($1); }
+	| NEWLINE														{ $$ = NewlineTextSemanticAction(); }												
+	;
+
+optionalNewline:
+	NEWLINE optionalNewline											{ $$ = NULL; }
+	| %empty														{ $$ = NULL; }
 	;
 
 /* ============================= LATEX ============================= */
 
 command:
-	BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE commandParams commandArgs content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
-																	{ $$ = EnvironmentCommandSemanticAction($3, $5, $6, $7, $10); }
+	BEGIN_ENVIRONMENT optionalNewline OPEN_BRACE text CLOSE_BRACE commandParams commandArgs content END_ENVIRONMENT optionalNewline OPEN_BRACE text CLOSE_BRACE
+																	{ $$ = EnvironmentCommandSemanticAction($4, $6, $7, $8, $12); }
 	| COMMAND commandArgs
 																	{ $$ = ParameterizedCommandSemanticAction($1,$2); }
 	;
@@ -166,20 +168,18 @@ commandParams:
 /* ============================ LANGTEX ============================ */
 
 langtexCommand:
-	TRANSLATE_COMMAND parameters OPEN_BRACE content CLOSE_BRACE OPEN_BRACE content CLOSE_BRACE  
-																	{ $$ = TranslateSemanticAction($2, $4, $7); }
-	| DIALOG_COMMAND parameters OPEN_BRACE speakerCommands CLOSE_BRACE 
-																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_DIALOG); }
-	| TABLE_COMMAND parameters OPEN_BRACE rowCommands CLOSE_BRACE 
-																	{ $$ = LangtexCommandListSemanticAction($2, $4, LANGTEX_TABLE); }
-	| EXERCISE_COMMAND parameters OPEN_BRACE exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
-																	{ $$ = ExerciseSemanticAction($2, $4, $5, $6, LANGTEX_EXERCISE); }
-	| BLOCK_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
-																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_BLOCK); }
-	| LANGUAGE_COMMAND textArgs
-																	{ $$ = LanguageSemanticAction($2, LANGTEX_LANGUAGE); }
-	| FILL_COMMAND text
-																	{ $$ = FillSemanticAction($2, LANGTEX_FILL); }
+	TRANSLATE_COMMAND parameters optionalNewline OPEN_BRACE content CLOSE_BRACE optionalNewline OPEN_BRACE content CLOSE_BRACE  
+																	{ $$ = TranslateSemanticAction($2, $5, $9); }
+	| DIALOG_COMMAND parameters optionalNewline OPEN_BRACE optionalNewline speakerCommands CLOSE_BRACE
+																	{ $$ = LangtexCommandListSemanticAction($2, $6, LANGTEX_DIALOG); }
+	| TABLE_COMMAND parameters optionalNewline OPEN_BRACE optionalNewline rowCommands CLOSE_BRACE 
+																	{ $$ = LangtexCommandListSemanticAction($2, $6, LANGTEX_TABLE); }
+	| EXERCISE_COMMAND parameters optionalNewline OPEN_BRACE optionalNewline exercisePrompt exerciseOptions exerciseAnswer CLOSE_BRACE 
+																	{ $$ = ExerciseSemanticAction($2, $6, $7, $8, LANGTEX_EXERCISE); }
+	| BLOCK_COMMAND parameters optionalNewline OPEN_BRACE content CLOSE_BRACE
+																	{ $$ = LangtexSimpleContentSemanticAction($2, $5, LANGTEX_BLOCK); }
+	| FILL_COMMAND
+																	{ $$ = FillSemanticAction(LANGTEX_FILL); }
 	;
 
 parameters:
@@ -200,20 +200,20 @@ param:
   	;
 
 	/* ========================= EXERCISE ========================== */
-	exercisePrompt:
-		PROMPT_COMMAND parameters OPEN_BRACE content CLOSE_BRACE
-																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_PROMPT);}
+	exerciseAnswer:
+		ANSWER_COMMAND parameters commandArgs NEWLINE				{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_ANSWERS);}
 		;
-		
+
 	exerciseOptions:
-		OPTIONS_COMMAND parameters commandArgs 						{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_OPTIONS);}
+		OPTIONS_COMMAND parameters commandArgs NEWLINE 				{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_OPTIONS);}
 		| %empty													{ $$ = NULL; }
 		;
 
-	exerciseAnswer:
-		ANSWER_COMMAND parameters commandArgs						{ $$ = LangtexContentListSemanticAction($2,$3, LANGTEX_ANSWERS);}
+	exercisePrompt:
+		PROMPT_COMMAND parameters OPEN_BRACE content CLOSE_BRACE NEWLINE
+																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_PROMPT);}
 		;
-	
+		
 	/* ============================ ROW ============================ */
 	rowCommands:
 		rowCommand rowCommands 										{ $$ = AppendLangtexComand($1, $2); }
@@ -221,7 +221,7 @@ param:
 		;
 
 	rowCommand:
-		ROW_COMMAND parameters commandArgs							{ $$ = LangtexContentListSemanticAction($2, $3, LANGTEX_ROW); }
+		ROW_COMMAND parameters commandArgs NEWLINE							{ $$ = LangtexContentListSemanticAction($2, $3, LANGTEX_ROW); }
 		;
 
 	/* ========================== SPEAKER ========================== */
@@ -232,7 +232,7 @@ param:
 
 	
 	speakerCommand: 
-		SPEAKER_COMMAND parameters OPEN_BRACE content CLOSE_BRACE 
+		SPEAKER_COMMAND parameters OPEN_BRACE content CLOSE_BRACE NEWLINE
 																	{ $$ = LangtexSimpleContentSemanticAction($2, $4, LANGTEX_SPEAKER); }
 		;
 

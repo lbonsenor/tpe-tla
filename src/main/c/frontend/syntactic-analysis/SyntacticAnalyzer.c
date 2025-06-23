@@ -37,7 +37,6 @@ extern int yyparse(void);
 void yyerror(const char * string) {
 	LexicalAnalyzerContext * lexicalAnalyzerContext = createLexicalAnalyzerContext();
 	logError(_logger, "Syntax error (on line %d).", lexicalAnalyzerContext->line);
-	// TODO: agregue esto para evitar el leak - luego borrar este comentario!!! 
 	destroyLexicalAnalyzerContext(lexicalAnalyzerContext); 
 }
 

@@ -25,7 +25,6 @@
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 
-
 %%
 "[!translate]"                      { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), TRANSLATE_COMMAND); }
 "[!dialog]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), DIALOG_COMMAND); }
@@ -36,9 +35,8 @@
 "[!prompt]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), PROMPT_COMMAND); }
 "[!options]"                        { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), OPTIONS_COMMAND); }
 "[!answer]"                         { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), ANSWER_COMMAND); }
-"[!useLanguage]"                    { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), LANGUAGE_COMMAND); }
 "[!block]"                          { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), BLOCK_COMMAND);}
-"[!fill]"                           { BEGIN(LANGTEX); return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
+"[!fill]"                           { return LangtexCommandLexemeAction(createLexicalAnalyzerContext(), FILL_COMMAND); }
 
 \\[\\{}#\$%\^&_~\[\]]               { return TextLexemeAction(createLexicalAnalyzerContext()); }
 
@@ -49,7 +47,7 @@
 <PARAM>true|false					{ return ParameterLexemeAction(createLexicalAnalyzerContext(), BOOLEAN_PARAM); }
 <PARAM>[a-zA-Z_-]+                  { return ParameterLexemeAction(createLexicalAnalyzerContext(), ARGS_PARAM); }
 <LANGTEX>\(                         { BEGIN(PARAM); return ParenthesisLexemeAction(createLexicalAnalyzerContext(), OPEN_PARENTHESIS); }
-<PARAM>\)                           { BEGIN(INITIAL); return ParenthesisLexemeAction(createLexicalAnalyzerContext(), CLOSE_PARENTHESIS); }
+<PARAM>\)                           { BEGIN(LANGTEX); return ParenthesisLexemeAction(createLexicalAnalyzerContext(), CLOSE_PARENTHESIS); }
 <PARAM>.                            { return UnknownLexemeAction(createLexicalAnalyzerContext()); } 
 
 "\\begin"                           { return BeginCommandLexemeAction(createLexicalAnalyzerContext()); }
@@ -65,11 +63,18 @@
 
 "%"[^\n]*                           { CommentLexemeAction(createLexicalAnalyzerContext());}
 
-[[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-[^\\{}#\$%\^_~\[\]]+               { return TextLexemeAction(createLexicalAnalyzerContext()); }
+\n                                  { return NEWLINE; }
+
+[ \t\r]+                            { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
+
+[^\\{}#\$%\^_~\[\]\n]+              { return TextLexemeAction(createLexicalAnalyzerContext()); }
+
+
 
 .									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
 %%
 
+
 #include "FlexExport.h"
+

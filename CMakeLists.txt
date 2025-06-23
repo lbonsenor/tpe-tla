@@ -55,7 +55,9 @@ endif ()
 # Defines the entry-point of the application, and the source-codes (*.c extension).
 # The header files (*.h extension), are automatically included from the source-codes.
 add_executable(Compiler
-	# src/main/c/backend/code-generation/Generator.c
+	src/main/c/backend/code-generation/Generator.c
+	src/main/c/backend/domain-specific/SemanticAnalyzer.c
+	src/main/c/shared/SymbolTable.c
 	# src/main/c/backend/domain-specific/Calculator.c
 	src/main/c/EntryPoint.c
 	src/main/c/frontend/lexical-analysis/FlexActions.c
@@ -70,6 +72,11 @@ add_executable(Compiler
 	src/main/c/shared/String.c
 	# Add more *.c files if needed (otherwise, they won't be compiled).
 	src/main/c/frontend/syntactic-analysis/LangTeXAST.c
+	# Romanizers
+	src/main/c/backend/romanizers/hangul.c
+	src/main/c/backend/romanizers/hebrew.c
+	src/main/c/backend/romanizers/russian.c
+	src/main/c/backend/romanizers/romanize.c
 )
 
 # Link final project and libraries.

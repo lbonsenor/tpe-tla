@@ -22,8 +22,8 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
     if (langtexCommand != NULL){
         switch (langtexCommand->type) {
             case LANGTEX_TRANSLATE:
-                releaseContent(langtexCommand->rightContent);
-                releaseContent(langtexCommand->leftContent);
+                releaseContent(langtexCommand->rightText);
+                releaseContent(langtexCommand->leftText);
                 releaseParamList(langtexCommand->parameters); 
                 break;
             case LANGTEX_DIALOG:
@@ -53,8 +53,6 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
                 releaseTextList(langtexCommand->textList);
                 releaseParamList(langtexCommand->parameters);
                 break;
-            case LANGTEX_FILL:
-                releaseText(langtexCommand->text);
             default:
                 break;
         }
@@ -99,9 +97,9 @@ void releaseParamList(LangtexParamList * list) {
 void releaseCommand(Command * command){
     if (command != NULL){
         switch (command->type) {
-            case SIMPLE:
-                free(command->simpleCommand);
-                break;
+            // case SIMPLE:
+            //     free(command->simpleCommand);
+            //     break;
             case PARAMETERIZED:
                 free(command->parameterizedCommand);
                 releaseContentList(command->parameterizedContentList);
@@ -165,9 +163,9 @@ void releaseElement(Element * element){
 void releaseContent(Content * content){
     if (content != NULL){
         switch (content->type) {
-            case ELEMENT:
-                releaseElement(content->element);
-                break;
+            // case ELEMENT:
+            //     releaseElement(content->element);
+            //     break;
             case SEQUENCE:
                 releaseElement(content->sequenceElement);
                 releaseContent(content->sequenceContent);

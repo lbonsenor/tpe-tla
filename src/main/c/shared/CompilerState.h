@@ -7,8 +7,9 @@
  * The general status of a compilation.
 */
 typedef enum {
-	SUCCEED = 0,
-	FAILED = 1
+    SUCCEED = 0,
+    FAILED = 1,
+    FAILED_WITH_WARNINGS = 2
 } CompilationStatus;
 
 /**
@@ -23,12 +24,12 @@ typedef struct {
 	boolean succeed;
 
 	// TODO: Add an stack to handle nested scopes.
-	// TODO: Add a symbol table.
+	// TODO: Add symbols stack.
 	// TODO: Add configuration.
 	// TODO: ...
 
 	// The computed value of the entire program (only for the calculator).
-	int value;
+	// int value;
 } CompilerState;
 
 #endif
