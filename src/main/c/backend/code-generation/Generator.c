@@ -248,10 +248,6 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     _start_buffering();
     _generateContent(level, command->leftText);
     char *left_content = _stop_buffering();
-
-    // _start_buffering();
-    // _generateContent(level, command->rightText);
-    // char *right_content = _stop_buffering();
     char *language = _checkTranslateParam(command->parameters);
     if (!language)
     {
@@ -264,23 +260,15 @@ static void _generateTranslateCommand(unsigned int level, LangtexCommand *comman
     {
         logError(_logger, "Failed to romanize the word: %s", left_content);
         free(left_content);
-        // free(right_content);
         return;
     }
 
     _output(level, "\\rom[");
-    _generateContent(level, command->rightText); // right content
+    _generateContent(level, command->rightText);
     _output(level, "]{%s}{%s}", left_content, romanizedWord);
-    
-           
-    // _output(level, "\\rom[%s]{%s}{%s}",
-    //         right_content,  // translation
-    //         left_content,   // caracteres especiales 안녕하세요
-    //         romanizedWord!=NULL? romanizedWord : "this is null!! " ); // romanizacion
 
     free(romanizedWord);
     free(left_content);
-    // free(right_content);
 }
 
 static void _generateSpeakerCommand(unsigned int level, LangtexCommand *command)
@@ -488,10 +476,8 @@ static void _generateAnswersCommand(unsigned int level, LangtexCommand *answersC
 static void _generateFillCommand(unsigned int level, LangtexCommand *command)
 {
     _output(level, "\\fillLine ");
-    // TODO: look at fill later in bison grammar
 }
 
-// TODO: change to LATEX format
 static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
 {
     if (!command)
@@ -525,12 +511,6 @@ static void _generateLangtexCommand(unsigned int level, LangtexCommand *command)
     case LANGTEX_FILL:
         _generateFillCommand(level, command);
         break;
-    // case LANGTEX_ANSWERS:
-    //     _generateAnswersCommand(level, command, char *options[], int arraySize);
-    //     break;
-    // case LANGTEX_OPTIONS:
-    //     _generateptionsCommand(level, command);
-    //     break;
     default:
         _output(level, "%% Unsupported command type: %d\\n", command->type);
     }
@@ -563,20 +543,6 @@ static char *_indentation(const unsigned int level)
  * allows to see the output even close to a failure, because it drops the
  * buffering.
  */
-// static void _output(const unsigned int indentationLevel, const char * const format, ...) {
-// 	va_list arguments;
-// 	va_start(arguments, format);
-// 	char * indentation = _indentation(indentationLevel);
-// 	char * effectiveFormat = concatenate(2, indentation, format);
-// 	vfprintf(stdout, effectiveFormat, arguments);
-// 	fflush(stdout);
-// 	free(effectiveFormat);
-// 	free(indentation);
-// 	va_end(arguments);
-// }
-
-/**  */
-
 // Funciones para manejar el buffer
 static void _start_buffering()
 {
@@ -608,17 +574,14 @@ static void _output(const unsigned int indentationLevel, const char *const forma
 
     if (_use_buffer && _output_buffer)
     {
-        // Modo buffer: escribir al string
         char *indentation = _indentation(indentationLevel);
         char *effectiveFormat = concatenate(2, indentation, format);
 
-        // Calcular el tamaño necesario
         va_list args_copy;
         va_copy(args_copy, arguments);
         int needed_chars = vsnprintf(NULL, 0, effectiveFormat, args_copy);
         va_end(args_copy);
 
-        // Redimensionar buffer si es necesario
         size_t needed_size = _buffer_pos + needed_chars + 1;
         if (needed_size > _buffer_size)
         {
@@ -630,7 +593,6 @@ static void _output(const unsigned int indentationLevel, const char *const forma
             }
         }
 
-        // Escribir al buffer
         if (_output_buffer)
         {
             vsprintf(_output_buffer + _buffer_pos, effectiveFormat, arguments);
@@ -677,9 +639,8 @@ void generate(char * outputDir, char * fileName, bool isInput, CompilerState *co
         char* preambleLinkPath = malloc(strlen(outputDir) + strlen("/preamble.tex") + 1);
         sprintf(preambleLinkPath, "%s/preamble.tex", outputDir);
 
-        unlink(preambleLinkPath); // si ya existia, lo borra 
+        unlink(preambleLinkPath);
 
-        // Crear nuevo symlink (path relativo desde outputDir)
         const char* preambleSource = "../references/preamble.tex";
         if (symlink(preambleSource, preambleLinkPath) == -1) {
             logError(_logger, "Failed to create preamble symlink: %s -> %s", preambleLinkPath, preambleSource);
@@ -688,8 +649,6 @@ void generate(char * outputDir, char * fileName, bool isInput, CompilerState *co
         }
         
         free(preambleLinkPath);
-
-        // Make path for output file
 
         size_t len = strlen(outputDir);
         bool needs_slash = (len > 0 && outputDir[len - 1] != '/');
@@ -731,51 +690,5 @@ void generate(char * outputDir, char * fileName, bool isInput, CompilerState *co
 
     logDebugging(_logger, "Generation is done.");
     free(outputPath);
-
-    // if (outputDir != NULL) {
-    //     size_t len = strlen(outputDir);
-    //     bool needs_slash = (len > 0 && outputDir[len - 1] != '/');
-    //     outputPath = malloc(strlen(outputDir) + strlen(fileName) + 2); // +1 for '/' or '\0', +1 for '\0'
-
-    //     if (outputPath == NULL) {
-    //         logError(_logger, "Memory allocation failed for outputPath.");
-    //         return;
-    //     }
-    //     sprintf(outputPath, "%s%s%s", outputDir, needs_slash ? "/" : "", fileName);
-
-    //     FILE *fd = fopen(outputPath, "w");
-    //     if (fd == NULL) {
-    //         logError(_logger, "Could not create/open file: %s", outputPath);
-    //         if (!outputPath) free(outputPath);
-    //         return;
-    //     }
-        
-    //     logDebugging(_logger, "Generating LaNgTeX output to file: %s", outputPath);
-        
-    //     // Save original stdout and redirect to file
-    //     original_stdout = stdout;
-    //     stdout = fd;
-    // } else {
-    //     logDebugging(_logger, "Generating LaNgTeX output to stdout");
-    // }
-
-    // // Generate the content
-    // if (!isInput) _generatePrologue();
-    // _generateProgram(compilerState->abstractSyntaxtTree);
-    // if (!isInput) _generateEpilogue();
-
-    // // Restore stdout if we redirected it
-    // if (outputDir != NULL && original_stdout != NULL) {
-    //     FILE *fd = stdout;
-    //     stdout = original_stdout;
-        
-    //     if (fclose(fd) != 0) {
-    //         logError(_logger, "Error while losing file");
-    //     }
-        
-    // }
-
-    // logDebugging(_logger, "Generation is done.");
-    // free(outputPath);
 
 }

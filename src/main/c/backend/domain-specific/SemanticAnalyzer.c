@@ -60,14 +60,11 @@ static boolean validateLangtexContent(Content *content)
 
     if (content->type == SEQUENCE)
     {
-        if (!validateLangtexElement(content->sequenceElement)) {
+        if (!validateLangtexElement(content->sequenceElement))
+        {
             return false;
         }
         return validateLangtexContent(content->sequenceContent);
-    }
-    else if (content->type == ELEMENT)
-    {
-        return validateLangtexElement(content->sequenceElement);
     }
 
     logError(_logger, "[!speaker] unexpected content type: %d", content->type);
@@ -159,9 +156,6 @@ static boolean validateLatexInContent(Content *content)
         return true;
     switch (content->type)
     {
-    case ELEMENT:
-        return validateLatexInElement(content->sequenceElement);
-        break;
     case SEQUENCE:
         if (!validateLatexInElement(content->sequenceElement))
         {
@@ -195,7 +189,7 @@ static boolean validateLatexInElement(Element *element)
         return false;
         break;
     }
-    return true; 
+    return true;
 }
 
 /* HELPER FUNCTIONS FOR EXERCISE COMMAND */
@@ -219,7 +213,7 @@ static boolean validatePromptContent(Content *content)
         }
         return validatePromptContent(content->sequenceContent);
     }
-    else if (content->type == ELEMENT)
+    else 
     {
         if (content->sequenceElement->type == LANGTEX_COMMAND && content->sequenceElement->langtexCommand->type == LANGTEX_FILL)
         {
@@ -312,8 +306,7 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
         ContentList *current = answers->contentList;
         while (current)
         {
-            logDebugging(_logger, "[!exercise] content type is: %s", current->content->type == ELEMENT ? "ELEMENT" : "SEQUENCE");
-            if (current->content->sequenceContent!=NULL && current->content->sequenceElement->type != LATEX_TEXT)
+            if (current->content->sequenceContent != NULL && current->content->sequenceElement->type != LATEX_TEXT)
             {
                 logError(_logger, "[!exercise] answers must be plain text");
                 return false;
@@ -334,7 +327,7 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
             }
             current = current->next;
         }
-        
+
         return true; // All answers are valid
     }
 
@@ -346,11 +339,6 @@ static boolean validateMultipleChoiceExercise(LangtexCommand *prompt, LangtexCom
 
 SemanticAnalysisStatus analyzeProgram(Program *program)
 {
-    if (!program || !program->content)
-    {
-        logWarning(_logger, "Empty program");
-    }
-
     logDebugging(_logger, "Starting semantic analysis");
     return analyzeContent(program->content);
 }
@@ -392,7 +380,7 @@ SemanticAnalysisStatus analyzeElement(Element *element)
     {
     case LANGTEX_COMMAND:
         return analyzeLangtexCommand(element->langtexCommand);
-    
+
         // all LATEX commands are accepted -> they will be checked by latex
     case LATEX_COMMAND:
     case LATEX_TEXT:

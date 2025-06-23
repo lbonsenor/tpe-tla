@@ -38,7 +38,7 @@ typedef struct LangtexCommandList LangtexCommandList;
  * Node types for the Abstract Syntax Tree (AST).
  */
 enum ContentType {
-    ELEMENT,
+    // ELEMENT,
     SEQUENCE
 };
 
@@ -85,11 +85,11 @@ struct LangtexCommand{
         Content * leftText;
         Content * rightText;
     };
-    // Usage: dialog, hebrew_table
+    // Usage: dialog
     struct {
         LangtexCommandList * langtexCommandList;
     };
-    // Usage: speaker,prompt
+    // Usage: speaker, prompt
     struct {
         Content * content;
     };
@@ -107,10 +107,6 @@ struct LangtexCommand{
     // Usage: language
     struct {
         TextList * textList;
-    };
-    // Usage: fill
-    struct {
-        Text * text;
     };
    };
    LangtexCommandType type;
@@ -184,12 +180,6 @@ struct TextList{
 
 struct Command{
     union{
-        // \command
-		// struct {
-		// 	char * simpleCommand;
-		// };
-
-        // \begin{...}...\end{...} -> environment
         struct {
             Text * environmentLeftText;
             Content * environmentParameters;
@@ -197,7 +187,6 @@ struct Command{
             Content * environmentContent;
         };
 
-        // \command{...} -> parameterized
         struct {
             char * parameterizedCommand;
             ContentList * parameterizedContentList;

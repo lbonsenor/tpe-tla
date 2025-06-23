@@ -58,29 +58,6 @@ Content * AppendContentSemanticAction(Element * element, Content * content){
 	return newContent;
 }
 
-//singleElement
-// Content * SingleContentSemanticAction(Element * element){
-// 	_logSyntacticAnalyzerAction(__FUNCTION__);
-// 	Content * newContent = calloc(1, sizeof(Content));
-// 	newContent->element = element;
-// 	newContent->type = ELEMENT;
-// 	return newContent;
-
-// }
-
-// Command * SimpleCommandSemanticAction(char * command){
-//     _logSyntacticAnalyzerAction(__FUNCTION__);
-//     Command * newCommand = calloc(1, sizeof(Command));
-//     if (command != NULL) {
-//         newCommand->simpleCommand = command;
-//     } else {
-//         newCommand->simpleCommand = NULL;
-//         logError(_logger, "SimpleCommandSemanticAction received NULL command");
-//     }
-//     newCommand->type = SIMPLE;
-//     return newCommand;
-// }
-
 Command * ParameterizedCommandSemanticAction(char * command, ContentList * commandArgs){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	logDebugging(_logger, "Matched parameterized command");

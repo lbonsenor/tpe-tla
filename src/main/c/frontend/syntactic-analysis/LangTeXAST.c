@@ -53,8 +53,6 @@ void releaseLangtexCommand(LangtexCommand * langtexCommand){
                 releaseTextList(langtexCommand->textList);
                 releaseParamList(langtexCommand->parameters);
                 break;
-            case LANGTEX_FILL:
-                releaseText(langtexCommand->text);
             default:
                 break;
         }

@@ -11,14 +11,14 @@ Un compilador que convierte archivos LaNgTeX a LaTeX, facilitando la generación
 > - `Fernando LI` | <feli@itba.edu.ar> | Legajo `64382`
 > - `Matias RINALDO` | <mrinaldo@itba.edu.ar> | Legajo `60357`
 
-## 🔧 Prerrequisitos
+## Prerrequisitos
 
 Antes de comenzar, asegúrate de tener instalado:
 
 - [Docker](https://www.docker.com/get-started) (versión 20.10 o superior)
 - [Git](https://git-scm.com/downloads) (versión 2.25 o superior)
 
-## 🚀 Instalación
+## Instalación
 
 ### ① Clonar el Repositorio
 
